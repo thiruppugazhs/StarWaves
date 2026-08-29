@@ -1,0 +1,53 @@
+/* Eve UI Overrides — runtime injected overrides sit above tokens */
+.eve-ui-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-overlay);
+  box-shadow: var(--shadow-lg);
+  font-size: 13px;
+  line-height: 1;
+  animation: eve-ui-banner-in 180ms ease;
+}
+
+@keyframes eve-ui-banner-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.eve-ui-banner strong { font-weight: 600; }
+.eve-ui-banner-actions { display: flex; gap: 6px; margin-left: 6px; }
+.eve-ui-banner-btn {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: var(--radius-full);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.eve-ui-banner-btn:hover { background: var(--bg-hover); }
+.eve-ui-banner-close {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 999px;
+}
+.eve-ui-banner-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* Hide/show hook for Eve visibility tool */
+[data-eve-target] { transition: opacity var(--transition-fast), display var(--transition-fast); }
+
+/* Guard: ensure injected style tags never cause layout shift */
+style#eve-ui-global, style[id^="eve-ui-page-"] { display: none !important; }

@@ -1,0 +1,16 @@
+{
+  "name": "StarWaves Workspace",
+  "short_name": "StarWaves",
+  "description": "Productivity, competitive coding, hackathons, job tracking, and team workspace",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/starwaves-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

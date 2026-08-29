@@ -1,0 +1,29 @@
+/* OLED Pitch Black - Ultra dark #000000 background for max contrast */
+html.oled-theme {
+  --bg-primary: #000000;
+  --bg-secondary: #050505;
+  --bg-tertiary: #0d0d0d;
+  --bg-card: #0a0a0a;
+  --bg-card-hover: #141414;
+  --bg-hover: #181818;
+  --bg-overlay: #0a0a0a;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b8;
+  --text-muted: #757580;
+  --text-inverse: #000000;
+  --color-primary: #ffffff;
+  --color-primary-hover: #e6e6e6;
+  --color-primary-light: #1f1f1f;
+  --color-accent: #ffffff;
+  --border-color: #222226;
+  --border-light: #17171a;
+  --border-heavy: #44444c;
+  --border-focus: #888896;
+  --scrollbar-track: #050505;
+  --scrollbar-thumb: #44444c;
+  --scrollbar-thumb-hover: #888896;
+  --color-success: #ffffff;
+  --color-warning: #aaaaaa;
+  --color-danger: #ffffff;
+  --color-purple: #cccccc;
+}

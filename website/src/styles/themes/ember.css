@@ -1,0 +1,29 @@
+/* Ember Blaze - Charred umber black with blazing tangerine accent */
+html.ember-theme {
+  --bg-primary: #1a110b;
+  --bg-secondary: #241810;
+  --bg-tertiary: #2f2016;
+  --bg-card: #261b13;
+  --bg-card-hover: #342619;
+  --bg-hover: #412f1f;
+  --bg-overlay: #261b13;
+  --text-primary: #fff7ed;
+  --text-secondary: #fed7aa;
+  --text-muted: #fdba74;
+  --text-inverse: #1a110b;
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
+  --color-primary-light: #431407;
+  --color-accent: #fb923c;
+  --border-color: #3d2a18;
+  --border-light: #2c1e12;
+  --border-heavy: #5a3a20;
+  --border-focus: #f97316;
+  --scrollbar-track: #241810;
+  --scrollbar-thumb: #5a3a20;
+  --scrollbar-thumb-hover: #f97316;
+  --color-success: #f97316;
+  --color-warning: #fb923c;
+  --color-danger: #ea580c;
+  --color-purple: #fdba74;
+}

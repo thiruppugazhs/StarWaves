@@ -1,0 +1,67 @@
+/* WaveLoader - full-screen StarWaves loading state */
+
+.wave-loader {
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 24px 16px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.wave-loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.wave-loader-title {
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.wave-loader-label {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.wave-loader-progress {
+  position: relative;
+  width: clamp(200px, 56vw, 260px);
+  height: 6px;
+  margin: 6px 0;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+}
+
+.wave-loader-progress-bar {
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-primary);
+  animation: wave-loader-progress-slide 1.4s ease-in-out infinite;
+}
+
+@keyframes wave-loader-progress-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-loader-progress-bar {
+    animation: none;
+  }
+}

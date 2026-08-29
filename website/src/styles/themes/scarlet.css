@@ -1,0 +1,29 @@
+/* Scarlet Noir - Noir burgundy base with crimson fire */
+html.scarlet-theme {
+  --bg-primary: #1a0c13;
+  --bg-secondary: #28121c;
+  --bg-tertiary: #3a1a28;
+  --bg-card: #2e1422;
+  --bg-card-hover: #3f1a2e;
+  --bg-hover: #4f2038;
+  --bg-overlay: #2e1422;
+  --text-primary: #fff1f2;
+  --text-secondary: #fecdd3;
+  --text-muted: #fda4af;
+  --text-inverse: #1a0c13;
+  --color-primary: #ef4444;
+  --color-primary-hover: #dc2626;
+  --color-primary-light: #450a0a;
+  --color-accent: #f87171;
+  --border-color: #4a1e32;
+  --border-light: #321522;
+  --border-heavy: #6b2a44;
+  --border-focus: #ef4444;
+  --scrollbar-track: #28121c;
+  --scrollbar-thumb: #6b2a44;
+  --scrollbar-thumb-hover: #ef4444;
+  --color-success: #ef4444;
+  --color-warning: #f87171;
+  --color-danger: #dc2626;
+  --color-purple: #fda4af;
+}

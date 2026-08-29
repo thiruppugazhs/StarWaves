@@ -1,0 +1,29 @@
+/* Aurum Obsidian - Graphite night veil with gilded amber */
+html.aurum-theme {
+  --bg-primary: #13110e;
+  --bg-secondary: #1c1913;
+  --bg-tertiary: #28231a;
+  --bg-card: #1e1b15;
+  --bg-card-hover: #2e2a1e;
+  --bg-hover: #3a3426;
+  --bg-overlay: #1e1b15;
+  --text-primary: #fffbeb;
+  --text-secondary: #fde68a;
+  --text-muted: #fcd34d;
+  --text-inverse: #13110e;
+  --color-primary: #f59e0b;
+  --color-primary-hover: #d97706;
+  --color-primary-light: #451a03;
+  --color-accent: #fbbf24;
+  --border-color: #332e20;
+  --border-light: #251f15;
+  --border-heavy: #4a3f28;
+  --border-focus: #f59e0b;
+  --scrollbar-track: #1c1913;
+  --scrollbar-thumb: #4a3f28;
+  --scrollbar-thumb-hover: #f59e0b;
+  --color-success: #f59e0b;
+  --color-warning: #fbbf24;
+  --color-danger: #d97706;
+  --color-purple: #fcd34d;
+}

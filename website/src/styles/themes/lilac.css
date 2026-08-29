@@ -1,0 +1,29 @@
+/* Lilac Dream - Lavender mist haze with orchid bloom */
+html.lilac-theme {
+  --bg-primary: #fdf4ff;
+  --bg-secondary: #fae8ff;
+  --bg-tertiary: #f5d0fe;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fdf4ff;
+  --bg-hover: #f5d0fe;
+  --bg-overlay: #ffffff;
+  --text-primary: #3b0764;
+  --text-secondary: #6b21a8;
+  --text-muted: #7e22ce;
+  --text-inverse: #fdf4ff;
+  --color-primary: #a855f7;
+  --color-primary-hover: #9333ea;
+  --color-primary-light: #fae8ff;
+  --color-accent: #c084fc;
+  --border-color: #f5d0fe;
+  --border-light: #fae8ff;
+  --border-heavy: #e9a5f9;
+  --border-focus: #a855f7;
+  --scrollbar-track: #fae8ff;
+  --scrollbar-thumb: #e9a5f9;
+  --scrollbar-thumb-hover: #a855f7;
+  --color-success: #a855f7;
+  --color-warning: #c084fc;
+  --color-danger: #9333ea;
+  --color-purple: #e9a5f9;
+}

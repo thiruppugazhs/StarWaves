@@ -1,0 +1,29 @@
+/* Fog Grey - Cool light grey theme with soft misty surfaces */
+html.fog-theme {
+  --bg-primary: #f5f6f7;
+  --bg-secondary: #eceef0;
+  --bg-tertiary: #e2e5e8;
+  --bg-card: #fafbfc;
+  --bg-card-hover: #f0f2f4;
+  --bg-hover: #e2e5e8;
+  --bg-overlay: #fafbfc;
+  --text-primary: #1f2429;
+  --text-secondary: #4a535c;
+  --text-muted: #6f7a85;
+  --text-inverse: #fafbfc;
+  --color-primary: #232a31;
+  --color-primary-hover: #14181d;
+  --color-primary-light: #e5e9ed;
+  --color-accent: #4a535c;
+  --border-color: #e2e5e8;
+  --border-light: #eaedf0;
+  --border-heavy: #aeb8c2;
+  --border-focus: #4a535c;
+  --scrollbar-track: #eceef0;
+  --scrollbar-thumb: #aeb8c2;
+  --scrollbar-thumb-hover: #232a31;
+  --color-success: #232a31;
+  --color-warning: #6f7a85;
+  --color-danger: #232a31;
+  --color-purple: #6f7a85;
+}

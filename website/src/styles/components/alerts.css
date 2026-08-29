@@ -1,0 +1,94 @@
+/* Alert Component Styles */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.45;
+  transition: all var(--transition-fast, 0.18s ease);
+}
+
+.alert-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.alert-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.alert-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.alert-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.alert-body p {
+  margin: 0;
+}
+
+.alert-dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 3px;
+  margin: -2px -4px 0 0;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.alert-dismiss:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.alert-dismiss:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 1px;
+}
+
+/* Monochrome Alert Variants */
+.alert-error {
+  background: var(--bg-surface, #121214);
+  border-color: var(--text-primary, #ffffff);
+}
+
+.alert-warning {
+  background: var(--bg-surface, #121214);
+  border-color: var(--border-heavy, #71717a);
+}
+
+.alert-success {
+  background: var(--bg-surface, #121214);
+  border-color: var(--border-color, #27272a);
+}
+
+.alert-info {
+  background: var(--bg-surface, #121214);
+  border-color: var(--border-color, #27272a);
+}

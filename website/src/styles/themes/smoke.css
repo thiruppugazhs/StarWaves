@@ -1,0 +1,29 @@
+/* Smoke Grey - Deep neutral grey theme with soft charcoal surfaces */
+html.smoke-theme {
+  --bg-primary: #0f1114;
+  --bg-secondary: #171a1e;
+  --bg-tertiary: #21252b;
+  --bg-card: #1a1e23;
+  --bg-card-hover: #24282f;
+  --bg-hover: #2e333b;
+  --bg-overlay: #1a1e23;
+  --text-primary: #eceef0;
+  --text-secondary: #b0b6bd;
+  --text-muted: #7e8790;
+  --text-inverse: #0f1114;
+  --color-primary: #e6e9eb;
+  --color-primary-hover: #ffffff;
+  --color-primary-light: #2a2f37;
+  --color-accent: #c0c6cc;
+  --border-color: #2a2f37;
+  --border-light: #1f232a;
+  --border-heavy: #454c55;
+  --border-focus: #7e8790;
+  --scrollbar-track: #171a1e;
+  --scrollbar-thumb: #454c55;
+  --scrollbar-thumb-hover: #7e8790;
+  --color-success: #e6e9eb;
+  --color-warning: #9aa3ac;
+  --color-danger: #e6e9eb;
+  --color-purple: #b0b6bd;
+}

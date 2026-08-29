@@ -1,0 +1,29 @@
+/* Silver Mist - Light silvery grey theme with a polished metal feel */
+html.silver-theme {
+  --bg-primary: #eef0f2;
+  --bg-secondary: #e3e6e9;
+  --bg-tertiary: #d7dbdf;
+  --bg-card: #f4f6f7;
+  --bg-card-hover: #e9ecee;
+  --bg-hover: #d7dbdf;
+  --bg-overlay: #f4f6f7;
+  --text-primary: #2b3035;
+  --text-secondary: #586068;
+  --text-muted: #7c858e;
+  --text-inverse: #f4f6f7;
+  --color-primary: #2f363d;
+  --color-primary-hover: #1c2126;
+  --color-primary-light: #dfe3e6;
+  --color-accent: #586068;
+  --border-color: #d7dbdf;
+  --border-light: #e0e4e7;
+  --border-heavy: #a6aeb5;
+  --border-focus: #586068;
+  --scrollbar-track: #e3e6e9;
+  --scrollbar-thumb: #a6aeb5;
+  --scrollbar-thumb-hover: #2f363d;
+  --color-success: #2f363d;
+  --color-warning: #7c858e;
+  --color-danger: #2f363d;
+  --color-purple: #7c858e;
+}

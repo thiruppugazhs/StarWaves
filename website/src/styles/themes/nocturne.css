@@ -1,0 +1,29 @@
+/* Nocturne Violet - Ink plum darkness with electric violet */
+html.nocturne-theme {
+  --bg-primary: #120e1c;
+  --bg-secondary: #1a1428;
+  --bg-tertiary: #261e3a;
+  --bg-card: #1d1630;
+  --bg-card-hover: #2a2044;
+  --bg-hover: #342856;
+  --bg-overlay: #1d1630;
+  --text-primary: #f5f3ff;
+  --text-secondary: #ddd6fe;
+  --text-muted: #c4b5fd;
+  --text-inverse: #120e1c;
+  --color-primary: #8b5cf6;
+  --color-primary-hover: #7c3aed;
+  --color-primary-light: #2e1065;
+  --color-accent: #a78bfa;
+  --border-color: #2e234a;
+  --border-light: #211836;
+  --border-heavy: #43306e;
+  --border-focus: #8b5cf6;
+  --scrollbar-track: #1a1428;
+  --scrollbar-thumb: #43306e;
+  --scrollbar-thumb-hover: #8b5cf6;
+  --color-success: #8b5cf6;
+  --color-warning: #7c3aed;
+  --color-danger: #6d28d9;
+  --color-purple: #a78bfa;
+}

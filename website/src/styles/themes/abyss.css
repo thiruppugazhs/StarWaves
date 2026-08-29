@@ -1,0 +1,29 @@
+/* Abyss Teal - Deep abyss black with luminous cyan accent */
+html.abyss-theme {
+  --bg-primary: #061417;
+  --bg-secondary: #0a1f24;
+  --bg-tertiary: #112e35;
+  --bg-card: #0c2530;
+  --bg-card-hover: #143642;
+  --bg-hover: #184252;
+  --bg-overlay: #0c2530;
+  --text-primary: #e0fffe;
+  --text-secondary: #8de8e6;
+  --text-muted: #5ccfcf;
+  --text-inverse: #061417;
+  --color-primary: #06b6d4;
+  --color-primary-hover: #0891b2;
+  --color-primary-light: #0a2e36;
+  --color-accent: #22d3ee;
+  --border-color: #143642;
+  --border-light: #0e2b33;
+  --border-heavy: #1d5563;
+  --border-focus: #06b6d4;
+  --scrollbar-track: #0a1f24;
+  --scrollbar-thumb: #1d5563;
+  --scrollbar-thumb-hover: #06b6d4;
+  --color-success: #06b6d4;
+  --color-warning: #0891b2;
+  --color-danger: #0e7490;
+  --color-purple: #22d3ee;
+}

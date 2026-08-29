@@ -1,0 +1,8 @@
+{
+  "appId": "com.starwaves.app",
+  "appName": "StarWaves",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -1,0 +1,22 @@
+# GHCR backend-only overlay — single image, no website.
+# Image built by .github/workflows/docker-backend.yml:
+#   ghcr.io/susin-d/dashboard-backend:latest  (and alias ghcr.io/susin-d/dashboard:latest)
+#
+# Usage:
+#   docker login ghcr.io -u susin-d
+#   TAG=latest docker compose -f docker-compose.yml -f docker-compose.backend.yml -f docker-compose.ghcr.backend.yml up -d
+#   curl -i http://localhost:8000/api/v1/health
+#   curl -i http://localhost/health
+#
+services:
+  server:
+    image: ghcr.io/susin-d/dashboard-backend:${TAG:-latest}
+    # keep build as fallback for local dev without GHCR
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+  whatsapp-worker:
+    image: ghcr.io/susin-d/dashboard-whatsapp-worker:${TAG:-latest}
+    build:
+      context: ./services/whatsapp-worker
+      dockerfile: Dockerfile

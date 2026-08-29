@@ -1,0 +1,42 @@
+{
+  "productName": "Starwaves",
+  "version": "0.1.0",
+  "identifier": "app.starwaves.workspace",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "title": "Starwaves",
+    "windows": [
+      {
+        "title": "Starwaves",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "plugins": {
+    "fs": {
+      "scope": {
+        "allow": ["**"],
+        "deny": []
+      }
+    },
+    "shell": {
+      "open": true,
+      "scope": []
+    },
+    "dialog": {
+      "open": true,
+      "save": true
+    }
+  }
+}

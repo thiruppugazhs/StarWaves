@@ -1,0 +1,9 @@
+.git
+.gitignore
+.vscode
+.idea
+website/node_modules
+website/dist
+server/__pycache__
+server/.venv
+services/whatsapp-worker/data

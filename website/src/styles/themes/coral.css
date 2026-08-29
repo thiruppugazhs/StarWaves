@@ -1,0 +1,29 @@
+/* Coral Dawn - Warm seashell white with coral rose pop */
+html.coral-theme {
+  --bg-primary: #fffbf7;
+  --bg-secondary: #fff1f0;
+  --bg-tertiary: #ffe4e0;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fff1f2;
+  --bg-hover: #ffe4e6;
+  --bg-overlay: #ffffff;
+  --text-primary: #4c0519;
+  --text-secondary: #881337;
+  --text-muted: #be123c;
+  --text-inverse: #fffbf7;
+  --color-primary: #f43f5e;
+  --color-primary-hover: #e11d48;
+  --color-primary-light: #ffe4e6;
+  --color-accent: #fb7185;
+  --border-color: #fecdd3;
+  --border-light: #ffe4e6;
+  --border-heavy: #fda4af;
+  --border-focus: #f43f5e;
+  --scrollbar-track: #fff1f0;
+  --scrollbar-thumb: #fda4af;
+  --scrollbar-thumb-hover: #f43f5e;
+  --color-success: #f43f5e;
+  --color-warning: #fb7185;
+  --color-danger: #e11d48;
+  --color-purple: #fda4af;
+}

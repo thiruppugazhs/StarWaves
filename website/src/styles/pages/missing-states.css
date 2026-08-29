@@ -1,0 +1,644 @@
+/* Styles for page states and controls introduced after the original page sheets. */
+
+.page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.page-heading p,
+.section-heading p {
+  margin: 0 0 5px;
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.page-heading h1,
+.section-heading h2 {
+  margin: 0;
+  color: var(--text-primary);
+  letter-spacing: -0.035em;
+}
+
+.page-heading h1 {
+  font-size: clamp(25px, 3vw, 34px);
+}
+
+.section-heading h2 {
+  font-size: 18px;
+}
+
+.section-heading {
+  min-width: 0;
+}
+
+.competitive-coding-page,
+.documents-page,
+.hackathons-page,
+.jobs-page,
+.profile-page,
+.project-page,
+.projects-page,
+.setting-page,
+.stats-page,
+.todo-page {
+  min-width: 0;
+}
+
+.todo-api-error,
+.document-save-error,
+.workspace-connection-error,
+.delete-account-modal-error {
+  padding: 10px 12px;
+  border: 1px solid var(--border-heavy);
+  border-radius: 9px;
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.todo-modal-form,
+.apps-settings-stack,
+.workspace-app-list,
+.google-calendar-account-list {
+  display: grid;
+  gap: 12px;
+}
+
+.document-form-row {
+  grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.6fr);
+}
+
+.document-upload-note {
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.dashboard-panel-backdrop {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  background: rgb(0 0 0 / 0.35);
+  backdrop-filter: blur(2px);
+}
+
+.dashboard-customize-panel {
+  width: min(390px, 100%);
+  height: 100%;
+  overflow-y: auto;
+  padding: 22px;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-lg);
+}
+
+.dashboard-customize-panel > header,
+.stats-rating-display,
+.stats-solved-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dashboard-customize-panel > section {
+  padding: 18px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.dashboard-help {
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.dashboard-widget-toggles {
+  display: grid;
+  gap: 8px;
+}
+
+.dashboard-density-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+
+.dashboard-widget-toggles button,
+.dashboard-density-options button,
+.dashboard-reset {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dashboard-widget-toggles button {
+  justify-content: flex-start;
+}
+
+.dashboard-widget-toggles button i {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+.dashboard-density-options button.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.dashboard-reset {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.dashboard-widget-drag-handle {
+  cursor: grab;
+}
+
+.landing-hero-copy {
+  min-width: 0;
+}
+
+.auth-back,
+.auth-forgot,
+.auth-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.auth-back {
+  margin-bottom: 28px;
+}
+
+.auth-heading {
+  margin-bottom: 24px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-forgot {
+  justify-self: end;
+}
+
+.auth-error {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 10px;
+}
+
+.auth-switch {
+  margin-top: 22px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-align: center;
+}
+
+.auth-switch button {
+  padding-left: 4px;
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.onboarding-brand {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 18px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  font-weight: 850;
+}
+
+.onboarding-copy {
+  display: block;
+  margin: 7px 0 20px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.mail-reader-loading {
+  display: flex;
+  min-height: 260px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.mail-compose-subject {
+  width: 100%;
+  border-width: 0 0 1px;
+  border-color: var(--border-color);
+  border-radius: 0;
+}
+
+.calendar-detail-contest-logo,
+.calendar-detail-record-icon,
+.google-calendar-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.calendar-detail-no-contests {
+  padding: 18px;
+  border: 1px dashed var(--border-color);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.google-calendar-event-link {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.contest-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stats-wide-card {
+  grid-column: 1 / -1;
+}
+
+.stats-four-values,
+.stats-leetcode-values {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stats-rating-display,
+.stats-solved-heading {
+  align-items: flex-end;
+  padding: 18px 0;
+}
+
+.stats-rating-display strong,
+.stats-solved-heading strong {
+  display: block;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.stats-rating-display span,
+.stats-solved-heading span {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.stats-rating-display em {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.stats-progress-row {
+  display: grid;
+  gap: 7px;
+  padding: 9px 0;
+}
+
+.stats-progress-row > div:first-child,
+.stats-project-rows > div,
+.stats-hackathon-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 11px;
+}
+
+.stats-progress-row > div:first-child {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.stats-project-rows,
+.stats-hackathon-list {
+  display: grid;
+}
+
+.stats-project-rows > div,
+.stats-hackathon-list > div {
+  min-width: 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.stats-project-rows > div:first-child,
+.stats-hackathon-list > div:first-child {
+  border-top: 0;
+}
+
+.stats-project-rows > div > div,
+.stats-hackathon-list > div > div {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 3px;
+}
+
+.stats-project-rows span,
+.stats-hackathon-list span,
+.stats-project-rows em,
+.stats-hackathon-list em {
+  color: var(--text-muted);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.stats-date-box {
+  display: grid;
+  width: 38px;
+  flex: 0 0 auto;
+  padding: 5px;
+  border-radius: 9px;
+  background: var(--bg-tertiary);
+  text-align: center;
+}
+
+.google-calendar-settings-card,
+.github-settings-card,
+.gmail-settings-card {
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.google-calendar-settings-body,
+.github-settings-copy {
+  padding: 20px 22px;
+}
+
+.google-calendar-settings-body {
+  display: grid;
+  gap: 20px;
+}
+
+.google-calendar-account-list {
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+
+.google-calendar-account {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.google-calendar-account:first-child {
+  border-top: 0;
+}
+
+.google-calendar-account > div {
+  overflow: hidden;
+}
+
+.google-calendar-account strong,
+.google-calendar-account small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.google-calendar-account > div,
+.hackathon-source-row > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.google-calendar-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.google-calendar-avatar svg {
+  display: block;
+  margin: auto;
+}
+
+.google-calendar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.google-calendar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.google-calendar-chips span {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 7px;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 8px;
+}
+
+.google-calendar-remove,
+.google-calendar-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.google-calendar-empty,
+.github-settings-copy p,
+.hackathon-source-message {
+  color: var(--text-secondary);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.google-calendar-refresh {
+  justify-self: start;
+}
+
+@media (max-width: 560px) {
+  .google-calendar-settings-body,
+  .github-settings-copy {
+    padding: 16px;
+  }
+
+  .google-calendar-account {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .google-calendar-remove {
+    margin-left: auto;
+  }
+
+  .google-calendar-chips span {
+    max-width: 170px;
+  }
+}
+
+.delete-account-modal-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 14px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.delete-account-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.profile-page-content {
+  max-width: 760px;
+}
+
+.profile-edit-button,
+.empty-action button,
+.empty-action a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.profile-edit-button {
+  margin-left: auto;
+}
+
+.empty-action {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.backdrop {
+  position: fixed;
+  z-index: 39;
+  inset: 0;
+  display: none;
+  border: 0;
+  background: var(--bg-backdrop);
+}
+
+@media (max-width: 760px) {
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .document-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-four-values,
+  .stats-leetcode-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .backdrop {
+    display: block;
+  }
+}

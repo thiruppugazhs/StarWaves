@@ -1,0 +1,29 @@
+/* Citrus Zest - Lemon cream sorbet with zesty lime spark */
+html.citrus-theme {
+  --bg-primary: #fefce8;
+  --bg-secondary: #fef9c3;
+  --bg-tertiary: #fde68a;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fefce8;
+  --bg-hover: #fde047;
+  --bg-overlay: #ffffff;
+  --text-primary: #1a2e05;
+  --text-secondary: #3f6212;
+  --text-muted: #4d7c0f;
+  --text-inverse: #fefce8;
+  --color-primary: #84cc16;
+  --color-primary-hover: #65a30d;
+  --color-primary-light: #ecfccb;
+  --color-accent: #a3e635;
+  --border-color: #eab308;
+  --border-light: #fef9c3;
+  --border-heavy: #facc15;
+  --border-focus: #84cc16;
+  --scrollbar-track: #fef9c3;
+  --scrollbar-thumb: #facc15;
+  --scrollbar-thumb-hover: #84cc16;
+  --color-success: #84cc16;
+  --color-warning: #a3e635;
+  --color-danger: #65a30d;
+  --color-purple: #bef264;
+}

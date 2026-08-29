@@ -1,0 +1,29 @@
+/* Bone White - Warm off-white theme with gentle ivory surfaces */
+html.bone-theme {
+  --bg-primary: #f7f5f1;
+  --bg-secondary: #efece6;
+  --bg-tertiary: #e4e0d6;
+  --bg-card: #fbfaf7;
+  --bg-card-hover: #f2efe8;
+  --bg-hover: #e4e0d6;
+  --bg-overlay: #fbfaf7;
+  --text-primary: #3a3833;
+  --text-secondary: #66625a;
+  --text-muted: #8a857a;
+  --text-inverse: #fbfaf7;
+  --color-primary: #403d36;
+  --color-primary-hover: #2a2823;
+  --color-primary-light: #e6e2d9;
+  --color-accent: #66625a;
+  --border-color: #e4e0d6;
+  --border-light: #ece8e0;
+  --border-heavy: #b6b0a3;
+  --border-focus: #66625a;
+  --scrollbar-track: #efece6;
+  --scrollbar-thumb: #b6b0a3;
+  --scrollbar-thumb-hover: #403d36;
+  --color-success: #403d36;
+  --color-warning: #8a857a;
+  --color-danger: #403d36;
+  --color-purple: #8a857a;
+}

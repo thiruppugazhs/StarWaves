@@ -1,0 +1,29 @@
+/* Meadow Fresh - Airy mint-white meadow with leaf green lift */
+html.meadow-theme {
+  --bg-primary: #f0fdf4;
+  --bg-secondary: #dcfce7;
+  --bg-tertiary: #bbf7d0;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0fdf4;
+  --bg-hover: #bbf7d0;
+  --bg-overlay: #ffffff;
+  --text-primary: #052e16;
+  --text-secondary: #14532d;
+  --text-muted: #15803d;
+  --text-inverse: #f0fdf4;
+  --color-primary: #22c55e;
+  --color-primary-hover: #16a34a;
+  --color-primary-light: #dcfce7;
+  --color-accent: #4ade80;
+  --border-color: #bbf7d0;
+  --border-light: #dcfce7;
+  --border-heavy: #86efac;
+  --border-focus: #22c55e;
+  --scrollbar-track: #dcfce7;
+  --scrollbar-thumb: #86efac;
+  --scrollbar-thumb-hover: #22c55e;
+  --color-success: #22c55e;
+  --color-warning: #16a34a;
+  --color-danger: #15803d;
+  --color-purple: #4ade80;
+}

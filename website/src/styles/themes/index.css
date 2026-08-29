@@ -1,0 +1,44 @@
+:root {
+  /* Colors - Light Theme (Greyer Off-White Palette) */
+  --bg-primary: #f4f4f5;
+  --bg-secondary: #ececec;
+  --bg-tertiary: #e4e4e7;
+  --bg-card: #fafafa;
+  --bg-card-hover: #f0f0f2;
+  --bg-hover: #e4e4e7;
+  --bg-hover-subtle: #eaeaea;
+  --bg-overlay: rgba(244, 244, 245, 0.94);
+  --bg-backdrop: rgba(0, 0, 0, 0.22);
+
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --text-disabled: #a1a1aa;
+  --text-inverse: #f4f4f5;
+
+  --color-primary: #18181b;
+  --color-primary-hover: #09090b;
+  --color-primary-light: #e4e4e7;
+  --color-foam: #ffffff;
+
+  --border-color: #e4e4e7;
+  --border-light: #ececec;
+  --border-heavy: #a1a1aa;
+  --border-focus: #71717a;
+
+  --scrollbar-track: #e4e4e7;
+  --scrollbar-thumb: #a1a1aa;
+  --scrollbar-thumb-hover: #18181b;
+
+  /* Accents & Status Colors (Monochrome) */
+  --color-accent: #18181b;
+  --color-accent-light: #e4e4e7;
+  --color-success: #18181b;
+  --color-success-light: #e4e4e7;
+  --color-warning: #71717a;
+  --color-warning-light: #e4e4e7;
+  --color-danger: #18181b;
+  --color-danger-light: #e4e4e7;
+  --color-purple: #71717a;
+  --color-purple-light: #e4e4e7;
+}

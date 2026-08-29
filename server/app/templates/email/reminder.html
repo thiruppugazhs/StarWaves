@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reminder: {{ reminder_title }} - StarWaves</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #09090b;
+      color: #fafafa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #09090b;
+      padding: 40px 16px;
+    }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      background-color: #121212;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 36px 32px;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-color: #27272a;
+      color: #ffffff;
+      border: 1px solid #3f3f46;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #ffffff;
+      margin: 0 0 16px 0;
+    }
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #a1a1aa;
+      margin: 0 0 16px 0;
+    }
+    .reminder-card {
+      background-color: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      padding: 16px;
+      margin: 20px 0;
+    }
+    .reminder-card p {
+      margin: 4px 0;
+      font-size: 13px;
+      color: #e4e4e7;
+    }
+    .btn-container {
+      margin: 28px 0;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #ffffff;
+      color: #09090b;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #27272a;
+      font-size: 12px;
+      color: #71717a;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="brand">StarWaves</div>
+      <div class="badge">{{ reminder_type }}</div>
+      <h1>{{ reminder_title }}</h1>
+      <p>Hello {{ user_name }},</p>
+      <p>This is an automated reminder notification from your StarWaves workspace.</p>
+      
+      <div class="reminder-card">
+        <p><strong>Item:</strong> {{ reminder_title }}</p>
+        <p><strong>Scheduled Due Time:</strong> {{ due_time }}</p>
+        {{ description_block }}
+      </div>
+
+      <div class="btn-container">
+        <a href="{{ app_url }}" class="btn">Open StarWaves Workspace</a>
+      </div>
+
+      <div class="footer">
+        StarWaves Reminders & Notifications • Automated System Message
+      </div>
+    </div>
+  </div>
+</body>
+</html>

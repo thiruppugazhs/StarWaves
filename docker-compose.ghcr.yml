@@ -1,0 +1,28 @@
+# Pull prebuilt images from GHCR instead of building locally.
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.ghcr.yml pull
+#   docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
+#
+# Images are published by .github/workflows/docker-ghcr.yml on push to main:
+#   ghcr.io/susin-d/dashboard-server
+#   ghcr.io/susin-d/dashboard-website
+#   ghcr.io/susin-d/dashboard-whatsapp-worker
+#
+# Override with TAG env (default: latest or main-sha). Example:
+#   TAG=main-abc1234 docker compose -f docker-compose.yml -f docker-compose.ghcr.yml pull
+services:
+  server:
+    image: ghcr.io/susin-d/dashboard-server:${TAG:-latest}
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+  website:
+    image: ghcr.io/susin-d/dashboard-website:${TAG:-latest}
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+  whatsapp-worker:
+    image: ghcr.io/susin-d/dashboard-whatsapp-worker:${TAG:-latest}
+    build:
+      context: ./services/whatsapp-worker
+      dockerfile: Dockerfile

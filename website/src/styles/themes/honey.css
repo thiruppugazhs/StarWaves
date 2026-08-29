@@ -1,0 +1,29 @@
+/* Honey Parchment - Soft parchment glow with honey amber */
+html.honey-theme {
+  --bg-primary: #fffbeb;
+  --bg-secondary: #fef3c7;
+  --bg-tertiary: #fde68a;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fff7e0;
+  --bg-hover: #fde68a;
+  --bg-overlay: #ffffff;
+  --text-primary: #451a03;
+  --text-secondary: #92400e;
+  --text-muted: #b45309;
+  --text-inverse: #fffbeb;
+  --color-primary: #d97706;
+  --color-primary-hover: #b45309;
+  --color-primary-light: #fef3c7;
+  --color-accent: #f59e0b;
+  --border-color: #fde68a;
+  --border-light: #fef3c7;
+  --border-heavy: #fcd34d;
+  --border-focus: #d97706;
+  --scrollbar-track: #fef3c7;
+  --scrollbar-thumb: #fcd34d;
+  --scrollbar-thumb-hover: #d97706;
+  --color-success: #d97706;
+  --color-warning: #f59e0b;
+  --color-danger: #b45309;
+  --color-purple: #fbbf24;
+}

@@ -1,0 +1,1264 @@
+/* Calls Page Styles - Monochrome Design System */
+
+.calls-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-section-gap, 22px);
+}
+
+/* Call session panel (dialing / connecting / active / result) */
+.calls-session-panel {
+  background: var(--bg-card, #fafafa);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-surface);
+}
+
+.call-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 340px;
+}
+
+.call-screen-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 280px;
+  background:
+    linear-gradient(180deg, var(--bg-tertiary, #e4e4e7), var(--bg-primary, #f4f4f5));
+  overflow: hidden;
+}
+
+html.dark-theme .call-screen-stage {
+  background: linear-gradient(180deg, var(--bg-card, #141414), var(--bg-primary, #080808));
+}
+
+.call-remote-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--bg-primary, #f4f4f5);
+}
+
+.call-local-video {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: clamp(96px, 26%, 220px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--bg-secondary, #ececec);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 9px);
+  box-shadow: var(--shadow-md);
+  z-index: 2;
+}
+
+.call-avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.call-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.call-avatar-large {
+  width: 104px;
+  height: 104px;
+  font-size: 34px;
+}
+
+.call-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-tertiary, #e4e4e7);
+  color: var(--text-primary, #09090b);
+}
+
+.call-screen-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px 18px;
+  text-align: center;
+  background: var(--bg-overlay, rgba(244, 244, 245, 0.94));
+  border-top: 1px solid var(--border-color, #e4e4e7);
+  backdrop-filter: blur(6px);
+}
+
+.call-screen-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+}
+
+.call-screen-status {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--text-muted, #71717a);
+}
+
+.call-screen-error {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--text-primary, #09090b);
+}
+
+.call-screen-hint {
+  margin: 0;
+  padding: 12px 18px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--text-muted, #71717a);
+}
+
+/* In-call controls */
+.call-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 18px;
+  border-top: 1px solid var(--border-color, #e4e4e7);
+}
+
+.call-control-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1px solid var(--border-heavy, #a1a1aa);
+  background: var(--bg-card, #fafafa);
+  color: var(--text-primary, #09090b);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast, 140ms ease),
+    border-color var(--transition-fast, 140ms ease),
+    color var(--transition-fast, 140ms ease);
+}
+
+.call-control-button:hover {
+  background: var(--bg-hover, #e4e4e7);
+}
+
+.call-control-button.active {
+  background: var(--color-primary, #18181b);
+  border-color: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+}
+
+.call-control-end {
+  background: var(--color-primary, #18181b);
+  border-color: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+}
+
+.call-control-end:hover {
+  background: #09090b;
+  border-color: #09090b;
+}
+
+.call-control-dismiss {
+  width: auto;
+  border-radius: var(--radius-full, 999px);
+  padding: 0 20px;
+}
+
+/* Calls layout */
+.calls-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) 1fr;
+  gap: var(--layout-section-gap, 22px);
+  align-items: start;
+}
+
+.calls-dialer-card,
+.calls-recent-card {
+  background: var(--bg-card, #fafafa);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--layout-card-padding, 20px);
+  box-shadow: var(--shadow-surface);
+}
+
+.calls-dialer-header h2,
+.calls-recent-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+}
+
+.calls-dialer-header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-muted, #71717a);
+}
+
+.calls-mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 18px 0 16px;
+  padding: 4px;
+  background: var(--bg-tertiary, #e4e4e7);
+  border-radius: var(--radius-md, 9px);
+}
+
+.calls-mode-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  color: var(--text-muted, #71717a);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast, 140ms ease),
+    color var(--transition-fast, 140ms ease);
+}
+
+.calls-mode-option.active {
+  background: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+}
+
+.calls-dialer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calls-dialer-form label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary, #71717a);
+}
+
+.calls-dialer-form input {
+  width: 100%;
+  padding: 11px 12px;
+  background: var(--bg-tertiary, #e4e4e7);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-primary, #09090b);
+  font: inherit;
+  font-size: 14px;
+}
+
+.calls-dialer-form input:focus-visible {
+  outline: 2px solid var(--border-focus, #71717a);
+  outline-offset: 1px;
+}
+
+.calls-dial-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Recent calls */
+.calls-recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.calls-recent-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-primary, #09090b);
+  background: var(--bg-tertiary, #e4e4e7);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.calls-recent-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 16px;
+  color: var(--text-muted, #71717a);
+  text-align: center;
+  font-size: 14px;
+}
+
+.calls-recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.calls-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--border-color, #e4e4e7);
+}
+
+.calls-recent-item:last-child {
+  border-bottom: 0;
+}
+
+.calls-recent-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-primary-light, #e4e4e7);
+  color: var(--text-primary, #09090b);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.calls-recent-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.calls-recent-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #09090b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calls-recent-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+  white-space: nowrap;
+}
+
+.calls-recent-direction {
+  color: var(--text-muted, #71717a);
+}
+
+.calls-recent-direction.incoming {
+  color: var(--text-primary, #09090b);
+  font-weight: 500;
+}
+
+.calls-recent-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Scheduled calls section ── */
+.calls-scheduled-card {
+  background: var(--bg-card, #fafafa);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--layout-card-padding, 20px);
+  box-shadow: var(--shadow-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.calls-scheduled-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calls-scheduled-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+}
+
+.calls-scheduled-header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-muted, #71717a);
+  line-height: 1.4;
+}
+
+.calls-scheduled-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 13px;
+  border: 1px solid var(--border-color, #e4e4e7);
+}
+
+.calls-scheduled-banner.success {
+  background: var(--bg-tertiary, #e4e4e7);
+  color: var(--text-primary, #09090b);
+}
+
+.calls-scheduled-banner.error {
+  background: var(--bg-tertiary, #e4e4e7);
+  color: var(--text-primary, #09090b);
+}
+
+.calls-scheduled-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-tertiary, #f4f4f5);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 8px);
+}
+
+html.dark-theme .calls-scheduled-form {
+  background: var(--bg-secondary, #18181b);
+}
+
+.calls-scheduled-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .calls-scheduled-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calls-scheduled-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calls-scheduled-field span {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #71717a);
+}
+
+.calls-scheduled-field textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.calls-scheduled-help {
+  font-size: 11px;
+  color: var(--text-muted, #71717a);
+  line-height: 1.4;
+}
+
+.calls-scheduled-help code {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  padding: 1px 4px;
+  background: var(--bg-card, #fafafa);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: 4px;
+}
+
+.calls-scheduled-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.calls-scheduled-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--text-muted, #71717a);
+  border: 1px dashed var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-secondary, transparent);
+}
+
+.calls-scheduled-empty h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+}
+
+.calls-scheduled-empty p {
+  margin: 0;
+  font-size: 13px;
+  max-width: 480px;
+  line-height: 1.45;
+}
+
+.calls-scheduled-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calls-scheduled-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 8px);
+  transition: opacity 140ms ease;
+}
+
+html.dark-theme .calls-scheduled-item {
+  background: var(--bg-secondary, #18181b);
+}
+
+.calls-scheduled-item.disabled {
+  opacity: 0.55;
+}
+
+.calls-scheduled-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.calls-scheduled-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.calls-scheduled-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calls-scheduled-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: var(--radius-full, 999px);
+  background: var(--bg-tertiary, #e4e4e7);
+  border: 1px solid var(--border-color, #e4e4e7);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted, #71717a);
+  text-transform: capitalize;
+}
+
+.calls-scheduled-badge.muted {
+  background: transparent;
+}
+
+.calls-scheduled-item-prompt {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+}
+
+.calls-scheduled-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-muted, #71717a);
+}
+
+.calls-scheduled-item-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.calls-scheduled-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.calls-scheduled-footer {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-tertiary, #f4f4f5);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+  line-height: 1.4;
+}
+
+html.dark-theme .calls-scheduled-footer {
+  background: var(--bg-secondary, #18181b);
+}
+
+.calls-scheduled-footer svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Incoming call overlay */
+.incoming-call-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--bg-backdrop, rgba(0, 0, 0, 0.22));
+}
+
+.incoming-call-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(92vw, 380px);
+  padding: 36px 28px 28px;
+  background: var(--bg-card, #fafafa);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-xl, 16px);
+  box-shadow: var(--shadow-lifted);
+  text-align: center;
+}
+
+.incoming-call-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.incoming-call-ring::before,
+.incoming-call-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 128px;
+  height: 128px;
+  border: 1px solid var(--border-heavy, #a1a1aa);
+  border-radius: 50%;
+  opacity: 0;
+  animation: incoming-call-pulse 2.2s ease-out infinite;
+}
+
+.incoming-call-ring::after {
+  animation-delay: 1.1s;
+}
+
+.incoming-call-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #71717a);
+}
+
+.incoming-call-name {
+  margin: 6px 0 2px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+}
+
+.incoming-call-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted, #71717a);
+}
+
+.incoming-call-actions {
+  display: flex;
+  gap: 22px;
+  margin-top: 26px;
+}
+
+.incoming-call-action {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 84px;
+  padding: 14px 12px 10px;
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg-tertiary, #e4e4e7);
+  color: var(--text-primary, #09090b);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast, 140ms ease),
+    transform var(--transition-fast, 140ms ease);
+}
+
+.incoming-call-action:hover {
+  background: var(--bg-hover, #e4e4e7);
+}
+
+.incoming-call-accept {
+  background: var(--color-primary, #18181b);
+  border-color: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+}
+
+.incoming-call-accept:hover {
+  background: #09090b;
+  border-color: #09090b;
+}
+
+@keyframes incoming-call-pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+@keyframes calls-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.calls-spin {
+  animation: calls-spin 0.9s linear infinite;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .calls-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .call-screen-stage {
+    min-height: 240px;
+  }
+
+  .call-local-video {
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .call-controls {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .call-control-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .incoming-call-card {
+    padding: 28px 20px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .incoming-call-ring::before,
+  .incoming-call-ring::after,
+  .calls-spin {
+    animation: none;
+  }
+}
+
+/* ── Eve AI Voice Call Visualizer & UI ── */
+.eve-quick-call-box {
+  margin: 14px 0 18px;
+  padding: 14px 16px;
+  background: var(--bg-tertiary, #f4f4f5);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 8px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+html.dark-theme .eve-quick-call-box {
+  background: var(--bg-secondary, #18181b);
+}
+
+.eve-quick-call-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+}
+
+.eve-quick-call-desc {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+  line-height: 1.4;
+}
+
+.eve-quick-call-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.eve-quick-call-buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 6px 12px;
+  min-height: 36px;
+}
+
+.eve-quick-call-buttons button svg {
+  flex-shrink: 0;
+}
+
+/* Eve Call Screen Visualizer */
+.eve-call-screen .eve-stage {
+  flex-direction: column;
+  padding: 28px 18px 80px;
+}
+
+.eve-visualizer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.eve-pulse-avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eve-pulse-core {
+  position: relative;
+  z-index: 3;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-primary, #09090b);
+  color: var(--text-inverse, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.eve-pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-heavy, #71717a);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.eve-pulse-avatar.speaking .ring-1 {
+  animation: eve-wave 1.8s ease-out infinite;
+}
+
+.eve-pulse-avatar.speaking .ring-2 {
+  animation: eve-wave 1.8s ease-out infinite 0.6s;
+}
+
+.eve-pulse-avatar.speaking .ring-3 {
+  animation: eve-wave 1.8s ease-out infinite 1.2s;
+}
+
+@keyframes eve-wave {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.0);
+    opacity: 0;
+  }
+}
+
+.eve-visualizer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full, 999px);
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e4e4e7);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary, #09090b);
+}
+
+.eve-info {
+  position: static !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/* Captions Overlay */
+.eve-captions-box {
+  width: min(92%, 520px);
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.92));
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 10px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+html.dark-theme .eve-captions-box {
+  background: var(--bg-overlay, rgba(18, 18, 18, 0.92));
+}
+
+.eve-caption-row {
+  display: flex;
+  gap: 6px;
+}
+
+.eve-caption-row .caption-speaker {
+  font-weight: 600;
+  color: var(--text-muted, #71717a);
+  flex-shrink: 0;
+}
+
+.eve-caption-row .caption-text {
+  color: var(--text-primary, #09090b);
+}
+
+/* Eve Text Fallback Input */
+.eve-text-fallback {
+  width: min(92%, 520px);
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.eve-stt-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+  line-height: 1.4;
+  text-align: center;
+}
+
+.eve-text-fallback label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #71717a);
+}
+
+.eve-text-fallback-row {
+  display: flex;
+  gap: 8px;
+}
+
+.eve-text-fallback-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 9px);
+  color: var(--text-primary, #09090b);
+  font: inherit;
+  font-size: 13px;
+}
+
+html.dark-theme .eve-text-fallback-row input {
+  background: var(--bg-secondary, #18181b);
+}
+
+.eve-text-fallback-row input:focus-visible {
+  outline: 2px solid var(--border-focus, #71717a);
+  outline-offset: 1px;
+}
+
+.eve-text-fallback-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  flex: 0 0 auto;
+  border: 1px solid var(--color-primary, #18181b);
+  border-radius: var(--radius-md, 9px);
+  background: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+  cursor: pointer;
+  transition:
+    opacity var(--transition-fast, 140ms ease),
+    background var(--transition-fast, 140ms ease);
+}
+
+.eve-text-fallback-row button:hover:not(:disabled) {
+  background: #09090b;
+  border-color: #09090b;
+}
+
+.eve-text-fallback-row button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Eve Page Voice Call Header Banner */
+.eve-header-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 18px;
+  margin-bottom: 16px;
+  background: var(--bg-card, #fafafa);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 10px);
+}
+
+.eve-header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eve-header-info div {
+  display: flex;
+  flex-direction: column;
+}
+
+.eve-header-info strong {
+  font-size: 14px;
+  color: var(--text-primary, #09090b);
+}
+
+.eve-header-info small {
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+}
+
+.eve-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Automated Schedules Card Styles */
+.eve-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.eve-schedule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--bg-tertiary, #f4f4f5);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 8px);
+}
+
+html.dark-theme .eve-schedule-form {
+  background: var(--bg-secondary, #18181b);
+}
+
+.eve-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.eve-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.eve-schedule-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-sm, 6px);
+  transition: opacity 140ms ease;
+}
+
+.eve-schedule-item.disabled {
+  opacity: 0.55;
+}
+
+.eve-schedule-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.eve-schedule-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eve-schedule-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eve-schedule-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: var(--radius-full, 999px);
+  background: var(--bg-tertiary, #e4e4e7);
+  color: var(--text-muted, #71717a);
+  text-transform: capitalize;
+}
+
+.eve-schedule-prompt {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eve-schedule-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-tertiary, #a1a1aa);
+}
+
+.eve-schedule-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

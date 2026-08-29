@@ -1,0 +1,29 @@
+/* Graphite Steel - Cool industrial grey theme with gunmetal surfaces */
+html.graphite-theme {
+  --bg-primary: #f2f3f5;
+  --bg-secondary: #e8eaee;
+  --bg-tertiary: #dde0e6;
+  --bg-card: #f8f9fb;
+  --bg-card-hover: #eef0f4;
+  --bg-hover: #dde0e6;
+  --bg-overlay: #f8f9fb;
+  --text-primary: #1c2126;
+  --text-secondary: #4b5560;
+  --text-muted: #6b7680;
+  --text-inverse: #f8f9fb;
+  --color-primary: #23272d;
+  --color-primary-hover: #111418;
+  --color-primary-light: #e4e7eb;
+  --color-accent: #4b5560;
+  --border-color: #dde0e6;
+  --border-light: #e6e9ee;
+  --border-heavy: #aab2bd;
+  --border-focus: #4b5560;
+  --scrollbar-track: #e8eaee;
+  --scrollbar-thumb: #aab2bd;
+  --scrollbar-thumb-hover: #23272d;
+  --color-success: #1f6f50;
+  --color-warning: #9a6a00;
+  --color-danger: #b91c1c;
+  --color-purple: #6d5bb8;
+}

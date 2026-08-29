@@ -1,0 +1,29 @@
+/* Verdant Depth - Forest obsidian with emerald glow */
+html.verdant-theme {
+  --bg-primary: #07140f;
+  --bg-secondary: #0d2118;
+  --bg-tertiary: #143026;
+  --bg-card: #0f271e;
+  --bg-card-hover: #183a2c;
+  --bg-hover: #1e4635;
+  --bg-overlay: #0f271e;
+  --text-primary: #ecfdf5;
+  --text-secondary: #a7f3d0;
+  --text-muted: #6ee7b7;
+  --text-inverse: #07140f;
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
+  --color-primary-light: #062e23;
+  --color-accent: #34d399;
+  --border-color: #1a3a2d;
+  --border-light: #11261e;
+  --border-heavy: #24573f;
+  --border-focus: #10b981;
+  --scrollbar-track: #0d2118;
+  --scrollbar-thumb: #24573f;
+  --scrollbar-thumb-hover: #10b981;
+  --color-success: #10b981;
+  --color-warning: #059669;
+  --color-danger: #047857;
+  --color-purple: #34d399;
+}

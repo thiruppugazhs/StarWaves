@@ -1,0 +1,72 @@
+@import './themes/index.css';
+@import './themes/dark.css';
+
+:root {
+  /* Typography */
+  --font-family: 'Inter', sans-serif;
+
+  /* 8pt spacing scale — use these instead of hard-coded px */
+  --space-3xs: 4px;
+  --space-2xs: 8px;
+  --space-xs: 12px;
+  --space-sm: 16px;
+  --space-md: 20px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 40px;
+  --space-3xl: 48px;
+
+  /* Shared layout geometry */
+  --layout-max-width: 1440px;
+  --content-max-width: 1440px;
+  --layout-public-max-width: 1200px;
+  --layout-gutter: clamp(16px, 3vw, 40px);
+  --content-gutter: clamp(16px, 3vw, 40px);
+  --layout-section-gap: clamp(20px, 2.4vw, 32px);
+  --section-gap: clamp(20px, 2.4vw, 32px);
+  --layout-card-padding: clamp(16px, 1.8vw, 22px);
+  --card-padding: clamp(16px, 1.8vw, 22px);
+  --card-gap: 16px;
+  --header-height: 68px;
+  --header-height-mobile: 62px;
+  --sidebar-collapsed: 72px;
+  --sidebar-expanded: 244px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 20px 55px rgba(0, 0, 0, 0.16);
+  --shadow-surface: 0 1px 1px rgba(0, 0, 0, 0.04), 0 8px 18px rgba(0, 0, 0, 0.07), 0 22px 44px rgba(0, 0, 0, 0.055);
+  --shadow-lifted: 0 2px 2px rgba(0, 0, 0, 0.05), 0 14px 28px rgba(0, 0, 0, 0.1), 0 30px 60px rgba(0, 0, 0, 0.07);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  --shadow-focus: 0 0 0 3px rgba(0, 0, 0, 0.05);
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  /* Transitions */
+  --transition-fast: 140ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Mobile Safe Area Insets */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+html.dark-theme {
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 55px rgba(0, 0, 0, 0.7);
+  --shadow-surface: 0 1px 1px rgba(0, 0, 0, 0.5), 0 10px 22px rgba(0, 0, 0, 0.42), 0 28px 60px rgba(0, 0, 0, 0.28);
+  --shadow-lifted: 0 2px 2px rgba(0, 0, 0, 0.55), 0 16px 32px rgba(0, 0, 0, 0.58), 0 36px 72px rgba(0, 0, 0, 0.38);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.55);
+  --shadow-focus: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}

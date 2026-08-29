@@ -1,0 +1,1898 @@
+/* Settings Page Styles */
+
+.setting-page {
+  display: grid;
+  gap: var(--section-gap);
+  padding-bottom: var(--space-xl);
+}
+
+
+.settings-source-summary {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+}
+
+.settings-source-summary strong {
+  font-size: 14px;
+}
+
+.settings-source-summary span {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.setting-section {
+  scroll-margin-top: 60px;
+}
+
+.setting-section {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  gap: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--border-color);
+}
+
+.setting-page .page-heading {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.setting-section:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+@media (max-width: 860px) {
+  .setting-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.section-heading h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+}
+
+.section-heading p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Card Shells */
+.workspace-settings-card,
+.coding-settings-card {
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.hackathon-source-settings {
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 14px);
+  box-shadow: var(--shadow-sm);
+}
+
+.setting-content-stack,
+.apps-settings-stack {
+  display: grid;
+  gap: 20px;
+}
+
+/* Header inside Card */
+.workspace-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--border-color);
+  border-top-left-radius: calc(var(--radius-xl, 14px) - 1px);
+  border-top-right-radius: calc(var(--radius-xl, 14px) - 1px);
+}
+
+.workspace-settings-header > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.coding-settings-header,
+.hackathon-source-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--border-color);
+  border-top-left-radius: calc(var(--radius-xl, 14px) - 1px);
+  border-top-right-radius: calc(var(--radius-xl, 14px) - 1px);
+}
+
+.workspace-google-mark,
+.hackathon-source-heading > span,
+.coding-settings-header > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-radius: 11px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.workspace-google-mark svg,
+.hackathon-source-heading > span svg,
+.coding-settings-header > span svg,
+.google-calendar-avatar svg {
+  display: block;
+  margin: auto;
+}
+
+.workspace-settings-header h3,
+.coding-settings-header h3,
+.hackathon-source-heading h3 {
+  margin: 0 0 3px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.workspace-settings-header p,
+.coding-settings-header p,
+.hackathon-source-heading p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Header Connect / Action Buttons */
+.workspace-settings-header button,
+.coding-settings-footer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.workspace-settings-header button:hover,
+.coding-settings-footer button:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.workspace-settings-header button.workspace-connected {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.workspace-settings-header button.workspace-connected:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.workspace-connection-error {
+  margin: 0;
+  padding: 12px 22px;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Google Workspace Apps Grid */
+.workspace-app-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 20px 22px;
+}
+
+@media (max-width: 640px) {
+  .workspace-app-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.workspace-app-list a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.18s ease;
+}
+
+.workspace-app-list a:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover, #f3f4f6);
+  transform: translateY(-1px);
+}
+
+.workspace-app-list a span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.workspace-app-list a div {
+  flex: 1;
+  min-width: 0;
+}
+
+.workspace-app-list a strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.workspace-app-list a small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.workspace-app-list a svg:last-child {
+  color: var(--text-muted);
+  transition: color 0.18s ease;
+}
+
+.workspace-app-list a:hover svg:last-child {
+  color: var(--color-primary);
+}
+
+/* Google Calendar Body & Accounts */
+.google-calendar-settings-body {
+  padding: 20px 22px;
+}
+
+.google-calendar-empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.google-calendar-account-list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.google-calendar-account {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  background: var(--bg-card, #ffffff);
+}
+
+.google-calendar-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  font-size: 14px;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.google-calendar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.google-calendar-account > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.google-calendar-account strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.google-calendar-account small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.google-calendar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.google-calendar-chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.google-calendar-chips i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.google-calendar-remove {
+  padding: 7px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.google-calendar-remove:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.google-calendar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.google-calendar-refresh,
+.google-calendar-add-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.google-calendar-refresh:hover,
+.google-calendar-add-account:hover {
+  border-color: var(--color-primary);
+  color: var(--text-primary);
+}
+
+.workspace-add-account {
+  margin: 0 22px 20px;
+}
+
+/* GitHub & Gmail Card Copy */
+.github-settings-copy {
+  padding: 16px 22px 20px;
+}
+
+.github-settings-copy p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.github-settings-copy strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.ics-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.ics-upload-button:hover {
+  background: #18181b;
+  color: #ffffff;
+}
+
+.mail-account-select {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.mail-account-select label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.mail-account-select select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Competitive Coding Form */
+.coding-profile-fields {
+  display: grid;
+  gap: 0;
+}
+
+.coding-profile-fields label {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+@media (max-width: 640px) {
+  .coding-profile-fields label {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.coding-profile-fields label span {
+  display: flex;
+  flex-direction: column;
+}
+
+.coding-profile-fields strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.coding-profile-fields small {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.coding-profile-fields input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.coding-profile-fields input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+  background: var(--bg-card);
+}
+
+.coding-profile-fields select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.coding-profile-fields select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+  background: var(--bg-card);
+}
+
+.coding-profile-fields select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* AI Models Settings */
+.ai-models-fields {
+  display: grid;
+  gap: 0;
+}
+
+.ai-models-fields label,
+.ai-models-env-row {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+@media (max-width: 640px) {
+  .ai-models-fields label,
+  .ai-models-env-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.ai-models-fields label > span,
+.ai-models-env-row > span {
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-models-fields strong,
+.ai-models-env-row strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ai-models-fields small,
+.ai-models-env-row small {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.ai-models-fields .custom-dropdown {
+  width: 100%;
+}
+
+.ai-models-fields .custom-dropdown-trigger {
+  min-height: 40px;
+  padding: 9px 12px;
+  font-size: 13px;
+}
+
+.ai-models-env-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.ai-models-env-pill svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.ai-models-key-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.ai-models-key-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-card);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ai-models-key-input-container:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.ai-models-key-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.ai-models-key-input-container input {
+  width: 100%;
+  padding: 9px 38px 9px 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.ai-models-key-input-container input::placeholder {
+  color: var(--text-muted, #71717a);
+}
+
+.ai-models-key-toggle {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.ai-models-key-toggle:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.ai-models-key-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.ai-models-key-status svg {
+  color: var(--text-primary);
+}
+
+/* Eve Voice Settings */
+.eve-voice-footer .eve-voice-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.eve-voice-footer .eve-voice-primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.eve-voice-footer .eve-voice-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.eve-voice-footer .eve-voice-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.eve-voice-footer .eve-voice-reset:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.eve-voice-capabilities {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 22px;
+}
+
+.eve-voice-capabilities > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted, #71717a);
+}
+
+.eve-voice-capabilities > span.supported {
+  color: var(--text-primary, #09090b);
+}
+
+.coding-settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 16px 22px;
+  background: var(--bg-card, #ffffff);
+  border-top: 1px solid var(--border-color);
+  border-bottom-left-radius: calc(var(--radius-xl, 14px) - 1px);
+  border-bottom-right-radius: calc(var(--radius-xl, 14px) - 1px);
+}
+
+.coding-settings-footer p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Hackathon Sources List */
+.hackathon-source-settings {
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.hackathon-source-list {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hackathon-source-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hackathon-source-row:last-child {
+  border-bottom: none;
+}
+
+.hackathon-source-logo {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: #000000;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.hackathon-source-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.hackathon-source-row strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hackathon-source-row small {
+  display: block;
+  margin: 2px 0 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.hackathon-source-row a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hackathon-source-row a:hover {
+  text-decoration: underline;
+}
+
+.hackathon-source-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  margin-left: 12px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.hackathon-source-row button:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover, #f3f4f6);
+}
+
+.hackathon-source-row button.enabled {
+  border-color: var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.hackathon-source-row button.enabled:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.hackathon-source-message {
+  margin: 0;
+  padding: 14px 22px;
+  background: var(--bg-card, #ffffff);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Delete Account Section & Modal */
+.delete-account-section {
+  padding-bottom: 32px;
+}
+
+.account-actions-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.account-action-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 14px);
+}
+
+.account-action-card h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.account-action-card p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.account-action-card button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.account-action-card button svg {
+  flex-shrink: 0;
+}
+
+.account-action-card button:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.08));
+  border-color: var(--border-heavy);
+}
+
+.delete-account-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-heavy);
+  border-radius: var(--radius-xl, 14px);
+}
+
+.delete-account-card h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.delete-account-card p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.delete-account-card button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.delete-account-card button svg {
+  flex-shrink: 0;
+}
+
+.delete-account-card button:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+/* Delete Modal */
+.delete-account-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.18s ease;
+}
+
+.delete-account-modal {
+  width: min(440px, 100%);
+  padding: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 16px);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-xl);
+}
+
+.delete-account-modal-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.delete-account-modal h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.delete-account-modal p {
+  margin: 0 0 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.delete-account-modal form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.delete-account-modal form input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card, #ffffff);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.delete-account-modal form input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.delete-account-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.delete-account-cancel {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.delete-account-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.delete-account-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Profile Card */
+.profile-card {
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 14px);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+}
+
+.profile-card-avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.profile-card-header h3 {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+}
+
+.profile-card-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.profile-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.profile-signout-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.profile-signout-button:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.08));
+  border-color: var(--border-heavy);
+}
+
+.profile-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--border-color);
+}
+
+.profile-detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+}
+
+.profile-detail + .profile-detail {
+  border-left: 1px solid var(--border-color);
+}
+
+.profile-detail strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.profile-detail span {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Combined Accounts & SMTP Access Sharing */
+.combined-accounts-section {
+  padding: 22px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.combined-accounts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.combined-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.combined-smtp-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs, 4px);
+}
+
+.combined-description {
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.combine-account-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.combine-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  transition: border-color var(--transition-fast, 140ms ease);
+}
+
+.combine-input-group:focus-within {
+  border-color: var(--border-heavy, var(--text-primary));
+}
+
+.combine-input-group svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.combine-input-group input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.combine-input-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.combine-input-group input:focus {
+  outline: none;
+}
+
+.combine-submit-btn {
+  white-space: nowrap;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.combine-submit-btn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.combine-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.combine-feedback {
+  margin: 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  line-height: 1.4;
+}
+
+.combine-feedback.success {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.combine-feedback.error {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-heavy);
+}
+
+.combined-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.combined-list h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.combined-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+}
+
+.combined-item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.combined-item-info svg {
+  color: var(--text-primary);
+}
+
+.combined-item-info strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.combined-item-info small {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.unlink-account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.unlink-account-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.pending-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-xs, 4px);
+  font-weight: 600;
+}
+
+/* WhatsApp Settings Section */
+.whatsapp-settings-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.whatsapp-settings-alert {
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.84rem;
+  color: var(--text-primary);
+}
+
+.whatsapp-status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  gap: 16px;
+}
+
+.whatsapp-status-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.whatsapp-status-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.whatsapp-status-info strong {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.whatsapp-status-info small {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.whatsapp-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.whatsapp-automation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.whatsapp-automation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 10px);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  user-select: none;
+}
+
+.whatsapp-automation-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-automation-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.whatsapp-automation-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.whatsapp-automation-text strong {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.whatsapp-automation-text small {
+  display: block;
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.whatsapp-toggle-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.whatsapp-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.whatsapp-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  transition: 0.2s ease;
+}
+
+.whatsapp-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background: var(--text-primary);
+  border-radius: 50%;
+  transition: 0.2s ease;
+}
+
+.whatsapp-toggle-switch input:checked + .whatsapp-toggle-slider {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.whatsapp-toggle-switch input:checked + .whatsapp-toggle-slider:before {
+  transform: translateX(18px);
+  background: var(--bg-primary);
+}
+
+/* WhatsApp Eve Trigger Keywords & Prompt Section */
+.whatsapp-keywords-section,
+.whatsapp-prompt-section {
+  padding-top: 18px;
+  margin-top: 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+.whatsapp-keywords-header,
+.whatsapp-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.whatsapp-keywords-title,
+.whatsapp-prompt-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.whatsapp-keywords-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-keywords-reset-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-keywords-desc,
+.whatsapp-prompt-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0 0 12px 0;
+}
+
+.whatsapp-keyword-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+  min-height: 28px;
+}
+
+.whatsapp-keyword-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: border-color 0.15s ease;
+}
+
+.whatsapp-keyword-tag:hover {
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-keyword-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.whatsapp-keyword-remove-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.whatsapp-keyword-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.whatsapp-keyword-text-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 8px 12px;
+  font-size: 0.84375rem;
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.whatsapp-keyword-text-input:focus {
+  border-color: var(--border-focus, #52525b);
+}
+
+.whatsapp-keyword-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.whatsapp-keyword-add-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.whatsapp-keyword-add-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.whatsapp-keyword-presets {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.whatsapp-keyword-presets-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.whatsapp-keyword-presets-list {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.whatsapp-keyword-preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-keyword-preset-chip:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-keyword-preset-chip.is-added {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.whatsapp-prompt-textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 10px 14px;
+  font-size: 0.84375rem;
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  margin-bottom: 8px;
+  transition: border-color 0.15s ease;
+}
+
+.whatsapp-prompt-textarea:focus {
+  border-color: var(--border-focus, #52525b);
+}
+
+.whatsapp-prompt-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.whatsapp-prompt-save-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-prompt-save-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-prompt-save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+

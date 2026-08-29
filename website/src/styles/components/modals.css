@@ -1,0 +1,123 @@
+/* Modal & Dialog Component Styles */
+
+.modal-backdrop,
+.todo-modal-backdrop,
+.delete-account-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: var(--bg-backdrop);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: modal-fade-in 140ms ease-out;
+}
+
+/* Confirm dialogs must stack above high-z overlays (Eve panel 120, incoming call 200) */
+.confirm-dialog-backdrop {
+  z-index: 300;
+}
+
+.modal,
+.todo-modal,
+.delete-account-modal,
+.drive-modal,
+.document-modal,
+.project-edit-modal,
+.job-modal {
+  width: min(100%, 480px);
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: modal-slide-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.modal-heading,
+.todo-modal-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.modal-heading p,
+.todo-modal-heading p {
+  margin: 0 0 5px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.modal-heading h2,
+.todo-modal-heading h2 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.025em;
+}
+
+.modal-actions,
+.todo-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+  margin-top: var(--space-md);
+}
+
+.profile-edit-modal {
+  max-width: 420px;
+}
+
+.profile-edit-header,
+.profile-edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile-edit-header {
+  margin-bottom: 16px;
+}
+
+.profile-edit-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.profile-edit-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profile-edit-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+.profile-edit-input input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.profile-edit-actions {
+  justify-content: flex-end;
+  margin-top: 16px;
+}

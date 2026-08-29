@@ -1,0 +1,92 @@
+name: Backend — Build and Push to GHCR
+
+# Single image for the backend API only (no website).
+# Useful when frontend is deployed on Vercel and you only need the API + workers.
+# Image: ghcr.io/<owner>/dashboard-backend  (or ghcr.io/susin-d/dashboard on `main` alias)
+# Tags: latest, main, main-<sha>, v*.*.*
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+    paths:
+      - "server/**"
+      - "services/whatsapp-worker/**"
+      - ".github/workflows/docker-backend.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "server/**"
+      - "services/whatsapp-worker/**"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata — backend
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # single backend image: ghcr.io/susin-d/dashboard-backend
+          # also alias ghcr.io/susin-d/dashboard for backwards compat when on main
+          images: |
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/dashboard-backend
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/dashboard
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.title=StarWaves Backend
+            org.opencontainers.image.description=StarWaves FastAPI backend (no website, frontend on Vercel)
+            org.opencontainers.image.vendor=susin-d
+          flavor: |
+            latest=false
+
+      - name: Build and push — backend (server)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false

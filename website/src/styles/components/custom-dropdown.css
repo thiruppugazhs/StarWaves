@@ -1,0 +1,101 @@
+.custom-dropdown {
+  position: relative;
+  min-width: 0;
+}
+
+.custom-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 14px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.18s ease);
+}
+
+.custom-dropdown-trigger:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-heavy, var(--text-muted));
+}
+
+.filter-bar .custom-dropdown-trigger,
+.custom-dropdown.compact .custom-dropdown-trigger {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+}
+
+.filter-bar .custom-dropdown-option,
+.custom-dropdown.compact .custom-dropdown-option {
+  padding: 5px 9px;
+  font-size: 11.5px;
+}
+
+.custom-dropdown-trigger:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 5px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 14px 34px -4px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.custom-dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm, 6px);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.custom-dropdown-option:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.custom-dropdown-option.selected {
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  font-weight: 600;
+}
+
+.custom-dropdown-option:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: -2px;
+}
+
+.custom-dropdown-trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

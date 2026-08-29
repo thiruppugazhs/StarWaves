@@ -1,0 +1,178 @@
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.0-pg16
+    container_name: starwaves-postgres
+    restart: unless-stopped
+    command: >
+      postgres
+      -c shared_buffers=128MB
+      -c effective_cache_size=512MB
+      -c work_mem=8MB
+      -c maintenance_work_mem=64MB
+      -c max_connections=50
+      -c synchronous_commit=off
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=8MB
+      -c random_page_cost=1.1
+      -c log_min_duration_statement=1000
+    environment:
+      POSTGRES_USER: starwaves
+      POSTGRES_PASSWORD: starwaves_password
+      POSTGRES_DB: starwaves
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - starwaves-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U starwaves -d starwaves"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: starwaves-server
+    restart: unless-stopped
+    env_file:
+      - path: ./server/.env
+        required: false
+    environment:
+      - APP_ENV=production
+      - PORT=8000
+      - DATABASE_URL=postgresql+asyncpg://starwaves:starwaves_password@postgres:5432/starwaves
+      - WHATSAPP_GATEWAY_URL=http://whatsapp-worker:3001
+      - REDIS_URL=redis://redis:6379/0
+      - WORKSPACE_STORAGE_PATH=/app/workspaces
+    expose:
+      - "8000"
+    ports:
+      # Host mapping so the Vite dev server can reach the API at 127.0.0.1:8000.
+      # Loopback-bound on purpose; nginx (port 80) is the public entrypoint.
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - workspace-data:/app/workspaces
+    networks:
+      - starwaves-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.8"
+
+  website:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api/v1
+    container_name: starwaves-website
+    restart: unless-stopped
+    expose:
+      - "80"
+    ports:
+      - "3000:80"
+    networks:
+      - starwaves-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:80/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  redis:
+    image: redis:7-alpine
+    container_name: starwaves-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 96mb --maxmemory-policy allkeys-lru --save 900 1 --save 300 10 --dir /data
+    volumes:
+      - redis-data:/data
+    networks:
+      - starwaves-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  nginx:
+    image: nginx:alpine
+    container_name: starwaves-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - starwaves-network
+
+  whatsapp-worker:
+    build:
+      context: ./services/whatsapp-worker
+      dockerfile: Dockerfile
+    container_name: starwaves-whatsapp-worker
+    restart: unless-stopped
+    environment:
+      - PORT=3001
+      - DATA_DIR=/app/data
+      - BACKEND_WEBHOOK_URL=http://server:8000/api/v1/whatsapp/webhook
+    ports:
+      - "3001:3001"
+    volumes:
+      - whatsapp-data:/app/data
+    networks:
+      - starwaves-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3001/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+networks:
+  starwaves-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  workspace-data:
+    driver: local
+  nginx-logs:
+    driver: local
+  whatsapp-data:
+    driver: local

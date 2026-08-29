@@ -1,0 +1,43 @@
+html.dark-theme {
+  /* Colors - Dark Theme Overrides */
+  --bg-primary: #080808;
+  --bg-secondary: #121212;
+  --bg-tertiary: #1a1a1a;
+  --bg-card: #141414;
+  --bg-card-hover: #1f1f1f;
+  --bg-hover: #222222;
+  --bg-hover-subtle: #191919;
+  --bg-overlay: rgba(18, 18, 18, 0.92);
+  --bg-backdrop: rgba(0, 0, 0, 0.55);
+
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-disabled: #52525b;
+  --text-inverse: #09090b;
+
+  --color-primary: #f4f4f5;
+  --color-primary-hover: #e4e4e7;
+  --color-primary-light: #222222;
+  --color-foam: #ffffff;
+
+  --border-color: #27272a;
+  --border-light: #1e1e1e;
+  --border-heavy: #3f3f46;
+  --border-focus: #71717a;
+
+  --scrollbar-track: #141414;
+  --scrollbar-thumb: #52525b;
+  --scrollbar-thumb-hover: #a1a1aa;
+
+  --color-accent: #f4f4f5;
+  --color-accent-light: #27272a;
+  --color-success: #f4f4f5;
+  --color-success-light: #27272a;
+  --color-warning: #a1a1aa;
+  --color-warning-light: #27272a;
+  --color-danger: #f4f4f5;
+  --color-danger-light: #27272a;
+  --color-purple: #a1a1aa;
+  --color-purple-light: #27272a;
+}

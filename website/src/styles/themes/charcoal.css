@@ -1,0 +1,29 @@
+/* Charcoal Ash - Warm charcoal grey theme with soft ash highlights */
+html.charcoal-theme {
+  --bg-primary: #131316;
+  --bg-secondary: #1a1a1f;
+  --bg-tertiary: #232329;
+  --bg-card: #1c1c21;
+  --bg-card-hover: #26262c;
+  --bg-hover: #303038;
+  --bg-overlay: #1c1c21;
+  --text-primary: #f0f0f2;
+  --text-secondary: #b4b4ba;
+  --text-muted: #82828c;
+  --text-inverse: #131316;
+  --color-primary: #e8e8ea;
+  --color-primary-hover: #ffffff;
+  --color-primary-light: #2c2c33;
+  --color-accent: #c9c9cf;
+  --border-color: #2c2c33;
+  --border-light: #212127;
+  --border-heavy: #45454f;
+  --border-focus: #82828c;
+  --scrollbar-track: #1a1a1f;
+  --scrollbar-thumb: #45454f;
+  --scrollbar-thumb-hover: #82828c;
+  --color-success: #e8e8ea;
+  --color-warning: #a1a1a9;
+  --color-danger: #e8e8ea;
+  --color-purple: #b4b4ba;
+}

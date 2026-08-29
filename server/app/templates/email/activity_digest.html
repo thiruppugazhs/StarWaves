@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your StarWaves Activity Digest</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #09090b;
+      color: #fafafa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #09090b;
+      padding: 40px 16px;
+    }
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      background-color: #121212;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 36px 32px;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #ffffff;
+      margin: 0 0 16px 0;
+    }
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #a1a1aa;
+      margin: 0 0 20px 0;
+    }
+    .stats-grid {
+      display: table;
+      width: 100%;
+      margin: 24px 0;
+      border-collapse: separate;
+      border-spacing: 12px 0;
+    }
+    .stat-card {
+      display: table-cell;
+      background-color: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+      width: 50%;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #71717a;
+    }
+    .digest-section {
+      background-color: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .digest-section h3 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      color: #ffffff;
+    }
+    .digest-section p {
+      margin: 0;
+      font-size: 13px;
+      color: #a1a1aa;
+    }
+    .btn-container {
+      margin: 28px 0;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #ffffff;
+      color: #09090b;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #27272a;
+      font-size: 12px;
+      color: #71717a;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="brand">StarWaves</div>
+      <h1>Weekly Activity Digest</h1>
+      <p>Hello {{ user_name }}, here is a snapshot of your recent coding performance and platform activity.</p>
+      
+      <div class="digest-section">
+        <h3>Competitive Coding Snapshot</h3>
+        <p>{{ summary_text }}</p>
+      </div>
+
+      <div class="digest-section">
+        <h3>Upcoming Contests & Tasks</h3>
+        <p>{{ upcoming_events }}</p>
+      </div>
+
+      <div class="btn-container">
+        <a href="{{ app_url }}" class="btn">View Full Dashboard</a>
+      </div>
+
+      <div class="footer">
+        StarWaves Digest Services • You are receiving this because of your notification settings.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

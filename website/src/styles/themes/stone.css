@@ -1,0 +1,29 @@
+/* Stone Grey - Warm neutral grey theme inspired by natural stone */
+html.stone-theme {
+  --bg-primary: #e9e6e2;
+  --bg-secondary: #dedad4;
+  --bg-tertiary: #d0cbc3;
+  --bg-card: #f0ede8;
+  --bg-card-hover: #e4e0d9;
+  --bg-hover: #d0cbc3;
+  --bg-overlay: #f0ede8;
+  --text-primary: #322f2b;
+  --text-secondary: #5f5a53;
+  --text-muted: #837d74;
+  --text-inverse: #f0ede8;
+  --color-primary: #37332e;
+  --color-primary-hover: #23201c;
+  --color-primary-light: #dcd7cf;
+  --color-accent: #5f5a53;
+  --border-color: #d0cbc3;
+  --border-light: #dcd7cf;
+  --border-heavy: #a39b90;
+  --border-focus: #5f5a53;
+  --scrollbar-track: #dedad4;
+  --scrollbar-thumb: #a39b90;
+  --scrollbar-thumb-hover: #37332e;
+  --color-success: #37332e;
+  --color-warning: #837d74;
+  --color-danger: #37332e;
+  --color-purple: #837d74;
+}

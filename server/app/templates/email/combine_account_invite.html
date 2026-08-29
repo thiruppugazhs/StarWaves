@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Combination Request - StarWaves</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #09090b;
+      color: #fafafa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #09090b;
+      padding: 40px 16px;
+    }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      background-color: #121212;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 36px 32px;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #ffffff;
+      margin: 0 0 16px 0;
+    }
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #a1a1aa;
+      margin: 0 0 20px 0;
+    }
+    .owner-badge {
+      display: inline-block;
+      background-color: #27272a;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .btn-container {
+      margin: 28px 0;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #ffffff;
+      color: #09090b;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #27272a;
+      font-size: 12px;
+      color: #71717a;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="brand">StarWaves</div>
+      <h1>Account Combination Request</h1>
+      <p>The user <span class="owner-badge">{{ owner_email }}</span> has requested to combine accounts with your email address (<strong style="color:#ffffff;">{{ target_email }}</strong>).</p>
+      <p>Combining accounts allows both accounts to link and share access to workspace resources, documents, and notifications on StarWaves.</p>
+      <p>Click the button below to confirm and verify this request:</p>
+      <div class="btn-container">
+        <a href="{{ verify_url }}" class="btn">Verify & Link Account</a>
+      </div>
+      <p style="font-size: 12px; color: #71717a;">If you did not request or expect this email, you can safely ignore it. This verification link will expire in 24 hours.</p>
+      <div class="footer">
+        StarWaves Account Security • Automated notification
+      </div>
+    </div>
+  </div>
+</body>
+</html>

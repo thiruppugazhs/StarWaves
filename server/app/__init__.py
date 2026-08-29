@@ -1,0 +1,2 @@
+"""StarWaves backend application."""
+

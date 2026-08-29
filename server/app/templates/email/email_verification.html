@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email - StarWaves</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #09090b;
+      color: #fafafa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #09090b;
+      padding: 40px 16px;
+    }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      background-color: #121212;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 36px 32px;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #ffffff;
+      margin: 0 0 16px 0;
+    }
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #a1a1aa;
+      margin: 0 0 20px 0;
+    }
+    .btn-container {
+      margin: 28px 0;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #ffffff;
+      color: #09090b;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .link-fallback {
+      font-size: 12px;
+      color: #71717a;
+      word-break: break-all;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #27272a;
+      font-size: 12px;
+      color: #71717a;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="brand">StarWaves</div>
+      <h1>Verify Your Email Address</h1>
+      <p>Hello {{ user_name }},</p>
+      <p>Please confirm your email address to complete your StarWaves account verification and unlock full platform capabilities.</p>
+      <div class="btn-container">
+        <a href="{{ verify_url }}" class="btn">Verify Email Address</a>
+      </div>
+      <p class="link-fallback">If the button above does not work, copy and paste this URL into your browser:<br>{{ verify_url }}</p>
+      <div class="footer">
+        If you did not create a StarWaves account, please disregard this email.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
