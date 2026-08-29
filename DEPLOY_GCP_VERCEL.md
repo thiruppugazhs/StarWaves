@@ -1,120 +1,213 @@
-# Deploy — Vercel (frontend) + GCP VM (backend)
+# StarWaves Deployment Guide: GCP e2-micro (Free Tier) + Vercel
 
-> Split: **Vercel** hosts `website/` (React/Vite), **GCP e2-micro VM** hosts `server` + `postgres` + `redis` + `whatsapp-worker` + `nginx`.
+This guide deploys StarWaves across the ideal free-tier architecture:
+- **Frontend (`website/`)**: Hosted on **Vercel** (Global CDN, free SSL, instant edge delivery).
+- **Backend (`server/`) & WhatsApp Worker (`services/whatsapp-worker/`)**: Hosted on a **Google Cloud e2-micro VM** (100% free-tier eligible, persistent 24/7 background processes for WhatsApp WebSockets and audio synthesis).
 
-## 1) GHCR images (already building)
+---
 
-Pushed on every `main` push:
+## Architecture Overview
 
-- `ghcr.io/susin-d/dashboard-backend:latest` — FastAPI backend (single image, no website)
-- `ghcr.io/susin-d/dashboard-server` / `-whatsapp-worker` / `-website` — legacy 3-image stack (ignore if using Vercel)
-
-New backend-only workflow: `.github/workflows/docker-backend.yml` → `dashboard-backend` (also alias `dashboard`).
-
-## 2) GCP VM — one-time setup
-
-```bash
-# create e2-micro (us-central1, Debian 12, 30GB, allow http/https)
-gcloud compute instances create starwaves-api \
-  --machine-type=e2-micro --zone=us-central1-a --image-family=debian-12 --image-project=debian-cloud \
-  --tags=http-server,https-server --boot-disk-size=30GB
-
-gcloud compute firewall-rules create allow-starwaves --allow tcp:80,tcp:443 --target-tags=http-server,https-server || true
-
-# ssh
-gcloud compute ssh starwaves-api --zone=us-central1-a
+```
+                        ┌───────────────────────────────┐
+                        │   User / Web Browser          │
+                        └──────────────┬────────────────┘
+                                       │
+                 ┌─────────────────────┴─────────────────────┐
+                 │                                           │
+                 ▼                                           ▼
+      ┌────────────────────┐                       ┌───────────────────┐
+      │   Vercel (Free)    │                       │  GCP e2-micro VM  │
+      │                    │                       │  (Always Free)    │
+      │ • React 19 + Vite  │                       │                   │
+      │ • Global Edge CDN  │                       │ • Nginx (Port 80) │
+      │ • Fast static SPA  │                       │ • FastAPI Backend │
+      │                    │                       │ • WhatsApp Worker │
+      └─────────┬──────────┘                       │ • Redis Cache     │
+                │                                  └─────────┬─────────┘
+                │ API Requests (REST / WebSocket)            │
+                └────────────────────────────────────────────┘
+                                       │
+                                       ▼
+                     ┌───────────────────────────────────┐
+                     │ Google Cloud Firestore Database   │
+                     │ (starwaves-cec20)                 │
+                     └───────────────────────────────────┘
 ```
 
-On VM:
+---
+
+## Part 1: Launch Google Cloud e2-micro VM (Always Free Tier)
+
+Google Cloud offers **1 e2-micro VM per month for free** forever (in US regions `us-central1`, `us-east1`, or `us-west1` with a 30 GB standard disk).
+
+### Step 1.1: Create the VM Instance
+
+You can create it via **Google Cloud Console (GUI)** or via the **Google Cloud Cloud Shell / CLI**:
+
+#### Method A: Using Google Cloud Console (Browser)
+1. Go to [Google Cloud Console: Compute Engine VM Instances](https://console.cloud.google.com/compute/instances).
+2. Select your project **`starwaves-cec20`**.
+3. Click **Create Instance**.
+4. Configure the settings:
+   - **Name**: `starwaves-vm`
+   - **Region**: `us-central1` (Iowa) or `us-east1` (South Carolina) *(Required for Free Tier)*
+   - **Zone**: Any (e.g. `us-central1-a`)
+   - **Machine Configuration**:
+     - Series: `E2`
+     - Machine type: **`e2-micro`** (2 vCPU, 1 GB memory) *(Free tier eligible)*
+   - **Boot disk**:
+     - Operating system: **Debian** or **Ubuntu** (e.g. Ubuntu 24.04 LTS or Debian 12)
+     - Boot disk type: **Standard persistent disk** *(Free tier eligible)*
+     - Size: **30 GB** *(Maximum free tier allowance)*
+   - **Firewall**:
+     - Check: **Allow HTTP traffic**
+     - Check: **Allow HTTPS traffic**
+5. Click **Create**.
+
+#### Method B: Using Google Cloud Shell / gcloud CLI
+Run this single command:
+```bash
+gcloud compute instances create starwaves-vm \
+  --project=starwaves-cec20 \
+  --zone=us-central1-a \
+  --machine-type=e2-micro \
+  --image-family=debian-12 \
+  --image-project=debian-cloud \
+  --boot-disk-size=30GB \
+  --boot-disk-type=pd-standard \
+  --tags=http-server,https-server
+```
+
+---
+
+### Step 1.2: Connect via SSH & Setup the Environment
+
+1. In the Google Cloud Console VM list, click the **SSH** button next to `starwaves-vm`.
+2. Once the terminal opens, run the following setup commands:
 
 ```bash
-sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
+# 1. Update system & install Docker + Git
+sudo apt update && sudo apt install -y docker.io docker-compose-plugin git curl
 
-# swap for 1GB VM (free tier)
-sudo fallocate -l 1G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+# 2. Add current user to docker group (so docker runs without sudo)
+sudo usermod -aG docker $USER
+newgrp docker
+
+# 3. Create a 1.5 GB swap file (essential for 1GB RAM e2-micro instances)
+sudo fallocate -l 1536M /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
-git clone https://github.com/susin-d/dashboard.git starwaves && cd starwaves
+# Verify swap is active:
+free -h
+```
 
-# env
-cp .env.docker.example server/.env
-nano server/.env  # set:
-#  AUTH_SECRET_KEY=$(openssl rand -base64 48)
-#  CRON_SECRET=$(openssl rand -hex 32)
-#  CORS_ORIGINS=https://starwaves.vercel.app,https://starwaves.susindran.in,https://*.vercel.app,http://<VM_EXTERNAL_IP>
-#  FRONTEND_URL=https://starwaves.vercel.app
-#  DATABASE_URL=postgresql+asyncpg://starwaves:starwaves_password@postgres:5432/starwaves
-#  plus OPENAI/ANTHROPIC/GEMINI keys etc
+---
 
-# login to GHCR (use PAT classic with read:packages)
-echo $GITHUB_TOKEN | docker login ghcr.io -u susin-d --password-stdin
+### Step 1.3: Clone the Repository & Configure Environment
 
-# pull + run backend-only (no website container)
-docker compose -f docker-compose.yml -f docker-compose.backend.yml -f docker-compose.ghcr.backend.yml pull
-docker compose -f docker-compose.yml -f docker-compose.backend.yml -f docker-compose.ghcr.backend.yml up -d
+```bash
+# Clone your StarWaves repository
+git clone https://github.com/thiruppugazhs/StarWaves.git
+cd StarWaves
+
+# Create the server environment file
+nano server/.env
+```
+
+Paste your production configuration into `server/.env` (press `Ctrl+O` then `Enter` to save, `Ctrl+X` to exit):
+
+```env
+APP_NAME=StarWaves API
+APP_ENV=production
+API_V1_PREFIX=/api/v1
+CORS_ORIGINS=https://starwaves.vercel.app,https://*.vercel.app,http://localhost:5173
+FRONTEND_URL=https://starwaves.vercel.app
+
+# Firebase Cloud Firestore
+FIREBASE_PROJECT_ID=starwaves-cec20
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@starwaves-cec20.iam.gserviceaccount.com
+FIRESTORE_DATABASE_ID=(default)
+GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
+
+# Auth Key (replace with any random 32+ character string)
+AUTH_SECRET_KEY=starwaves-prod-secret-93821094810293841029384
+
+# StarWaves Built-in AI (Google Gemini 2.5 Flash)
+DEFAULT_AI_PROVIDER=gemini
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-2.5-flash
+
+# ElevenLabs Speech
+ELEVENLABS_API_KEY=your-elevenlabs-api-key
+ELEVENLABS_MODEL_ID=eleven_turbo_v2_5
+ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
+```
+
+Also create `server/firebase-service-account.json` on the VM:
+```bash
+nano server/firebase-service-account.json
+```
+*(Paste your service account JSON contents here and save).*
+
+---
+
+### Step 1.4: Start Backend, WhatsApp Worker & Nginx
+
+Run Docker Compose using the backend overlay:
+```bash
+docker compose -f docker-compose.yml -f docker-compose.backend.yml up --build -d
+```
+
+Check the status of your containers:
+```bash
 docker compose -f docker-compose.yml -f docker-compose.backend.yml ps
-curl -i http://localhost/health
-curl -i http://localhost:8000/api/v1/health
-
-# logs
-docker compose -f docker-compose.yml -f docker-compose.backend.yml logs -f server
 ```
 
-`nginx/conf.d/default.backend.conf` on VM serves:
-- `GET /health`, `/api/*`, `/ws/*`, `/docs` → `server:8000`
-- `GET /` → `302` to `https://starwaves.vercel.app`
-
-Add DNS **A** `api.starwaves.susindran.in → <VM_EXTERNAL_IP>` and TLS:
-
+Test your backend health:
 ```bash
-sudo apt install -y certbot
-sudo certbot --nginx -d api.starwaves.susindran.in
-# certbot will uncomment HTTPS server block in default.backend.conf if you copy it to 443
+curl http://localhost/health
+# Should return: {"status":"ok","service":"StarWaves API","environment":"production"}
 ```
 
-Then update `server/.env` / `.env.docker.example` to `VITE_API_URL=https://api.starwaves.susindran.in/api/v1` and redeploy Vercel env.
+Note your VM's **External IP address** from Google Cloud Console (e.g. `34.xxx.xxx.xxx`).
+Your backend API is now accessible at:
+`http://<YOUR_VM_EXTERNAL_IP>/api/v1`
 
-## 3) Vercel — frontend
+---
 
-Vercel Project → Settings → Environment Variables:
+## Part 2: Deploy Frontend on Vercel
 
-```
-VITE_API_URL=https://api.starwaves.susindran.in/api/v1
-# or http://<VM_EXTERNAL_IP>/api/v1 during dev
-```
+1. Open [Vercel Dashboard](https://vercel.com/dashboard) and click **Add New…** &rarr; **Project**.
+2. Select your repository: **`thiruppugazhs/StarWaves`**.
+3. In **Project Settings**:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: Click *Edit* and select **`website`**
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Expand **Environment Variables** and add:
+   - `VITE_APP_NAME` = `StarWaves`
+   - `VITE_API_URL` = `http://<YOUR_VM_EXTERNAL_IP>/api/v1` (or your domain with HTTPS)
+5. Click **Deploy**.
+6. Once deployed, copy your Vercel URL (e.g. `https://starwaves.vercel.app`).
+7. Update `CORS_ORIGINS` in your VM `server/.env` to include your Vercel URL, and reload:
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.backend.yml restart server
+   ```
 
-`vercel.json` already SPA rewrites (`/(.*) → /index.html`), no API proxy needed — frontend calls GCP directly.
-On push to `main`, Vercel auto-deploys `website/`.
+---
 
-Local dev still works:
+## Part 3 (Optional): Free Custom Domain & HTTPS with Certbot
 
-```bash
-# website/.env
-VITE_API_URL=http://127.0.0.1:8000/api/v1
-```
-
-## 4) Pull updates (zero-build on VM)
-
-```bash
-cd ~/starwaves
-git pull
-echo $GITHUB_TOKEN | docker login ghcr.io -u susin-d --password-stdin
-docker compose -f docker-compose.yml -f docker-compose.backend.yml -f docker-compose.ghcr.backend.yml pull
-docker compose -f docker-compose.yml -f docker-compose.backend.yml -f docker-compose.ghcr.backend.yml up -d
-```
-
-Or dispatch **Backend — Build and Push to GHCR** workflow → VM `watchtower` / cron pull.
-
-## 5) Cost — e2-micro free tier
-
-- VM: 1 vCPU, 1GB RAM + 1G swap → fits `postgres 128M + redis 96M + server 512M + nginx`
-- Disk: 30GB standard (free)
-- If OOM, `docker stats --no-stream` + `free -h`, prune `docker system prune`.
-
-## 6) Troubleshooting
-
-- `AUTH_SECRET_KEY must be strong` → `openssl rand -base64 48` → `server/.env`
-- `CORS` 403 on Vercel → add `https://<vercel-preview>--*.vercel.app` to `CORS_ORIGINS`
-- `502` on `/` → expected (redirects to Vercel), check `/api/v1/health`
-- `502` on `/api` → `docker logs starwaves-server` → DB `DATABASE_URL` typo?
-- GHCR `denied` → `docker login ghcr.io`, ensure package is Public (`ghcr.io/susin-d/dashboard-backend` → Package settings → Public)
+If you have a domain (or free subdomain from DuckDNS / Cloudflare):
+1. Point your DNS A record to your VM External IP:
+   `api.yourdomain.com` &rarr; `<YOUR_VM_EXTERNAL_IP>`
+2. Install Certbot on your VM:
+   ```bash
+   sudo apt install -y certbot python3-certbot-nginx
+   sudo certbot --nginx -d api.yourdomain.com
+   ```
+3. Update `VITE_API_URL` on Vercel to `https://api.yourdomain.com/api/v1`.
