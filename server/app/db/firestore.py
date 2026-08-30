@@ -1,6 +1,7 @@
 import logging
 import os
 from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 import firebase_admin
@@ -40,32 +41,24 @@ def get_firebase_app() -> firebase_admin.App | None:
             logger.warning("Could not initialize Firebase with env credentials: %s", exc)
 
     # Check for service account file on disk
-    g_creds_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    if g_creds_path:
-        resolved_path = g_creds_path
-        if not os.path.exists(resolved_path):
-            # Check relative to server root
-            candidate = Path(__file__).resolve().parent.parent.parent / g_creds_path
-            if candidate.exists():
-                resolved_path = str(candidate)
-
-        if os.path.exists(resolved_path):
+    g_creds_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or "firebase-service-account.json"
+    search_paths = [
+        Path(g_creds_path),
+        Path("/app/firebase-service-account.json"),
+        Path(__file__).resolve().parent.parent.parent / "firebase-service-account.json",
+        Path.cwd() / "firebase-service-account.json",
+        Path.cwd() / "server" / "firebase-service-account.json",
+    ]
+    for p in search_paths:
+        if p.exists() and p.is_file():
             try:
-                cred = credentials.Certificate(resolved_path)
-                logger.info("Initializing Firebase Admin SDK with credentials file: %s", resolved_path)
+                cred = credentials.Certificate(str(p.resolve()))
+                logger.info("Initializing Firebase Admin SDK with credentials file: %s", p)
                 return firebase_admin.initialize_app(cred)
             except Exception as exc:
-                logger.warning("Could not initialize Firebase with creds file: %s", exc)
+                logger.warning("Could not initialize Firebase with creds file %s: %s", p, exc)
 
-    # Check project ID fallback
-    if settings.firebase_project_id:
-        try:
-            options = {"projectId": settings.firebase_project_id}
-            logger.info("Initializing Firebase Admin SDK with project ID: %s", settings.firebase_project_id)
-            return firebase_admin.initialize_app(options=options)
-        except Exception as exc:
-            logger.warning("Could not initialize Firebase with project ID: %s", exc)
-
+    logger.warning("No valid Firebase credentials found. Falling back to SQL client.")
     return None
 
 
