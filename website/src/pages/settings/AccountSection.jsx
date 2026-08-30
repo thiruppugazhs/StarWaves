@@ -12,7 +12,7 @@ export function AccountSection({ user, onSignOut }) {
 
   const deleteAccountHandler = async (event) => {
     event.preventDefault()
-    if (deleteConfirmation !== user.name) return
+    if (deleteConfirmation.trim().toLowerCase() !== 'delete my account') return
     setAccountDeleting(true)
     setAccountDeleteMessage('')
     try {
@@ -109,7 +109,7 @@ export function AccountSection({ user, onSignOut }) {
 
         <form onSubmit={deleteAccountHandler}>
           <label htmlFor="delete-account-confirmation">
-            Type <strong>{user.name}</strong> to confirm
+            Type <strong>Delete my account</strong> to confirm
           </label>
           <input
             id="delete-account-confirmation"
@@ -118,7 +118,7 @@ export function AccountSection({ user, onSignOut }) {
               setDeleteConfirmation(event.target.value)
               setAccountDeleteMessage('')
             }}
-            placeholder={user.name}
+            placeholder="Delete my account"
             autoComplete="off"
             data-modal-initial-focus
           />
@@ -140,7 +140,7 @@ export function AccountSection({ user, onSignOut }) {
               className="delete-account-confirm"
               type="submit"
               disabled={
-                accountDeleting || deleteConfirmation !== user.name
+                accountDeleting || deleteConfirmation.trim().toLowerCase() !== 'delete my account'
               }
             >
               <Trash2 size={15} />
