@@ -57,6 +57,7 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - workspace-data:/app/workspaces
+      - ./server/firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - starwaves-network
     depends_on:

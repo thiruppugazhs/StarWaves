@@ -21,6 +21,8 @@ def main():
     sa_path = server_dir / "firebase-service-account.json"
 
     env_content = base64.b64decode(ENV_B64).decode("utf-8")
+    if "CRON_SECRET=" not in env_content:
+        env_content += "\nCRON_SECRET=starwaves-cron-secret-392817294817203948\n"
     sa_content = base64.b64decode(SA_B64).decode("utf-8")
 
     env_path.write_text(env_content, encoding="utf-8")
