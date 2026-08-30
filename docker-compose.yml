@@ -55,6 +55,7 @@ services:
       - "8000:8000"
     volumes:
       - workspace-data:/app/workspaces
+      - ./server/app:/app/app:ro
       - ./server/firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - starwaves-network

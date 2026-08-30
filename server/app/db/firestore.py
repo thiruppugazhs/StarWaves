@@ -66,19 +66,26 @@ def get_firebase_app() -> firebase_admin.App | None:
 def get_firestore_client() -> Any:
     """Return the active database client.
 
-    Uses Google Cloud Firestore via Firebase Admin SDK when credentials are
-    present. Falls back to SqlClient (SQLite/PostgreSQL) when offline or
-    unconfigured.
+    Uses Google Cloud Firestore when USE_FIRESTORE=true and credentials are valid.
+    Defaults to the local PostgreSQL/SQLite database for instant 0ms responses and zero external failure points.
     """
+    use_firestore = os.getenv("USE_FIRESTORE", "false").lower() in ("true", "1", "yes")
+    if not use_firestore:
+        logger.info("Using PostgreSQL/SQL database client (USE_FIRESTORE=false)")
+        from app.db.sql.client import get_db_client
+        return get_db_client()
+
     app = get_firebase_app()
     if app:
         try:
             database_id = settings.firestore_database_id or "(default)"
             client = firestore.client(app=app, database_id=database_id)
+            # Fast probe to prevent 60-second timeout hangs on invalid credentials
+            list(client.collection("health").limit(1).stream(timeout=3))
             logger.info("Connected to Google Cloud Firestore (database: %s)", database_id)
             return client
         except Exception as exc:
-            logger.warning("Firebase app exists but Firestore client failed: %s. Using SqlClient.", exc)
+            logger.warning("Firebase credentials probe failed (%s). Falling back to PostgreSQL SqlClient.", exc)
 
     from app.db.sql.client import get_db_client
     return get_db_client()
