@@ -52,9 +52,7 @@ services:
     expose:
       - "8000"
     ports:
-      # Host mapping so the Vite dev server can reach the API at 127.0.0.1:8000.
-      # Loopback-bound on purpose; nginx (port 80) is the public entrypoint.
-      - "127.0.0.1:8000:8000"
+      - "8000:8000"
     volumes:
       - workspace-data:/app/workspaces
       - ./server/firebase-service-account.json:/app/firebase-service-account.json:ro
