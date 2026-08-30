@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/v1/:path*",
+      "destination": "http://13.203.228.229/api/v1/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "http://13.203.228.229/health"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
