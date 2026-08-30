@@ -10,7 +10,7 @@ from app.services.speech._shared import SpeechServiceError
 
 logger = logging.getLogger(__name__)
 
-ELEVENLABS_DEFAULT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # Rachel (calm, warm)
+ELEVENLABS_DEFAULT_VOICE_ID = "cgSgspJ2msm6clMCkdW9"  # Jessica (warm, clear, conversational female voice)
 ELEVENLABS_VOICES: list[dict[str, str]] = [
     {"id": "21m00Tcm4TlvDq8ikWAM", "label": "Rachel — calm, natural (female)", "gender": "female"},
     {"id": "AZnzlk1XvdvUeBnXmlld", "label": "Domi — friendly, empathetic (female)", "gender": "female"},

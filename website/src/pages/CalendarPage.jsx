@@ -10,6 +10,7 @@ import {
   ExternalLink,
   MapPin,
   Rocket,
+  Video,
   X,
 } from 'lucide-react'
 import { calendarDateKey } from '../utils/calendarEvents'
@@ -153,6 +154,26 @@ export function CalendarPage({ eventsByDate, onNavigate }) {
         </div>
 
         <div className="calendar-actions">
+          <a
+            href="https://meet.google.com/new"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="secondary-button"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none', padding: '6px 12px', fontSize: '0.8125rem' }}
+            title="Start an instant Google Meet call"
+          >
+            <Video size={15} /> Meet
+          </a>
+          <a
+            href="https://calendar.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="secondary-button"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none', padding: '6px 12px', fontSize: '0.8125rem' }}
+            title="Open Google Calendar"
+          >
+            <CalendarDays size={15} /> Google Calendar
+          </a>
           <CalendarPicker
             value={pickerDate}
             onChange={(date) => {
