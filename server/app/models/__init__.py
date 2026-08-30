@@ -21,7 +21,7 @@ try:
 except Exception:  # fallback for sqlite tests without pgvector
     Vector = None  # type: ignore
 
-from app.db.session import Base
+from app.db.base import Base
 
 
 def utc_now() -> datetime:

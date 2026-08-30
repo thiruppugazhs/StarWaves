@@ -12,10 +12,10 @@ from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
 
-from sqlalchemy import create_engine, text
+from app.db.base import Base
 
-class Base(DeclarativeBase):
-    pass
+
+from sqlalchemy import create_engine, text
 
 
 def get_async_db_url() -> str:
@@ -80,11 +80,12 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db() -> None:
-    """Initialize database tables.
-
-    e2-micro note: _ensure_* ALTERs run off the event loop via to_thread to avoid
-    blocking lifespan; create_all is already async via run_sync.
-    """
+    """Initialize database tables."""
+    import app.models  # noqa: F401
+    try:
+        Base.metadata.create_all(bind=sync_engine)
+    except Exception as e:
+        logger.warning("sync_engine create_all note: %s", e)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     # Run sync ALTERs off the loop so single worker stays responsive
