@@ -204,14 +204,27 @@ export async function fetchCurrentUser() {
   }
 }
 
-export async function updateUserProfile(displayName) {
+export async function updateUserProfile(displayName, assistantName = null) {
+  const body = { displayName }
+  if (assistantName) body.assistantName = assistantName
   const updatedUser = await request('/auth/profile', {
     method: 'PATCH',
-    body: JSON.stringify({ displayName }),
+    body: JSON.stringify(body),
   })
   const current = getStoredUser() || {}
-  const newUser = { ...current, displayName: updatedUser?.displayName || displayName }
+  const cleanAssistant = updatedUser?.assistantName || assistantName || current.assistantName || 'Eve'
+  const newUser = {
+    ...current,
+    displayName: updatedUser?.displayName || displayName,
+    assistantName: cleanAssistant,
+    isSubscribed: Boolean(updatedUser?.isSubscribed ?? current.isSubscribed),
+  }
   setStoredAuthToken(getStoredAuthToken(), newUser)
+  if (cleanAssistant) {
+    try {
+      localStorage.setItem('starwaves_assistant_name', cleanAssistant)
+    } catch {}
+  }
   return newUser
 }
 

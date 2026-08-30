@@ -20,6 +20,7 @@ def _invalidate_auth_me(user_id: str) -> None:
 
 class ProfileUpdateRequest(BaseModel):
     displayName: str
+    assistantName: str | None = None
 
 
 @router.delete("/account")
@@ -43,20 +44,27 @@ def get_me(
     database: SqlClient = Depends(get_firestore),
 ):
     user_record = get_user_by_id(database, user["uid"])
+    is_subscribed = False
+    assistant_name = "Eve"
     if user_record:
         display_name = user_record.get("display_name")
         email = user_record.get("email")
         email_verified = bool(user_record.get("email_verified") or user_record.get("google_auth"))
+        assistant_name = user_record.get("assistant_name") or "Eve"
+        is_subscribed = bool(user_record.get("is_subscribed") or user_record.get("subscription_plan"))
     else:
         display_name = user.get("name")
         email = user.get("email")
         email_verified = bool(user.get("email_verified") or user.get("google_auth"))
+        assistant_name = user.get("assistant_name") or "Eve"
 
     return {
         "uid": user["uid"],
         "email": email,
         "displayName": display_name or (email.split("@")[0] if email else "User"),
         "emailVerified": email_verified,
+        "assistantName": assistant_name,
+        "isSubscribed": is_subscribed,
     }
 
 
@@ -67,17 +75,34 @@ def update_user_profile(
     database: SqlClient = Depends(get_firestore),
 ):
     try:
-        user_record = update_profile_in_db(
+        user_record = get_user_by_id(database, user["uid"]) or {}
+        existing_assistant = user_record.get("assistant_name")
+        is_subscribed = bool(user_record.get("is_subscribed") or user_record.get("subscription_plan"))
+
+        # Lock assistant name after initial setup unless user has a subscription
+        if payload.assistantName and existing_assistant and payload.assistantName.strip().lower() != existing_assistant.strip().lower():
+            if not is_subscribed:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Renaming your AI companion is a subscription feature. Upgrade your plan to rename your AI assistant.",
+                )
+
+        updated = update_profile_in_db(
             database=database,
             uid=user["uid"],
             display_name=payload.displayName,
+            assistant_name=payload.assistantName,
         )
         _invalidate_auth_me(user["uid"])
         return {
-            "uid": user_record["uid"],
-            "email": user_record["email"],
-            "displayName": user_record["display_name"],
+            "uid": updated["uid"],
+            "email": updated.get("email", ""),
+            "displayName": updated["display_name"],
+            "assistantName": updated.get("assistant_name") or payload.assistantName or "Eve",
+            "isSubscribed": is_subscribed,
         }
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

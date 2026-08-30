@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { navigationItems } from '../config/navigation'
 
 export function Sidebar({
@@ -11,7 +11,18 @@ export function Sidebar({
   const sidebarRef = useRef(null)
   const itemRefs = useRef(new Map())
   const [hoveredItem, setHoveredItem] = useState(null)
-  const navigationGroups = Array.from(new Set(navigationItems.map(({ group }) => group)))
+  const assistantName = (typeof localStorage !== 'undefined' ? localStorage.getItem('starwaves_assistant_name') : null) || 'Eve'
+  const items = useMemo(() => navigationItems.map((item) => {
+    if (item.group === 'Eve AI') {
+      return {
+        ...item,
+        group: `${assistantName} AI`,
+        label: item.id === 'eve-memory' ? `${assistantName} Memory` : item.label,
+      }
+    }
+    return item
+  }), [assistantName])
+  const navigationGroups = Array.from(new Set(items.map(({ group }) => group)))
 
   const setItemRef = (id) => (node) => {
     if (node) itemRefs.current.set(id, node)
@@ -46,7 +57,7 @@ export function Sidebar({
           {navigationGroups.map((group) => (
             <div className="sidebar-nav-group" key={group}>
               <span className="sidebar-nav-group-label">{group}</span>
-              {navigationItems
+              {items
                 .filter((item) => item.group === group)
                 .map(({ id, label, icon: Icon }) => (
                   <button

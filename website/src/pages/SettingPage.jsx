@@ -135,7 +135,7 @@ export function SettingPage({
         setImportedIcsEvents={setImportedIcsEvents}
       />
       <WhatsAppSection />
-      <AiModelsSection />
+      <AiModelsSection user={user} />
       <AutoMemorySection />
       <CodingSection user={user} onContestSitesChange={onContestSitesChange} />
       <HackathonSourcesSection user={user} onHackathonsChange={onHackathonsChange} />

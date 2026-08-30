@@ -310,7 +310,7 @@ def update_user_password(database: SqlClient, uid: str, new_password: str) -> bo
     return True
 
 
-def update_user_profile(database: SqlClient, uid: str, display_name: str, email: str | None = None) -> dict:
+def update_user_profile(database: SqlClient, uid: str, display_name: str, email: str | None = None, assistant_name: str | None = None) -> dict:
     doc_ref = get_users_collection(database).document(uid)
     doc = doc_ref.get()
     clean_name = display_name.strip()
@@ -322,14 +322,21 @@ def update_user_profile(database: SqlClient, uid: str, display_name: str, email:
             "created_at": SERVER_TIMESTAMP,
             "updated_at": SERVER_TIMESTAMP,
         }
+        if assistant_name:
+            data["assistant_name"] = assistant_name.strip()
         doc_ref.set(data)
         return data
 
-    doc_ref.update({
+    updates = {
         "display_name": clean_name,
         "updated_at": SERVER_TIMESTAMP,
-    })
+    }
+    if assistant_name:
+        updates["assistant_name"] = assistant_name.strip()
+    doc_ref.update(updates)
     data = doc.to_dict()
     data["uid"] = uid
     data["display_name"] = clean_name
+    if assistant_name:
+        data["assistant_name"] = assistant_name.strip()
     return data

@@ -56,8 +56,11 @@ export function OnboardingPage({ user, onComplete }) {
       const cleanName = name.trim().replace(/\s+/g, ' ')
       const cleanAssistant = assistantName.trim() || 'Eve'
 
-      // 1. Update user profile
-      const updatedUser = await updateUserProfile(cleanName)
+      // 1. Update user profile with assistant name
+      const updatedUser = await updateUserProfile(cleanName, cleanAssistant)
+      try {
+        localStorage.setItem('starwaves_assistant_name', cleanAssistant)
+      } catch {}
 
       // 2. Save AI model choice & assistant name
       if (aiMode === 'builtin') {

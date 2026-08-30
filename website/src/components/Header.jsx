@@ -62,6 +62,7 @@ export function Header({
     }
   }
   const [eveOpen, setEveOpen] = useState(false)
+  const assistantName = user?.assistantName || (typeof localStorage !== 'undefined' ? localStorage.getItem('starwaves_assistant_name') : null) || 'Eve'
   const [darkTheme, setDarkTheme] = useState(
     () => localStorage.getItem('starwaves.theme') === 'dark',
   )
@@ -223,10 +224,10 @@ export function Header({
           className="eve-button"
           type="button"
           onClick={() => setEveOpen(true)}
-          aria-label="Open Eve AI assistant"
+          aria-label={`Open ${assistantName} AI assistant`}
         >
           <Bot size={17} />
-          <span>Eve</span>
+          <span>{assistantName}</span>
         </button>
         <button
           className="icon-button theme-toggle"

@@ -142,6 +142,18 @@ async def save_ai_models(
     if api_key_to_save and not is_default:
         user_keys[payload.provider] = api_key_to_save
 
+    from app.repositories.users import get_user_by_id, update_user_profile as update_profile_in_db
+    user_record = get_user_by_id(database, user["uid"]) or {}
+    is_subscribed = bool(user_record.get("is_subscribed") or user_record.get("subscription_plan"))
+    existing_assistant = user_record.get("assistant_name") or (current_pref or {}).get("assistant_name")
+
+    if payload.assistant_name and existing_assistant and payload.assistant_name.strip().lower() != existing_assistant.strip().lower():
+        if not is_subscribed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Renaming your AI companion is a subscription feature. Upgrade your plan to rename your AI assistant.",
+            )
+
     update_payload = {
         "provider": payload.provider,
         "model": payload.model,
@@ -149,7 +161,9 @@ async def save_ai_models(
         "updated_at": SERVER_TIMESTAMP,
     }
     if payload.assistant_name:
-        update_payload["assistant_name"] = payload.assistant_name.strip()
+        clean_assistant = payload.assistant_name.strip()
+        update_payload["assistant_name"] = clean_assistant
+        update_profile_in_db(database, user["uid"], display_name=user_record.get("display_name") or "User", assistant_name=clean_assistant)
 
     reference = _reference(database, user["uid"])
     reference.set(update_payload, merge=True)

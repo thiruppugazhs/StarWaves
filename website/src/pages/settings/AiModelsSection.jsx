@@ -7,7 +7,8 @@ import {
 } from '../../lib/aiModelsApi'
 import { CustomDropdown, SectionHeading, SettingsCard } from '../../components/ui'
 
-export function AiModelsSection() {
+export function AiModelsSection({ user }) {
+  const isSubscribed = Boolean(user?.isSubscribed || user?.is_subscribed)
   const [providers, setProviders] = useState([])
   const [selectedProvider, setSelectedProvider] = useState('default')
   const [selectedModel, setSelectedModel] = useState('default')
@@ -255,27 +256,63 @@ export function AiModelsSection() {
             <>
               <div className="ai-models-fields">
                 <label>
-                  <span>
-                    <strong>Assistant Name</strong>
-                    <small>Name your autonomous AI companion.</small>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <div>
+                      <strong>Assistant Name</strong>
+                      <small>Name your autonomous AI companion.</small>
+                    </div>
+                    {!isSubscribed && (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          fontSize: '0.6875rem',
+                          fontWeight: '600',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          background: 'rgba(255, 180, 0, 0.12)',
+                          color: 'var(--color-warning, #d97706)',
+                          border: '1px solid rgba(255, 180, 0, 0.25)',
+                        }}
+                      >
+                        <Lock size={12} /> Subscription Required to Rename
+                      </span>
+                    )}
                   </span>
-                  <input
-                    type="text"
-                    value={assistantName}
-                    onChange={(e) => setAssistantName(e.target.value)}
-                    placeholder="e.g. Eve, Jarvis, Aria, Nova"
-                    maxLength={32}
-                    style={{
-                      height: '42px',
-                      padding: '0 14px',
-                      borderRadius: '8px',
-                      background: 'var(--bg-primary)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-primary)',
-                      font: 'inherit',
-                      fontSize: '13px',
-                    }}
-                  />
+                  <div style={{ position: 'relative', width: '100%' }}>
+                    <input
+                      type="text"
+                      value={assistantName}
+                      onChange={(e) => {
+                        if (isSubscribed) {
+                          setAssistantName(e.target.value)
+                        }
+                      }}
+                      disabled={!isSubscribed}
+                      placeholder="e.g. Eve, Jarvis, Aria, Nova"
+                      maxLength={32}
+                      title={!isSubscribed ? "Renaming your AI companion is available with a Pro subscription." : "Change assistant name"}
+                      style={{
+                        width: '100%',
+                        height: '42px',
+                        padding: '0 14px',
+                        borderRadius: '8px',
+                        background: isSubscribed ? 'var(--bg-primary)' : 'var(--bg-surface-muted, rgba(0,0,0,0.03))',
+                        border: '1px solid var(--border-color)',
+                        color: 'var(--text-primary)',
+                        font: 'inherit',
+                        fontSize: '13px',
+                        cursor: isSubscribed ? 'text' : 'not-allowed',
+                        opacity: isSubscribed ? 1 : 0.8,
+                      }}
+                    />
+                  </div>
+                  {!isSubscribed && (
+                    <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>
+                      Your AI companion's name is locked after initial setup. Upgrading to a subscription unlocks renaming anytime.
+                    </small>
+                  )}
                 </label>
 
                 <label>
