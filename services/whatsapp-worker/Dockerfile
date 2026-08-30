@@ -1,21 +1,11 @@
-FROM golang:1.25-alpine AS builder
-
-WORKDIR /app
-
-COPY go.mod go.sum* ./
-RUN go mod download
-
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /app/whatsapp-worker .
-
 FROM alpine:3.19
 
 RUN apk add --no-cache ca-certificates sqlite-libs tzdata
 
 WORKDIR /app
 
-COPY --from=builder /app/whatsapp-worker /app/whatsapp-worker
+COPY whatsapp-worker-linux /app/whatsapp-worker
+RUN chmod +x /app/whatsapp-worker
 
 ENV PORT=3001
 ENV DATA_DIR=/app/data
