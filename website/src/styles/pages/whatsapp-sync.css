@@ -1,0 +1,122 @@
+/* WhatsApp Sync States — split from whatsapp.css (Wave E) */
+/* WhatsApp Sync Full-Screen Loading Bar & Error States */
+.whatsapp-sync-loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 80px);
+  background: var(--bg-primary, #09090b);
+  padding: 24px;
+}
+
+.whatsapp-sync-loading-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-secondary, #121212);
+  border: 1px solid var(--border-color, #27272a);
+  border-radius: var(--radius-lg, 12px);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.2s ease;
+}
+
+.whatsapp-sync-loading-card.is-error {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.whatsapp-sync-logo-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-primary, #09090b);
+  border: 1px solid var(--border-color, #27272a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 16px;
+}
+
+.whatsapp-sync-logo-wrapper.is-error {
+  color: var(--palette-red);
+  border-color: color-mix(in srgb, var(--palette-red) 30%, transparent);
+  background: color-mix(in srgb, var(--palette-red) 8%, transparent);
+}
+
+.whatsapp-sync-title {
+  margin: 0 0 6px 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary, #ffffff);
+}
+
+.whatsapp-sync-step {
+  margin: 0 0 20px 0;
+  font-size: 0.84rem;
+  color: var(--text-secondary, #a1a1aa);
+  min-height: 20px;
+}
+
+.whatsapp-sync-error-desc {
+  margin: 0 0 24px 0;
+  font-size: 0.84rem;
+  color: var(--palette-red);
+  line-height: 1.45;
+}
+
+.whatsapp-sync-progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-primary, #09090b);
+  border: 1px solid var(--border-color, #27272a);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.whatsapp-sync-progress-bar-fill {
+  height: 100%;
+  width: var(--progress, 0%);
+  background: var(--text-primary, #ffffff);
+  border-radius: 999px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whatsapp-sync-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.whatsapp-sync-footer-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.whatsapp-sync-footer-percent {
+  font-weight: 600;
+}
+
+.whatsapp-sync-retry-btn {
+  min-height: 40px;
+  padding: 8px 20px;
+  gap: 8px;
+}
+
+.whatsapp-sync-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+

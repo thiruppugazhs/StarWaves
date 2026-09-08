@@ -1,0 +1,235 @@
+/* Project Detail Page — split from projects.css (Wave B) */
+.project-page-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-3xs) 0 var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.project-page-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-radius: 13px;
+}
+
+.project-page-heading > div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+
+.project-page-heading p {
+  margin: 0 0 var(--space-3xs);
+  color: var(--text-muted);
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-page-heading h1 {
+  margin: 0 0 var(--space-3xs);
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.03em;
+}
+
+.project-page-heading > div:nth-child(2) > span {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+}
+
+.project-page-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.project-page-links a,
+.project-edit-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.project-edit-button {
+  cursor: pointer;
+}
+
+.project-page-links a:hover,
+.project-edit-button:hover {
+  background: var(--bg-tertiary);
+}
+
+.project-page-links a.live-link {
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.project-page-links a.live-link:hover {
+  background: var(--color-primary-hover);
+}
+
+.project-page-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.project-overview-card {
+  min-height: 168px;
+  padding: var(--layout-card-padding);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 13px;
+}
+
+.project-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.project-overview-heading p,
+.project-card-label {
+  margin: 0 0 5px;
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.project-overview-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.project-page-progress {
+  height: 9px;
+}
+
+.project-page-details {
+  display: grid;
+  gap: 14px;
+  margin-top: 17px;
+}
+
+.project-page-details > div {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.project-page-details span {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.project-page-details strong {
+  font-size: 10px;
+}
+
+.project-tech-card {
+  grid-column: auto;
+}
+
+.project-page-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 16px;
+}
+
+.project-page-tags span {
+  padding: 7px 10px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.project-page-tags .project-no-technologies {
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px dashed var(--border-heavy);
+}
+
+.project-edit-modal {
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+}
+
+.project-edit-form {
+  display: grid;
+  gap: 13px;
+  margin-top: 22px;
+}
+
+.project-edit-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.project-edit-form input,
+.project-edit-form select,
+.project-edit-form textarea {
+  width: 100%;
+  padding: 10px 11px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  outline: 0;
+  font: inherit;
+  font-weight: 500;
+}
+
+.project-edit-form input:focus,
+.project-edit-form select:focus,
+.project-edit-form textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+.project-edit-form textarea {
+  resize: vertical;
+}
+
+.project-edit-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.project-save-button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+

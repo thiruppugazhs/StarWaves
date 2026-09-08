@@ -1,37 +1,36 @@
 import asyncio
-import time as _time
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from app.db import SqlClient, get_firestore
 
 from app.core.auth import get_current_user
+from app.core.cache import cache_delete, cache_get, cache_set
 from app.core.config import settings
 from app.core.sync import broadcast_invalidate
 from app.repositories import workspace_files
 
-_tree_cache: dict[str, tuple[float, list]] = {}
-_TREE_TTL = 3  # seconds, short because files change frequently
+_TREE_TTL = 3  # seconds
+_TREE_PREFIX = "ws:tree"
+
 
 def _tree_cache_key(user_id: str, workspace_id: str) -> str:
-    return f"{user_id}:{workspace_id}"
+    return f"{_TREE_PREFIX}:{user_id}:{workspace_id}"
+
 
 def _get_tree_cache(user_id: str, workspace_id: str):
-    key = _tree_cache_key(user_id, workspace_id)
-    entry = _tree_cache.get(key)
-    if entry and entry[0] > _time.monotonic():
-        return entry[1]
-    return None
+    return cache_get(_tree_cache_key(user_id, workspace_id))
+
 
 def _set_tree_cache(user_id: str, workspace_id: str, data: list):
-    key = _tree_cache_key(user_id, workspace_id)
-    _tree_cache[key] = (_time.monotonic() + _TREE_TTL, data)
+    cache_set(_tree_cache_key(user_id, workspace_id), data, ttl=_TREE_TTL)
+
 
 def _invalidate_tree_cache(user_id: str, workspace_id: str | None = None):
     if workspace_id:
-        _tree_cache.pop(_tree_cache_key(user_id, workspace_id), None)
+        cache_delete(_tree_cache_key(user_id, workspace_id))
     else:
-        for k in list(_tree_cache.keys()):
-            if k.startswith(f"{user_id}:"):
-                _tree_cache.pop(k, None)
+        from app.core.cache import cache_invalidate_prefix
+        cache_invalidate_prefix(f"{_TREE_PREFIX}:{user_id}")
 from app.schemas.workspace_files import (
     WorkspaceCreateRequest,
     WorkspaceFileReadResponse,
@@ -77,6 +76,7 @@ async def create_workspace(
     try:
         created = await asyncio.to_thread(workspace_files.create_workspace, user["uid"], body.name)
         _invalidate_tree_cache(user["uid"])
+        await broadcast_invalidate(user["uid"], "workspace_files", {"workspace_id": created.get("id")})
         return WorkspaceItem(**created)
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))
@@ -154,6 +154,7 @@ async def write_file(
     try:
         size = await asyncio.to_thread(workspace_files.write_file, user["uid"], file_path, body.content, body.encoding, workspace_id)
         _invalidate_tree_cache(user["uid"], workspace_id)
+        await broadcast_invalidate(user["uid"], "workspace_files", {"workspace_id": workspace_id})
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))
     return {"path": file_path, "size": size, "written": True}
@@ -171,6 +172,7 @@ async def delete_file(
         if not ok:
             raise HTTPException(status_code=404, detail="File not found.")
         _invalidate_tree_cache(user["uid"], workspace_id)
+        await broadcast_invalidate(user["uid"], "workspace_files", {"workspace_id": workspace_id})
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -10,8 +10,7 @@ PRUNABLE_CODES = {"UNREGISTERED", "INVALID_ARGUMENT", "NOT_FOUND", "MISMATCH_SEN
 
 def _get_fcm_app() -> firebase_admin.App | None:
     try:
-        from app.db import get_firebase_app
-        return get_firebase_app()
+        return firebase_admin.get_app()
     except Exception:
         return None
 

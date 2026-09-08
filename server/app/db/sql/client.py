@@ -130,17 +130,27 @@ class SqlClient:
         """Route collection queries to the matching entity handler (registry-driven)."""
         with Session(self._sync_engine) as session:
             # Collection-group queries (Firestore semantics): fan out to the
-            # per-user handler for every user, bounded by the users table size.
+            # per-user handler for every user, bounded by query limit or 500.
             if len(path_parts) == 2 and path_parts[0] == "__group__":
                 coll = path_parts[1]
                 results: list[SqlSnapshot] = []
+                limit = getattr(query, "_limit", None) or 500
                 user_ids = session.execute(select(User.id)).scalars().all()
                 for uid in user_ids:
                     parts = ["users", uid, coll]
                     handler = registry_lookup(parts, "query")
                     if handler is not None:
-                        results.extend(handler(session, uid, query))
-                return results
+                        # Propagate bound to per-user handler to avoid N×unbounded
+                        per_user = SqlQuery(query.coll)
+                        per_user.filters = list(query.filters)
+                        per_user._order_by = query._order_by
+                        per_user._direction = query._direction
+                        per_user._limit = min(limit - len(results), limit) if limit else None
+                        per_user._start_after_doc_id = query._start_after_doc_id
+                        results.extend(handler(session, uid, per_user))
+                        if len(results) >= limit:
+                            return results[:limit]
+                return results[:limit] if limit else results
             handler = registry_lookup(path_parts, "query")
             if handler is not None:
                 if len(path_parts) == 1:

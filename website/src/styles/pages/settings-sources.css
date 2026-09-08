@@ -1,0 +1,123 @@
+/* Settings Sources — split from settings.css (Wave F) */
+/* Hackathon Sources List */
+.hackathon-source-settings {
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.hackathon-source-list {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hackathon-source-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hackathon-source-row:last-child {
+  border-bottom: none;
+}
+
+.hackathon-source-logo {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.hackathon-source-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.hackathon-source-row strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hackathon-source-row small {
+  display: block;
+  margin: 2px 0 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.hackathon-source-row a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hackathon-source-row a:hover {
+  text-decoration: underline;
+}
+
+.hackathon-source-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  margin-left: 12px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.hackathon-source-row button:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover, #f3f4f6);
+}
+
+.hackathon-source-row button.enabled {
+  border-color: var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.hackathon-source-row button.enabled:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.hackathon-source-message {
+  margin: 0;
+  padding: 14px 22px;
+  background: var(--bg-card, #ffffff);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+

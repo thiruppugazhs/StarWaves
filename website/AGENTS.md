@@ -13,8 +13,8 @@ These instructions apply to all work under `website/`. The repository-level `AGE
 
 ## Design system
 
-- The interface is intentionally monochrome. Use the variables in `src/styles/tokens.css` for all colors, borders, shadows, radii, and transitions.
-- Do not introduce red, blue, green, yellow, purple, gradients, or hard-coded status colors. Status variants must remain distinguishable through black, white, gray, borders, text, and iconography.
+- Use the variables in `src/styles/tokens.css` for shared design properties (borders, shadows, radii, spacing, transitions, and theme tokens).
+- Colors must ONLY come from the `tokens.css` palette via `var(--…)` (dark values in `styles/themes/dark.css`) — never bare hex/`rgb()` literals in CSS, inline styles, or JS color data. Add a named token for any missing hue; tint with `color-mix(in srgb, var(--…) N%, transparent)`. See repo `AGENTS.md` §4.6.2-item-5 for the rule and its narrow exceptions.
 - Prefer semantic token names such as `var(--bg-card)`, `var(--text-secondary)`, `var(--border-color)`, and `var(--color-primary)` over raw color literals.
 - Add shared visual rules to the appropriate component stylesheet and page-only rules to the appropriate file under `src/styles/pages`. Avoid inline styles and duplicated CSS.
 - Support both the default light theme and `html.dark-theme`. Verify contrast, borders, focus rings, disabled states, and hover states in both themes.

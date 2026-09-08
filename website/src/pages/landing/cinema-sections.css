@@ -1,0 +1,240 @@
+/* StarWaves — Cinematic sections: manifesto, showcase, eve, features, workflow, faq, finale (scoped) */
+
+/* — Manifesto — */
+.cinema-manifesto { padding: 72px 24px 64px; border-top: 1px solid var(--cinema-border); border-bottom: 1px solid var(--cinema-border); background: var(--cinema-bg); }
+.cinema-manifesto__rule { display: block; height: 2px; margin: 24px auto 0; max-width: 320px; transform-origin: 50% 50%; background: var(--cinema-gradient-primary); border-radius: 999px; }
+.cinema-manifesto__grid { width: min(1120px, 100%); margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.cinema-card {
+  position: relative; overflow: hidden; padding: 20px 18px; border-radius: 10px;
+  background: var(--cinema-bg-2); border: 1px solid var(--cinema-border); border-top: 2px solid var(--cinema-border-strong);
+}
+.cinema-card::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 72px; pointer-events: none; opacity: 0.1;
+  background: linear-gradient(180deg, var(--cinema-card-sheen, color-mix(in srgb, var(--cinema-primary) 50%, transparent)), transparent);
+}
+.cinema-card.is-work { --cinema-card-sheen: var(--cinema-work); border-top-color: var(--cinema-work); }
+.cinema-card.is-studio { --cinema-card-sheen: var(--cinema-studio); border-top-color: var(--cinema-studio); }
+.cinema-card.is-eve { --cinema-card-sheen: var(--cinema-eve); border-top-color: var(--cinema-eve); }
+.cinema-card__numeral {
+  position: absolute; top: 8px; right: 14px; font-size: 44px; font-weight: 900; letter-spacing: -0.05em;
+  color: transparent; -webkit-text-stroke: 1px var(--cinema-border-strong); opacity: 0.6;
+}
+.cinema-card__icon {
+  width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center;
+  margin-bottom: 14px; border: 1px solid transparent; color: var(--on-fill);
+}
+.cinema-card.is-work .cinema-card__icon { background: var(--cinema-work); }
+.cinema-card.is-studio .cinema-card__icon { background: var(--cinema-studio); }
+.cinema-card.is-eve .cinema-card__icon { background: var(--cinema-eve); }
+.cinema-card__kicker { margin: 0 0 8px; font-size: 10px; font-weight: 750; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cinema-dim); }
+.cinema-card h3 { margin: 0 0 8px; font-size: 16px; font-weight: 800; letter-spacing: -0.02em; white-space: pre-line; line-height: 1.2; color: var(--cinema-text); }
+.cinema-card p { margin: 0; color: var(--cinema-muted); font-size: 13px; line-height: 1.65; }
+
+/* — Showcase (pinned) — */
+.cinema-showcase { position: relative; border-top: 1px solid var(--cinema-border); border-bottom: 1px solid var(--cinema-border); background: var(--cinema-bg); }
+.cinema-showcase__sticky { position: sticky; top: 56px; min-height: calc(100vh - 56px); display: grid; place-items: center; padding: 28px 24px 32px; overflow: hidden; }
+.cinema-showcase__bg {
+  display: block; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 55% 45% at 50% 30%, color-mix(in srgb, var(--cinema-scene, var(--cinema-primary)) 16%, transparent), transparent 72%);
+  transition: background 300ms ease;
+}
+.cinema-showcase__inner { position: relative; z-index: 1; width: min(1120px, 100%); display: grid; gap: 20px; }
+.cinema-showcase__intro { text-align: center; }
+.cinema-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.cinema-tab {
+  position: relative; display: inline-flex; align-items: center; gap: 7px;
+  min-height: 44px; padding: 0 12px; border-radius: 999px;
+  border: 1px solid var(--cinema-border); background: var(--cinema-bg-2);
+  color: var(--cinema-muted); font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.cinema-tab__pill { position: absolute; inset: 0; border-radius: 999px; background: var(--cinema-scene, var(--cinema-primary)); }
+.cinema-tab__content { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 7px; }
+.cinema-tab.is-active { color: var(--on-fill); border-color: transparent; }
+.cinema-tab:hover { border-color: var(--cinema-border-strong); }
+.cinema-reel {
+  display: grid; grid-template-columns: 1.05fr 1.2fr; gap: 14px; align-items: stretch;
+  padding: 14px; border-radius: 10px; background: var(--cinema-bg-2); border: 1px solid var(--cinema-border);
+  min-height: 380px;
+}
+.cinema-reel__copy { padding: 10px 8px; text-align: left; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+.cinema-reel__cta { margin-top: 6px; }
+.cinema-progress--spaced { margin-top: 10px; }
+.cinema-scene-label {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 850;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--cinema-scene, var(--cinema-primary));
+}
+.cinema-scene-label i { width: 8px; height: 8px; border-radius: 999px; background: var(--cinema-scene, var(--cinema-primary)); display: inline-block; box-shadow: 0 0 8px var(--cinema-scene, var(--cinema-primary)); }
+.cinema-reel__copy h3 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--cinema-text); }
+.cinema-reel__copy p { margin: 0; color: var(--cinema-muted); font-size: 13px; line-height: 1.65; }
+.cinema-bullets { display: grid; gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
+.cinema-bullets li { display: flex; align-items: center; gap: 8px; color: var(--cinema-text); font-size: 12.5px; font-weight: 550; }
+.cinema-bullets li i { width: 18px; height: 18px; border-radius: 6px; background: var(--cinema-scene, var(--cinema-primary)); color: var(--on-fill); display: grid; place-items: center; flex-shrink: 0; }
+.cinema-reel__art { position: relative; border-radius: 8px; overflow: hidden; background: var(--cinema-bg); border: 1px solid var(--cinema-border); display: grid; place-items: center; padding: 14px; min-height: 340px; }
+.cinema-art__grid { width: 100%; display: grid; gap: 10px; }
+.cinema-art__split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cinema-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.cinema-mini--mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.cinema-mini--day { text-align: center; padding: 10px; }
+.cinema-mini { padding: 11px 12px; border-radius: 8px; background: var(--cinema-bg-2); border: 1px solid var(--cinema-border); }
+.cinema-mini strong { display: block; color: var(--cinema-text); font-size: 13px; font-weight: 750; letter-spacing: -0.01em; }
+.cinema-mini span { color: var(--cinema-dim); font-size: 11px; }
+.cinema-mini--hero { border-top: 2px solid var(--cinema-scene, var(--cinema-primary)); }
+.cinema-mini--palette { background: linear-gradient(135deg, color-mix(in srgb, var(--cinema-work) 22%, transparent), color-mix(in srgb, var(--cinema-todo) 14%, transparent)); }
+.cinema-mini--eve { background: linear-gradient(135deg, color-mix(in srgb, var(--cinema-studio) 24%, transparent), color-mix(in srgb, var(--cinema-eve) 16%, transparent)); }
+.cinema-mini--active-day { background: var(--cinema-calendar); border-color: transparent; }
+.cinema-mini--active-day strong { color: var(--on-fill); }
+.cinema-mini--active-day span { color: color-mix(in srgb, var(--on-fill) 85%, transparent); }
+.cinema-progress { height: 2px; background: var(--cinema-border); border-radius: 999px; overflow: hidden; }
+.cinema-progress i { display: block; height: 100%; background: var(--cinema-scene, var(--cinema-primary)); border-radius: 999px; }
+.cinema-reduced-note { text-align: center; color: var(--cinema-dim); font-size: 11px; margin: 0; }
+
+/* — Eve — */
+.cinema-eve {
+  position: relative; overflow: hidden; padding: 64px 24px;
+  border-top: 1px solid var(--cinema-border); border-bottom: 1px solid var(--cinema-border);
+  background:
+    radial-gradient(ellipse 55% 40% at 50% 0%, color-mix(in srgb, var(--cinema-eve) 14%, transparent), transparent 72%),
+    var(--cinema-bg);
+}
+.cinema-eve__inner { width: min(1120px, 100%); margin: 0 auto; display: grid; gap: 20px; }
+.cinema-eve__intro { text-align: center; max-width: 760px; margin: 0 auto; }
+.cinema-eve__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.cinema-eve__card { padding: 18px 16px; border-radius: 10px; background: var(--cinema-bg-2); border: 1px solid var(--cinema-border); border-top: 2px solid var(--cinema-eve); text-align: left; }
+.cinema-eve__card h3 { margin: 10px 0 8px; font-size: 14px; font-weight: 800; letter-spacing: -0.01em; color: var(--cinema-text); }
+.cinema-eve__card p { margin: 0 0 12px; color: var(--cinema-muted); font-size: 12.5px; line-height: 1.65; }
+.cinema-eve__icon {
+  width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--cinema-eve); color: var(--on-fill);
+}
+.cinema-eve__icon--voice { background: var(--cinema-calls); }
+.cinema-eve__icon--schedule { background: var(--cinema-growth); }
+.cinema-points { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.cinema-points li { display: flex; align-items: center; gap: 8px; color: var(--cinema-text); font-size: 12px; font-weight: 500; }
+.cinema-points li svg { color: var(--cinema-eve); }
+.cinema-voice {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 12px; align-items: stretch;
+  padding: 12px; border-radius: 10px; background: var(--cinema-bg-2); border: 1px solid var(--cinema-border);
+}
+.cinema-terminal { border-radius: 8px; overflow: hidden; background: var(--cinema-bg); border: 1px solid var(--cinema-border); text-align: left; }
+.cinema-terminal__top { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; background: var(--cinema-bg-2); border-bottom: 1px solid var(--cinema-border); color: var(--cinema-dim); font-size: 11px; font-weight: 650; }
+.cinema-terminal pre { margin: 0; padding: 12px; min-height: 118px; color: var(--cinema-text); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+.cinema-terminal__caret { color: var(--cinema-eve); animation: cinema-blink 1s steps(2) infinite; }
+.cinema-chat { padding: 0 12px 12px; }
+.cinema-chat__bubble { border-radius: 8px; padding: 10px 12px; border: 1px solid var(--cinema-border); background: var(--cinema-bg-2); }
+.cinema-chat__bubble strong { display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cinema-dim); margin-bottom: 4px; }
+.cinema-chat__bubble span { color: var(--cinema-text); font-size: 12.5px; line-height: 1.6; }
+.cinema-chat__bubble--eve { border-color: var(--cinema-eve); }
+.cinema-chat__bubble--eve strong { color: var(--cinema-eve); }
+.cinema-wave { border-radius: 8px; background: var(--cinema-bg); border: 1px solid var(--cinema-border); display: grid; place-items: center; padding: 16px; gap: 10px; }
+.cinema-wave__live { display: flex; align-items: center; gap: 10px; color: var(--cinema-text); font-weight: 800; font-size: 13px; }
+.cinema-wave__dot { width: 8px; height: 8px; border-radius: 999px; background: var(--cinema-eve); display: inline-block; box-shadow: 0 0 8px var(--cinema-eve); animation: cinema-pulse 1.6s ease-in-out infinite; }
+.cinema-wave__quote { margin: 0; color: var(--cinema-muted); font-size: 12px; text-align: center; }
+.cinema-bars { display: flex; align-items: end; gap: 3px; height: 56px; }
+.cinema-bars i { width: 4px; border-radius: 999px; background: var(--cinema-gradient-eve); display: block; }
+
+/* — Features bento — */
+.cinema-features { padding: 64px 24px; background: var(--cinema-bg); border-bottom: 1px solid var(--cinema-border); }
+.cinema-features__grid { width: min(1120px, 100%); margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.cinema-features__grid--bento .cinema-feat--large { grid-column: span 2; }
+.cinema-feat {
+  position: relative; overflow: hidden; padding: 16px 14px; border-radius: 10px;
+  background: var(--cinema-bg-2); border: 1px solid var(--cinema-border); border-top: 2px solid var(--cinema-border-strong);
+  text-align: left; transition: border-color 120ms ease, background 120ms ease;
+}
+.cinema-feat:hover { background: var(--cinema-surface); border-color: var(--cinema-border-strong); }
+.cinema-feat__spot {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 160ms ease;
+  background: radial-gradient(220px circle at var(--spot-x, 50%) var(--spot-y, 50%), color-mix(in srgb, var(--cinema-feat-color, var(--cinema-primary)) 22%, transparent), transparent 70%);
+}
+.cinema-feat:hover .cinema-feat__spot { opacity: 1; }
+.cinema-feat__icon { position: relative; width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; color: var(--on-fill); margin-bottom: 12px; background: var(--cinema-feat-color, var(--cinema-primary)); }
+.cinema-feat h3 { position: relative; margin: 0 0 6px; font-size: 13px; font-weight: 800; letter-spacing: -0.01em; color: var(--cinema-text); }
+.cinema-feat p { position: relative; margin: 0; color: var(--cinema-muted); font-size: 12px; line-height: 1.6; }
+.cinema-feat--todo { --cinema-feat-color: var(--cinema-todo); border-top-color: var(--cinema-todo); }
+.cinema-feat--calendar { --cinema-feat-color: var(--cinema-calendar); border-top-color: var(--cinema-calendar); }
+.cinema-feat--growth { --cinema-feat-color: var(--cinema-growth); border-top-color: var(--cinema-growth); }
+.cinema-feat--projects { --cinema-feat-color: var(--cinema-projects); border-top-color: var(--cinema-projects); }
+.cinema-feat--work { --cinema-feat-color: var(--cinema-work); border-top-color: var(--cinema-work); }
+.cinema-feat--documents { --cinema-feat-color: var(--cinema-documents); border-top-color: var(--cinema-documents); }
+.cinema-feat--mail { --cinema-feat-color: var(--cinema-mail); border-top-color: var(--cinema-mail); }
+.cinema-feat--chats { --cinema-feat-color: var(--cinema-work); border-top-color: var(--cinema-work); }
+
+/* — Workflow (pinned) — */
+.cinema-workflow { position: relative; border-top: 1px solid var(--cinema-border); border-bottom: 1px solid var(--cinema-border); background: var(--cinema-bg); }
+.cinema-workflow__sticky { position: sticky; top: 56px; min-height: calc(100vh - 56px); display: grid; place-items: center; padding: 32px 24px; overflow: hidden; }
+.cinema-workflow__inner { width: min(960px, 100%); display: grid; gap: 20px; }
+.cinema-workflow__intro { text-align: center; max-width: 720px; margin: 0 auto; }
+.cinema-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: left; }
+.cinema-step { position: relative; overflow: hidden; padding: 16px 14px; border-radius: 10px; background: var(--cinema-bg-2); border: 1px solid var(--cinema-border); }
+.cinema-step__ghost {
+  position: absolute; right: 6px; top: 0; font-size: 88px; font-weight: 900; letter-spacing: -0.05em;
+  color: transparent; -webkit-text-stroke: 1px var(--cinema-border-strong); opacity: 0.45; pointer-events: none;
+}
+.cinema-step__num { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: var(--cinema-step-color, var(--cinema-primary)); color: var(--on-fill); font-size: 11px; font-weight: 800; margin-bottom: 10px; }
+.cinema-step__icon { position: relative; width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; background: var(--cinema-step-color, var(--cinema-primary)); color: var(--on-fill); margin-bottom: 10px; }
+.cinema-step--work { --cinema-step-color: var(--cinema-work); }
+.cinema-step--studio { --cinema-step-color: var(--cinema-studio); }
+.cinema-step--eve { --cinema-step-color: var(--cinema-eve); }
+.cinema-step h3 { position: relative; margin: 0 0 8px; font-size: 14px; font-weight: 800; letter-spacing: -0.02em; color: var(--cinema-text); }
+.cinema-step p { position: relative; margin: 0; color: var(--cinema-muted); font-size: 12.5px; line-height: 1.65; }
+.cinema-step.is-active { border-color: var(--cinema-step-color, var(--cinema-primary)); background: var(--cinema-surface); box-shadow: 0 0 20px color-mix(in srgb, var(--cinema-step-color, #a83b59) 25%, transparent); }
+.cinema-rail { height: 2px; background: var(--cinema-border); border-radius: 999px; overflow: hidden; }
+.cinema-rail i { display: block; height: 100%; background: var(--cinema-gradient-primary); border-radius: 999px; }
+
+/* — FAQ split — */
+.cinema-faq { padding: 64px 24px 48px; background: var(--cinema-bg); border-bottom: 1px solid var(--cinema-border); }
+.cinema-faq__inner { width: min(820px, 100%); margin: 0 auto; display: grid; gap: 18px; }
+.cinema-faq__inner--split { width: min(1120px, 100%); grid-template-columns: 0.9fr 1.1fr; gap: 28px; align-items: start; }
+.cinema-faq__side { position: sticky; top: 76px; display: grid; gap: 12px; justify-items: start; text-align: left; }
+.cinema-faq__side .cinema-lead { margin: 0; }
+.cinema-faq__intro { text-align: center; }
+.cinema-faq__list { display: grid; gap: 8px; }
+.cinema-faq__item { border-radius: 8px; background: var(--cinema-bg-2); border: 1px solid var(--cinema-border); overflow: hidden; text-align: left; }
+.cinema-faq__q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  min-height: 56px; padding: 14px; background: transparent; border: 0; color: var(--cinema-text);
+  font-size: 13px; font-weight: 700; letter-spacing: -0.01em; cursor: pointer; text-align: left;
+}
+.cinema-faq__q > span:first-child { flex: 1; }
+.cinema-faq__chev { width: 30px; height: 30px; flex: none; border-radius: 6px; display: grid; place-items: center; background: var(--cinema-bg); border: 1px solid var(--cinema-border); color: var(--cinema-muted); transition: transform 180ms ease; }
+.cinema-faq__a { padding: 0 14px 14px; color: var(--cinema-muted); font-size: 13px; line-height: 1.65; }
+.cinema-faq__item.is-open { border-color: var(--cinema-primary); }
+.cinema-faq__item.is-open .cinema-faq__chev { transform: rotate(180deg); background: var(--cinema-primary); color: var(--on-fill); border-color: transparent; }
+.cinema-faq__answer-wrap { overflow: hidden; }
+
+/* — Finale — */
+.cinema-finale {
+  position: relative; overflow: hidden; display: grid; place-items: center; padding: 72px 24px 0; text-align: center;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 110%, color-mix(in srgb, var(--cinema-primary) 20%, transparent), transparent 72%),
+    radial-gradient(ellipse 45% 40% at 50% 110%, color-mix(in srgb, var(--cinema-eve) 14%, transparent), transparent 72%),
+    var(--cinema-bg);
+  border-top: 1px solid var(--cinema-border);
+}
+.cinema-finale__rings { position: absolute; left: 50%; bottom: -320px; width: 640px; height: 640px; transform: translateX(-50%); pointer-events: none; }
+.cinema-finale__rings span { position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--cinema-border-strong); opacity: 0.5; animation: cinema-ring 9s ease-in-out infinite; }
+.cinema-finale__rings span:nth-child(2) { inset: 70px; animation-delay: -3s; }
+.cinema-finale__rings span:nth-child(3) { inset: 140px; animation-delay: -6s; }
+.cinema-finale__glow { display: none; }
+.cinema-finale__inner { position: relative; z-index: 1; width: min(720px, 100%); display: grid; gap: 14px; justify-items: center; }
+.cinema-finale__title { margin: 0; font-size: clamp(40px, 7vw, 76px); line-height: 0.95; letter-spacing: -0.05em; font-weight: 900; color: var(--cinema-text); }
+.cinema-finale__title span { background: var(--cinema-gradient-studio); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cinema-finale p { margin: 0; max-width: 560px; color: var(--cinema-muted); font-size: 14px; line-height: 1.65; }
+.cinema-finale__ctas { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 6px; }
+.cinema-micro { display: inline-flex; align-items: center; gap: 6px; color: var(--cinema-faint); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+.cinema-marquee--finale { margin-top: 48px; border-bottom: 0; }
+
+@media (prefers-color-scheme: light) {
+  .cinema-eve {
+    background:
+      radial-gradient(ellipse 55% 40% at 50% 0%, rgba(219, 39, 119, 0.1), transparent 72%),
+      #f4f4f5;
+  }
+  .cinema-finale {
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 110%, rgba(124, 58, 237, 0.12), transparent 72%),
+      radial-gradient(ellipse 45% 40% at 50% 110%, rgba(219, 39, 119, 0.08), transparent 72%),
+      #f4f4f5;
+  }
+}

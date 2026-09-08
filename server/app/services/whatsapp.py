@@ -10,6 +10,7 @@ import httpx
 from app.db import SqlClient
 
 from app.core.config import settings
+from app.core.http import create_async_client
 from app.core.whatsapp_ws_manager import whatsapp_ws_manager
 from app.repositories import whatsapp as whatsapp_repo
 from app.schemas.whatsapp import (
@@ -31,7 +32,7 @@ class WhatsAppService:
         # Check whatsmeow worker status first if available — non-blocking; fast-fail 1.5s
         try:
             worker_url = settings.whatsapp_gateway_url
-            async with httpx.AsyncClient(timeout=httpx.Timeout(1.5, connect=0.8)) as client:
+            async with create_async_client(timeout=httpx.Timeout(1.5, connect=0.8)) as client:
                 resp = await client.get(f"{worker_url}/session/status/{user_id}")
                 if resp.is_success:
                     data = resp.json()
@@ -78,7 +79,7 @@ class WhatsAppService:
             if phone_number:
                 payload["phoneNumber"] = phone_number
 
-            async with httpx.AsyncClient(timeout=12.0) as client:
+            async with create_async_client(timeout=12.0) as client:
                 # First check if worker already has a live QR code cached for this user
                 if not phone_number:
                     try:
@@ -212,7 +213,7 @@ class WhatsAppService:
         # Sync chats from worker BEFORE returning — ensures pagination/chat list reflects all new chats
         try:
             worker_url = settings.whatsapp_gateway_url
-            async with httpx.AsyncClient(timeout=httpx.Timeout(1.2, connect=0.8)) as client:
+            async with create_async_client(timeout=httpx.Timeout(1.2, connect=0.8)) as client:
                 resp = await client.get(f"{worker_url}/session/chats/{user_id}")
                 if resp.is_success:
                     worker_chats = resp.json().get("chats") or []
@@ -281,7 +282,7 @@ class WhatsAppService:
         if chat_id != "eve":
             try:
                 worker_url = settings.whatsapp_gateway_url
-                async with httpx.AsyncClient(timeout=httpx.Timeout(0.8, connect=0.5)) as client:
+                async with create_async_client(timeout=httpx.Timeout(0.8, connect=0.5)) as client:
                     resp = await client.get(f"{worker_url}/session/messages/{user_id}/{chat_id}")
                     if resp.is_success:
                         worker_msgs = resp.json().get("messages") or []
@@ -342,7 +343,7 @@ class WhatsAppService:
         if chat_id != "eve":
             try:
                 worker_url = settings.whatsapp_gateway_url
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with create_async_client(timeout=5.0) as client:
                     await client.post(
                         f"{worker_url}/session/send",
                         json={
@@ -366,7 +367,7 @@ class WhatsAppService:
         # Handle Eve interaction if messaging Eve or mentioning Eve / owner aliases / custom keywords
         user_settings = whatsapp_repo.get_whatsapp_settings(database, user_id)
         eve_tag = (user_settings.eve_tag or "@eve").lower()
-        owner_aliases = [a.lower().strip() for a in (user_settings.owner_aliases or ["@me", "@user"]) if a.strip()]
+        owner_aliases = [a.lower().strip() for a in (user_settings.owner_aliases or ["@susindran", "@susin"]) if a.strip()]
         keywords = [k.lower().strip() for k in (user_settings.keywords or ["@eve", "eve"]) if k.strip()]
         text_lower = content.lower()
 
@@ -449,7 +450,7 @@ class WhatsAppService:
         if chat_id != "eve" and eve_reply_text:
             try:
                 worker_url = settings.whatsapp_gateway_url
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with create_async_client(timeout=5.0) as client:
                     await client.post(
                         f"{worker_url}/session/send",
                         json={

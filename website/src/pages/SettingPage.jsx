@@ -1,3 +1,11 @@
+import "../styles/pages/settings-shell.css"
+import "../styles/pages/settings-integrations.css"
+import "../styles/pages/settings-ai.css"
+import "../styles/pages/settings-sources.css"
+import "../styles/pages/settings-account-danger.css"
+import "../styles/pages/settings-account-profile.css"
+import "../styles/pages/settings-whatsapp.css"
+import "../styles/pages/settings-whatsapp-eve.css"
 import { useEffect, useRef, useState } from 'react'
 import { TabNav } from '../components/ui'
 import { AccountSection } from './settings/AccountSection'
@@ -7,10 +15,12 @@ import { AutoMemorySection } from './settings/AutoMemorySection'
 import { CodingSection } from './settings/CodingSection'
 import { AppearanceSection } from './settings/AppearanceSection'
 import { DeviceSection } from './settings/DeviceSection'
+import { EveAvatarSection } from './settings/EveAvatarSection'
 import { EveVoiceSection } from './settings/EveVoiceSection'
 import { HackathonSourcesSection } from './settings/HackathonSourcesSection'
 import { ProfileSection } from './settings/ProfileSection'
 import { ThemeSection } from './settings/ThemeSection'
+import { UpdateSection } from './settings/UpdateSection'
 import { WhatsAppSection } from './settings/WhatsAppSection'
 
 const SETTINGS_SECTIONS = [
@@ -24,7 +34,9 @@ const SETTINGS_SECTIONS = [
   { id: 'settings-coding', href: '#settings-coding', label: 'Coding profiles' },
   { id: 'settings-hackathons', href: '#settings-hackathons', label: 'Hackathons' },
   { id: 'settings-eve-voice', href: '#settings-eve-voice', label: 'Eve voice' },
+  { id: 'settings-eve-avatar', href: '#settings-eve-avatar', label: 'Eve avatar' },
   { id: 'settings-devices', href: '#settings-devices', label: 'Devices & sessions' },
+  { id: 'settings-updates', href: '#settings-updates', label: 'Updates' },
   { id: 'settings-account', href: '#settings-account', label: 'Account & security' },
 ]
 
@@ -109,13 +121,6 @@ export function SettingPage({
 
   return (
     <section className="setting-page">
-      <div className="page-heading">
-        <div>
-          <p>Account</p>
-          <h1>Settings</h1>
-        </div>
-      </div>
-
       <TabNav
         tabs={SETTINGS_SECTIONS}
         activeTab={activeSection}
@@ -140,7 +145,9 @@ export function SettingPage({
       <CodingSection user={user} onContestSitesChange={onContestSitesChange} />
       <HackathonSourcesSection user={user} onHackathonsChange={onHackathonsChange} />
       <EveVoiceSection />
+      <EveAvatarSection />
       <DeviceSection />
+      <UpdateSection />
       <AccountSection user={user} onSignOut={onSignOut} />
     </section>
   )

@@ -41,52 +41,80 @@
 
 /* ── Fullscreen exceptions — no gutters, true edge-to-edge ── */
 .content.whatsapp-fullscreen-content,
+.content.workspace-fullscreen-content,
+.content.avatar-fullscreen-content,
+.content:has(.whatsapp-page),
 .content:has(.whatsapp-page-wrapper),
 .content:has(.workspace-page),
-.content:has(.studio-builder) {
+.content:has(.studio-builder),
+.content:has(.studio-page-builder),
+.content:has(.studio-page-gallery),
+.content:has(.avatar-studio) {
   width: 100%;
   max-width: none;
   margin: 0;
   padding: 0 !important;
   overflow: hidden !important;
   height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
 }
 
-/* Studio builder on small screens: let content scroll */
-@media (max-width: 820px) {
-  .content:has(.studio-builder) {
-    overflow-y: auto !important;
-  }
+.content:has(.studio-builder) > .app-page-enter {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
-/* Studio hero: full-bleed prompt landing — flex-fills without phantom scrollbar */
-.content:has(.studio-hero) {
+.content:has(.todo-page) {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: var(--space-md) var(--space-lg) var(--space-xl);
   display: flex;
   flex-direction: column;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.content:has(.studio-hero) > .studio-page {
   flex: 1;
-  padding-top: 0;
-  padding-bottom: 0;
+  min-height: 100%;
 }
 
-/* Eve chat — full-height viewport, symmetric inner padding */
 .content:has(.eve-page-container) {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - var(--header-height));
-  max-height: calc(100vh - var(--header-height));
-  overflow: hidden;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  height: calc(100vh - var(--header-height)) !important;
+  max-height: calc(100vh - var(--header-height)) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
   padding: var(--space-sm) var(--content-gutter) var(--space-sm);
 }
 
-.content:has(.eve-page-container) > .eve-page-container {
-  flex: 1;
-  min-height: 0;
-  height: 100%;
+.content:has(.eve-page-container) > .app-page-enter {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Keep fullscreen route content stretched beneath the app header. */
+.content:has(.whatsapp-page) > .app-page-enter {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.content:has(.eve-page-container) .eve-page-container {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
   width: 100%;
   max-width: var(--content-max-width);
   margin-inline: auto;
@@ -105,6 +133,59 @@
   max-width: 100%;
   margin: 0;
   min-width: 0;
+}
+
+/* The disconnected mail state is a full-page onboarding surface. */
+.content:has(.mail-page-container) {
+  width: 100%;
+  max-width: none;
+  padding: var(--space-lg) var(--content-gutter) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.content:has(.mail-page-container) > .app-page-enter {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Chats uses an internal split-pane shell that should occupy the available
+   viewport below the app header while retaining the standard content gutters. */
+.content:has(.chats-page) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.content:has(.chats-page) > .app-page-enter {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Contacts uses the available viewport for its directory surface while
+   retaining the shared content gutters and natural page scrolling. */
+.content:has(.contacts-page) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.content:has(.contacts-page) > .app-page-enter {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
 }
 
 /* ── Page heading — symmetric, token-driven ── */
@@ -130,6 +211,8 @@
 .dashboard-heading,
 .project-page-heading,
 .calendar-toolbar {
+  display: flex;
+  justify-content: space-between;
   min-height: 72px;
   align-items: center;
   gap: var(--space-md);
@@ -138,6 +221,13 @@
 .page-heading {
   padding-bottom: var(--space-md);
   border-bottom: 1px solid var(--border-color);
+}
+
+/* Title lives in the topbar — PageHeader renders description/actions only */
+.page-heading.is-toolbar {
+  min-height: 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 0;
 }
 
 .page-heading > :first-child,
@@ -150,6 +240,8 @@
 
 .page-heading-actions,
 .dashboard-heading-actions,
+.dashboard-inline-actions,
+.page-inline-actions,
 .project-page-header-actions,
 .calendar-actions {
   display: flex;
@@ -163,6 +255,8 @@
 :where(
   .page-heading-actions,
   .dashboard-heading-actions,
+  .dashboard-inline-actions,
+  .page-inline-actions,
   .project-page-header-actions,
   .calendar-actions
 ) :where(button, a, select, input) {
@@ -220,10 +314,21 @@
 }
 
 .calendar-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding: 0 !important;
+  overflow: hidden;
   width: 100%;
   max-width: 100%;
   margin: 0;
+}
+
+.calendar-content > .app-page-enter {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .calendar-toolbar {
@@ -250,8 +355,7 @@
   margin-inline: auto;
 }
 
-.landing-hero,
-.auth-page {
+.landing-hero {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--section-gap);
 }
@@ -262,12 +366,6 @@
   padding-left: max(var(--content-gutter), calc((100% - var(--layout-public-max-width)) / 2));
 }
 
-.auth-form-panel,
-.auth-brand-panel {
-  min-width: 0;
-}
-
-.auth-form-shell,
 .onboarding-card {
   width: min(100%, 480px);
   margin-inline: auto;
@@ -285,8 +383,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .landing-hero,
-  .auth-page {
+  .landing-hero {
     grid-template-columns: 1fr;
   }
 }
@@ -316,6 +413,8 @@
 
   .page-heading-actions,
   .dashboard-heading-actions,
+  .dashboard-inline-actions,
+  .page-inline-actions,
   .project-page-header-actions,
   .calendar-actions {
     width: 100%;
@@ -324,8 +423,18 @@
 }
 
 @media (max-width: 640px) {
+  .calendar-content {
+    overflow-y: auto;
+  }
+
+  .calendar-page {
+    min-height: 100%;
+  }
+
   .page-heading-actions,
   .dashboard-heading-actions,
+  .dashboard-inline-actions,
+  .page-inline-actions,
   .project-page-header-actions,
   .calendar-actions {
     flex-wrap: wrap;
@@ -334,6 +443,8 @@
 
   .page-heading-actions > :where(button, a),
   .dashboard-heading-actions > :where(button, a, div),
+  .dashboard-inline-actions > :where(button, a, div),
+  .page-inline-actions > :where(button, a),
   .project-page-header-actions > :where(button, a),
   .calendar-actions > :where(button, a) {
     flex: 1 1 calc(50% - var(--space-2xs));

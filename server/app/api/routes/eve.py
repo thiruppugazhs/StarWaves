@@ -36,7 +36,6 @@ from app.services.speech import (
     resolve_tts_engine,
     stream_speech_openrouter,
     synthesize_speech,
-    synthesize_speech_elevenlabs,
     synthesize_speech_openrouter,
     transcribe_audio,
     transcribe_audio_deepgram,
@@ -99,22 +98,13 @@ async def synthesize(
     user: dict = Depends(get_current_user),
 ):
     engine, voice = await asyncio.to_thread(resolve_tts_engine, database, user["uid"])
-    if engine not in ("elevenlabs", "google", "openrouter"):
+    if engine not in ("google", "openrouter"):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Server text-to-speech is not configured. Select a server TTS provider or use browser voice.",
         )
     try:
-        if engine == "elevenlabs":
-            audio_bytes, media_type = await asyncio.to_thread(
-                synthesize_speech_elevenlabs,
-                payload.text,
-                payload.language,
-                payload.voice or voice,
-                payload.rate,
-                payload.pitch,
-            )
-        elif engine == "openrouter":
+        if engine == "openrouter":
             audio_bytes, media_type = await asyncio.to_thread(
                 synthesize_speech_openrouter,
                 payload.text,
@@ -227,13 +217,21 @@ async def chat(
     user: dict = Depends(get_current_user),
 ):
     # Offload heavy LLM + tool loop to thread to keep event loop responsive; LLM calls are sync httpx
-    message, changed_resources, actions = await asyncio.to_thread(
-        chat_with_eve,
-        database,
-        user,
-        [item.model_dump() for item in payload.messages],
-        payload.session_id,
-    )
+    messages = [item.model_dump() for item in payload.messages]
+    if payload.provider or payload.model:
+        result = await asyncio.to_thread(
+            chat_with_eve,
+            database,
+            user,
+            messages,
+            payload.session_id,
+            payload.provider,
+            payload.model,
+            payload.editor_context,
+        )
+    else:
+        result = await asyncio.to_thread(chat_with_eve, database, user, messages, payload.session_id, None, None, payload.editor_context)
+    message, changed_resources, actions = result
     return {"message": message, "changed_resources": changed_resources, "actions": actions}
 
 

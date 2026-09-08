@@ -31,7 +31,7 @@ PREVIEW_TOKEN_MAX_AGE_SECONDS = 7 * 24 * 3600
 PREVIEW_TOKEN_SALT = "studio-preview"
 
 GIT_AUTHOR_NAME = "StarWaves Studio"
-GIT_AUTHOR_EMAIL = "studio@starwaves.app"
+GIT_AUTHOR_EMAIL = "studio@starwaves.susindran.in"
 
 # Build output directories checked in order when serving previews.
 PREVIEW_BUILD_DIRS = ("dist", "build", "out", "public")

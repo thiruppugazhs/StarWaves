@@ -1,3 +1,4 @@
+import "../styles/pages/jobs.css"
 import { useEffect, useMemo, useState } from 'react'
 import {
   BriefcaseBusiness,
@@ -14,8 +15,9 @@ import {
 } from 'lucide-react'
 import { usePersistentState } from '../hooks/usePersistentState'
 import { createJob, deleteJob, updateJob } from '../lib/workspaceApi'
-import { Alert, ConfirmDialog, CustomDropdown, EmptyState, FilterBar, Modal, PageHeader, SearchBar } from '../components/ui'
-import { buildApplicationTimeline } from '../utils/jobTimeline'
+import { ConfirmDialog, CustomDropdown, EmptyState, FilterBar, SearchBar } from '../components/ui'
+import { JobModals } from './jobs/JobModals'
+import { JobPipelineSummary } from './jobs/JobPipelineSummary'
 
 const emptyJob = {
   company: '',
@@ -77,8 +79,6 @@ export function JobsPage({ jobs, setJobs, documents, createIntent, canLoadMore, 
   }, [jobs, searchQuery, statusFilter, workTypeFilter, sortOrder])
 
   const activeFilters = statusFilter !== 'All' || workTypeFilter !== 'All' || searchQuery
-
-  const { months, max, total } = useMemo(() => buildApplicationTimeline(jobs), [jobs])
 
   const toggleJob = (jobId) => {
     setOpenJobs((current) => {
@@ -168,54 +168,6 @@ export function JobsPage({ jobs, setJobs, documents, createIntent, canLoadMore, 
 
   return (
     <section className="jobs-page">
-      <PageHeader
-        eyebrow="Career tracker"
-        title="Jobs"
-        description={`${jobs.length} opportunities in your pipeline`}
-        actions={
-          <button
-            className="primary-button jobs-add-button"
-            onClick={() => setFormOpen(true)}
-          >
-            <Plus size={17} />
-            Add job
-          </button>
-        }
-      />
-
-      <div className="jobs-summary" aria-label="Job pipeline summary">
-        {jobStatuses.slice(0, 4).map((status) => (
-          <button key={status} className={`jobs-summary-item ${statusFilter === status ? 'active' : ''}`} onClick={() => setStatusFilter(statusFilter === status ? 'All' : status)}>
-            <strong>{jobs.filter((job) => job.status === status).length}</strong><span>{status}</span>
-          </button>
-        ))}
-<div className="jobs-summary-item jobs-summary-total"><strong>{jobs.length}</strong><span>Total tracked</span></div>
-      </div>
-
-      <article className="jobs-timeline-card" aria-label={`Applications per month over the last 12 months: ${total} applications`}>
-        <header className="jobs-timeline-heading">
-          <div>
-            <p>Activity</p>
-            <h2>Application frequency</h2>
-          </div>
-          <span>{total} applications · 12 months</span>
-        </header>
-        <div className="jobs-timeline-chart" role="img" aria-label={`Bar chart of ${total} job applications across the last 12 months`}>
-          {months.map((month) => (
-            <div className="jobs-timeline-bar-wrap" key={month.key} title={`${month.fullLabel}: ${month.count}`}>
-              <div className="jobs-timeline-bar" style={{ height: max ? `${Math.max(6, Math.round((month.count / max) * 100))}%` : '6%' }}>
-                {month.count > 0 && <span className="jobs-timeline-bar-count">{month.count}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="jobs-timeline-labels" aria-hidden="true">
-          {months.map((month) => (
-            <span key={month.key}>{month.label}</span>
-          ))}
-        </div>
-      </article>
-
       <FilterBar
         className="jobs-toolbar"
         search={
@@ -253,12 +205,25 @@ export function JobsPage({ jobs, setJobs, documents, createIntent, canLoadMore, 
             />
           </>
         }
+        actions={
+          <button className="primary-button jobs-add-button" type="button" onClick={() => setFormOpen(true)}>
+            <Plus size={17} />
+            Add job
+          </button>
+        }
         isFiltered={Boolean(activeFilters)}
         onReset={() => {
           setSearchQuery('')
           setStatusFilter('All')
           setWorkTypeFilter('All')
         }}
+      />
+
+      <JobPipelineSummary
+        jobs={jobs}
+        jobStatuses={jobStatuses}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
       />
 
       <div className="job-list">
@@ -403,106 +368,26 @@ export function JobsPage({ jobs, setJobs, documents, createIntent, canLoadMore, 
 
       {canLoadMore && <button className="secondary-button" type="button" onClick={onLoadMore} disabled={loadingMore}>{loadingMore ? 'Loading…' : 'Load more jobs'}</button>}
 
-      <Modal
-        isOpen={formOpen}
-        onClose={() => setFormOpen(false)}
-        className="job-modal"
-        subtitle="Career"
-        title="Add job record"
-      >
-        <form className="project-edit-form" onSubmit={addJob}>
-          {jobError && (
-            <Alert variant="error" onDismiss={() => setJobError('')}>
-              {jobError}
-            </Alert>
-          )}
-          <div className="project-edit-form-row">
-            <label>Company<input value={form.company} onChange={(event) => updateField('company', event.target.value)} required data-modal-initial-focus /></label>
-            <label>Role<input value={form.role} onChange={(event) => updateField('role', event.target.value)} required /></label>
-            <label>Status<select value={form.status} onChange={(event) => updateField('status', event.target.value)}><option>Saved</option><option>Applied</option><option>Interview</option><option>Offer</option><option>Rejected</option></select></label>
-          </div>
-          <div className="project-edit-form-row">
-            <label>Location<input value={form.location} onChange={(event) => updateField('location', event.target.value)} /></label>
-            <label>Work type<select value={form.workType} onChange={(event) => updateField('workType', event.target.value)}><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Hybrid</option></select></label>
-            <label>Salary<input value={form.salary} onChange={(event) => updateField('salary', event.target.value)} /></label>
-          </div>
-          <div className="project-edit-form-row">
-            <label>Applied date<input type="date" value={form.appliedDate} onChange={(event) => updateField('appliedDate', event.target.value)} /></label>
-            <label>Interview date<input type="date" value={form.interviewDate} onChange={(event) => updateField('interviewDate', event.target.value)} /></label>
-            <label>Deadline<input type="date" value={form.deadline} onChange={(event) => updateField('deadline', event.target.value)} /></label>
-          </div>
-          <label>
-            Resume used
-            <select
-              value={form.resumeId}
-              onChange={(event) =>
-                updateField('resumeId', event.target.value)
-              }
-            >
-              <option value="">No resume selected</option>
-              {resumeDocuments.map((document) => (
-                <option key={document.id} value={document.id}>
-                  {document.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>Job URL<input type="url" value={form.jobUrl} onChange={(event) => updateField('jobUrl', event.target.value)} /></label>
-          <label>Notes<textarea rows="3" value={form.notes} onChange={(event) => updateField('notes', event.target.value)} /></label>
-          <div className="todo-modal-actions"><button className="secondary-button" type="button" onClick={() => setFormOpen(false)} disabled={jobSaving}>Cancel</button><button className="primary-button jobs-add-button" type="submit" disabled={jobSaving}><Plus size={16} />{jobSaving ? 'Saving…' : 'Add job'}</button></div>
-        </form>
-      </Modal>
-
-      <Modal
-        isOpen={Boolean(editingJob)}
-        onClose={() => setEditingJob(null)}
-        className="job-modal"
-        subtitle="Career"
-        title="Edit job record"
-      >
-        <form className="project-edit-form" onSubmit={saveJobEdit}>
-          {editError && (
-            <Alert variant="error" onDismiss={() => setEditError('')}>
-              {editError}
-            </Alert>
-          )}
-          <div className="project-edit-form-row">
-            <label>Company<input value={editForm.company} onChange={(event) => updateEditField('company', event.target.value)} required data-modal-initial-focus /></label>
-                <label>Location<input value={editForm.location} onChange={(event) => updateEditField('location', event.target.value)} /></label>
-                <label>Work type<select value={editForm.workType} onChange={(event) => updateEditField('workType', event.target.value)}><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Hybrid</option></select></label>
-                <label>Salary<input value={editForm.salary} onChange={(event) => updateEditField('salary', event.target.value)} /></label>
-              </div>
-              <div className="project-edit-form-row">
-                <label>Applied date<input type="date" value={editForm.appliedDate} onChange={(event) => updateEditField('appliedDate', event.target.value)} /></label>
-                <label>Interview date<input type="date" value={editForm.interviewDate} onChange={(event) => updateEditField('interviewDate', event.target.value)} /></label>
-                <label>Deadline<input type="date" value={editForm.deadline} onChange={(event) => updateEditField('deadline', event.target.value)} /></label>
-              </div>
-              <label>
-                Resume used
-                <select
-                  value={editForm.resumeId}
-                  onChange={(event) =>
-                    updateEditField('resumeId', event.target.value)
-                  }
-                >
-                  <option value="">No resume selected</option>
-                  {resumeDocuments.map((document) => (
-                    <option key={document.id} value={document.id}>
-                      {document.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>Job URL<input type="url" value={editForm.jobUrl} onChange={(event) => updateEditField('jobUrl', event.target.value)} /></label>
-              <label>Notes<textarea rows="3" value={editForm.notes} onChange={(event) => updateEditField('notes', event.target.value)} /></label>
-              <div className="todo-modal-actions">
-                <button className="secondary-button" type="button" onClick={() => setEditingJob(null)} disabled={editSaving}>Cancel</button>
-                <button className="primary-button jobs-add-button" type="submit" disabled={editSaving}>{editSaving ? 'Saving…' : 'Save changes'}</button>
-              </div>
-            </form>
-          </Modal>
+      <JobModals
+        formOpen={formOpen}
+        setFormOpen={setFormOpen}
+        form={form}
+        updateField={updateField}
+        addJob={addJob}
+        jobSaving={jobSaving}
+        jobError={jobError}
+        setJobError={setJobError}
+        resumeDocuments={resumeDocuments}
+        editingJob={editingJob}
+        setEditingJob={setEditingJob}
+        editForm={editForm}
+        updateEditField={updateEditField}
+        saveJobEdit={saveJobEdit}
+        editSaving={editSaving}
+        editError={editError}
+        setEditError={setEditError}
+      />
       <ConfirmDialog isOpen={Boolean(deleteId)} message="Are you sure you want to delete this job entry?" onCancel={() => setDeleteId(null)} onConfirm={confirmDeleteJob} />
     </section>
   )
 }
-

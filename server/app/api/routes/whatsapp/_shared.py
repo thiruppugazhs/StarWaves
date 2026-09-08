@@ -6,7 +6,7 @@ from app.repositories import whatsapp as whatsapp_repo
 def has_eve_mention(content: str, user_settings) -> bool:
     text_lower = (content or "").lower()
     eve_tag = (user_settings.eve_tag or "@eve").lower()
-    owner_aliases = [a.lower().strip() for a in (user_settings.owner_aliases or ["@me", "@user"]) if a.strip()]
+    owner_aliases = [a.lower().strip() for a in (user_settings.owner_aliases or ["@susindran", "@susin"]) if a.strip()]
     keywords = [k.lower().strip() for k in (user_settings.keywords or ["@eve", "eve"]) if k.strip()]
     return (
         eve_tag in text_lower

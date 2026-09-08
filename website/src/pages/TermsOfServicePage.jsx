@@ -37,7 +37,7 @@ export function TermsOfServicePage({ onNavigate }) {
           <section>
             <h2>1. Acceptance of Terms</h2>
             <p>
-              By accessing or using <strong>StarWaves</strong> (accessible via <strong>starwaves.app</strong>), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, please do not access or use the application.
+              By accessing or using <strong>StarWaves</strong> (accessible via <strong>starwaves.susindran.in</strong>), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, please do not access or use the application.
             </p>
           </section>
 
@@ -96,8 +96,8 @@ export function TermsOfServicePage({ onNavigate }) {
               For questions regarding these Terms of Service, please contact:
             </p>
             <p className="legal-contact">
-              Email: <a href="mailto:support@starwaves.app" className="legal-link">support@starwaves.app</a><br />
-              Domain: starwaves.app
+              Email: <a href="mailto:dev@susindran.in" className="legal-link">dev@susindran.in</a><br />
+              Domain: starwaves.susindran.in
             </p>
           </section>
         </article>

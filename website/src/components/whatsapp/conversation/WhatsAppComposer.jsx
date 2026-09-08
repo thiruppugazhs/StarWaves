@@ -33,7 +33,7 @@ export function WhatsAppComposer({
     <>
       {!isEve && (
         <div className="whatsapp-eve-prompt-bar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)' }}>
+          <div className="whatsapp-eve-prompt-label">
             <Bot size={16} />
             <span>Need assistance responding?</span>
           </div>
@@ -72,7 +72,7 @@ export function WhatsAppComposer({
             </p>
           </div>
           {replyingTo.media && (replyingTo.media.url || replyingTo.media.thumbnail_base64) && (
-            <div className="whatsapp-quoted-thumb-wrapper" style={{ marginRight: 8 }}>
+            <div className="whatsapp-quoted-thumb-wrapper whatsapp-quoted-thumb-wrapper--spaced">
               <img src={replyingTo.media.url || replyingTo.media.thumbnail_base64} alt="Attachment preview" className="whatsapp-quoted-thumb" />
             </div>
           )}
@@ -95,9 +95,9 @@ export function WhatsAppComposer({
             ))}
           </div>
           <div className="whatsapp-media-tray-stickers">
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', marginBottom: 4, display: 'block' }}>Quick Mentions / Tags</span>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {['@assistant', '@me', '@urgent', '@mynumber'].map((tag) => (
+            <span className="whatsapp-tray-label">Quick Mentions / Tags</span>
+            <div className="whatsapp-tray-row">
+              {['@eve', '@susindran', '@susin', '@mynumber', '@myjid'].map((tag) => (
                 <button
                   key={tag}
                   type="button"
@@ -111,8 +111,8 @@ export function WhatsAppComposer({
             </div>
           </div>
           <div className="whatsapp-media-tray-stickers">
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', marginBottom: 4, display: 'block' }}>Quick Stickers / Expressions</span>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <span className="whatsapp-tray-label">Quick Stickers / Expressions</span>
+            <div className="whatsapp-tray-row">
               {['🤖', '🌟', '🎯', '💫', '🪄', '💎', '🚀', '🛡️'].map((stk) => (
                 <button
                   key={stk}
@@ -138,11 +138,11 @@ export function WhatsAppComposer({
       )}
 
       <form className="whatsapp-composer" onSubmit={handleSend}>
-        <input type="file" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
-        <button type="button" className="whatsapp-icon-btn" onClick={() => setShowEmojiPicker((prev) => !prev)} title="Emojis">
+        <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="whatsapp-composer-file-input" />
+        <button type="button" className="whatsapp-icon-btn" onClick={() => setShowEmojiPicker((prev) => !prev)} title="Emojis" aria-label="Toggle emoji picker">
           <Smile size={18} />
         </button>
-        <button type="button" className="whatsapp-icon-btn" onClick={() => fileInputRef.current?.click()} title="Attach media or document">
+        <button type="button" className="whatsapp-icon-btn" onClick={() => fileInputRef.current?.click()} title="Attach media or document" aria-label="Attach media or document">
           <Paperclip size={18} />
         </button>
         <input
@@ -156,10 +156,10 @@ export function WhatsAppComposer({
         />
         <button
           type="button"
-          className={`whatsapp-icon-btn ${isRecording ? 'recording' : ''}`}
+          className={`whatsapp-icon-btn ${isRecording ? 'recording whatsapp-icon-btn--recording' : ''}`}
           onClick={handleSimulateVoiceNote}
           title={isRecording ? 'Stop & send voice note' : 'Record voice note'}
-          style={isRecording ? { background: 'var(--text-primary)', color: 'var(--bg-primary)' } : {}}
+          aria-label={isRecording ? 'Stop recording' : 'Record voice note'}
         >
           {isRecording ? <Square size={16} /> : <Mic size={18} />}
         </button>

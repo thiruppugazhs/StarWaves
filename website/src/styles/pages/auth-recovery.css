@@ -1,0 +1,288 @@
+/* Auth Recovery — split from landing-auth.css (Wave F) */
+.auth-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.auth-step-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+}
+
+.auth-step-pill.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.auth-step-pill.completed {
+  border-color: var(--border-heavy);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.auth-step-pill .step-num {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--on-fill) 20%, transparent);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.auth-step-pill.active .step-num {
+  background: var(--text-inverse);
+  color: var(--color-primary);
+}
+
+.auth-step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+  transition: background var(--transition-fast);
+}
+
+.auth-step-line.active {
+  background: var(--border-heavy);
+}
+
+.auth-email-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.auth-change-email-btn {
+  padding: 2px 8px;
+  border: 1px solid var(--border-heavy);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-otp-group {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.auth-otp-field {
+  width: 100% !important;
+  max-width: 52px;
+  height: 54px !important;
+  padding: 0 !important;
+  text-align: center;
+  font-size: 20px !important;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.auth-otp-field:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+.auth-resend-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -4px;
+}
+
+.auth-resend-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-resend-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-resend-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.auth-password-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: -4px;
+}
+
+.auth-password-rules span.valid {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.auth-success-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--bg-card);
+  gap: 12px;
+}
+
+.auth-success-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  margin-bottom: 8px;
+}
+
+.auth-success-card h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.auth-success-card p {
+  margin: 0 0 16px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.auth-success-card .auth-submit {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .auth-cinematic {
+    padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+    overflow-x: hidden;
+  }
+
+  .auth-split__form {
+    padding: 24px 20px;
+  }
+
+  .auth-heading {
+    margin-bottom: 22px;
+  }
+
+  .auth-heading h2 {
+    font-size: 24px;
+  }
+
+  .auth-heading span {
+    font-size: 13px;
+  }
+
+  .auth-form {
+    gap: 14px;
+  }
+
+  .auth-form label span input {
+    font-size: 16px !important;
+    height: 48px;
+    padding: 0 42px 0 42px;
+  }
+
+  .auth-google,
+  .auth-submit {
+    height: 48px;
+    font-size: 13.5px;
+    min-height: 48px;
+  }
+
+  .auth-switch {
+    margin-top: 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-cinematic {
+    padding: 20px 14px calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .auth-split {
+    border-radius: var(--radius-lg);
+  }
+
+  .auth-split__form {
+    padding: 22px 18px;
+  }
+
+  .auth-heading h2 {
+    font-size: 22px;
+  }
+
+  .auth-heading span {
+    font-size: 12.5px;
+  }
+
+  .auth-form label span input {
+    font-size: 16px !important;
+    height: 46px;
+  }
+
+  .auth-google,
+  .auth-submit {
+    height: 46px;
+    font-size: 13px;
+  }
+}
+
+/* Ensure inputs never trigger iOS zoom and tap targets are 44px+ */
+.auth-form label span input,
+.onboarding-form input,
+.auth-otp-field {
+  font-size: 16px;
+}
+@media (min-width: 901px) {
+  .auth-form label span input {
+    font-size: 13px;
+  }
+}

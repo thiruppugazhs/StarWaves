@@ -1,3 +1,4 @@
+import '../../styles/pages/calls-schedules-card.css'
 import { useCallback, useEffect, useState } from 'react'
 import {
   AlertCircle,

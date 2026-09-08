@@ -28,6 +28,7 @@ PROVIDER_CLIENTS = {
     "openrouter": OpenAiCompatibleClient,
     "ollama": OpenAiCompatibleClient,
     "opencode": OpenAiCompatibleClient,
+    "groq": OpenAiCompatibleClient,
 }
 
 

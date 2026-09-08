@@ -69,6 +69,26 @@ export function useWorkspace() {
         // Filter ignored files
         const filtered = files.filter((f) => !ignoreMatcherRef.current(f.path))
         setFileTree(filtered)
+
+        // Also reload content for any open tabs that haven't been modified locally
+        setOpenTabs((currentTabs) => {
+          if (currentTabs.length === 0) return currentTabs
+          // Fetch updated content from disk for each tab asynchronously
+          Promise.all(
+            currentTabs.map(async (tab) => {
+              if (dirtyFiles.current.has(tab.path)) return tab
+              try {
+                const freshContent = await bridge.readFile(tab.path, targetWorkspaceId)
+                return { ...tab, content: freshContent, savedContent: freshContent }
+              } catch {
+                return tab
+              }
+            }),
+          ).then((refreshedTabs) => {
+            setOpenTabs(refreshedTabs)
+          })
+          return currentTabs
+        })
       } catch (err) {
         setError(err.message || 'Failed to load workspace files.')
       } finally {
@@ -186,6 +206,38 @@ export function useWorkspace() {
     [activeTab, openTabs],
   )
 
+  const autoSaveTimers = useRef(new Map())
+
+  useEffect(() => {
+    return () => {
+      autoSaveTimers.current.forEach((timer) => clearTimeout(timer))
+      autoSaveTimers.current.clear()
+    }
+  }, [])
+
+  const saveFile = useCallback(
+    async (filePath, contentToSave) => {
+      // Clear any pending debounce timer for this file
+      if (autoSaveTimers.current.has(filePath)) {
+        clearTimeout(autoSaveTimers.current.get(filePath))
+        autoSaveTimers.current.delete(filePath)
+      }
+      const tab = openTabs.find((t) => t.path === filePath)
+      const content = contentToSave !== undefined ? contentToSave : tab?.content
+      if (content === undefined) return
+      try {
+        await bridge.writeFile(filePath, content, 'utf-8', activeWorkspaceIdRef.current)
+        dirtyFiles.current.delete(filePath)
+        setOpenTabs((tabs) =>
+          tabs.map((t) => (t.path === filePath ? { ...t, content, savedContent: content } : t)),
+        )
+      } catch (err) {
+        setError(err.message || 'Failed to save file.')
+      }
+    },
+    [bridge, openTabs],
+  )
+
   const updateTabContent = useCallback((filePath, newContent) => {
     setOpenTabs((tabs) =>
       tabs.map((tab) => {
@@ -199,24 +251,25 @@ export function useWorkspace() {
         return { ...tab, content: newContent }
       }),
     )
-  }, [])
 
-  const saveFile = useCallback(
-    async (filePath) => {
-      const tab = openTabs.find((t) => t.path === filePath)
-      if (!tab) return
+    // Debounced Auto-Save (750ms)
+    if (autoSaveTimers.current.has(filePath)) {
+      clearTimeout(autoSaveTimers.current.get(filePath))
+    }
+    const timer = setTimeout(async () => {
+      autoSaveTimers.current.delete(filePath)
       try {
-        await bridge.writeFile(filePath, tab.content, 'utf-8', activeWorkspaceIdRef.current)
+        await bridge.writeFile(filePath, newContent, 'utf-8', activeWorkspaceIdRef.current)
         dirtyFiles.current.delete(filePath)
         setOpenTabs((tabs) =>
-          tabs.map((t) => (t.path === filePath ? { ...t, savedContent: t.content } : t)),
+          tabs.map((t) => (t.path === filePath ? { ...t, savedContent: newContent } : t)),
         )
       } catch (err) {
-        setError(err.message || 'Failed to save file.')
+        console.warn('Auto-save failed:', err)
       }
-    },
-    [bridge, openTabs],
-  )
+    }, 750)
+    autoSaveTimers.current.set(filePath, timer)
+  }, [bridge])
 
   const deleteWorkspaceFile = useCallback(
     async (filePath) => {

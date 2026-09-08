@@ -4,6 +4,7 @@ import os
 import shutil
 import tempfile
 import unittest
+import uuid
 
 from app.core.config import settings
 from app.repositories import studio as studio_repo
@@ -46,7 +47,10 @@ class TestStudioProjects(unittest.TestCase):
     def test_create_and_list_project(self):
         project = self._create("Habit Tracker")
         self.assertEqual(project["type"], "studio")
+        self.assertEqual(str(uuid.UUID(project["id"])), project["id"])
         self.assertEqual(project["db_preference"], "sqlite")
+        self.assertEqual(project["preview_status"], "unavailable")
+        self.assertEqual(project["last_activity"]["type"], "created")
         projects = list_projects(USER)
         self.assertEqual(len(projects), 1)
         self.assertEqual(projects[0]["name"], "Habit Tracker")
@@ -117,11 +121,20 @@ class TestStudioProjects(unittest.TestCase):
         self.assertEqual(user_id, USER)
         self.assertEqual(workspace_id, project["id"])
 
+    def test_preview_missing_output_returns_controlled_html(self):
+        project = self._create("Empty Preview")
+        data, media_type = studio_preview.read_preview_file(USER, project["id"], "index.html")
+        self.assertEqual(media_type, "text/html")
+        self.assertIn(b"No HTML entry file found", data)
+
     def test_curated_templates_catalog(self):
         templates = list_curated_templates()
         ids = {t["id"] for t in templates}
         self.assertIn("react-vite", ids)
         self.assertIn("fullstack-react-fastapi", ids)
+        react_vite = next(template for template in templates if template["id"] == "react-vite")
+        self.assertTrue(react_vite["featured"])
+        self.assertIn("React", react_vite["tags"])
 
 
 if __name__ == "__main__":

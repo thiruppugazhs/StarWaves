@@ -8,16 +8,32 @@ from app.services.studio.templates import (
     scaffold_from_template,
     snapshot_workspace_as_template_files,
 )
+from app.services.studio import preview as studio_preview
+
+
+def _activity(activity_type: str, label: str) -> dict:
+    from datetime import datetime, timezone
+
+    return {
+        "type": activity_type,
+        "label": label,
+        "occurred_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def _with_presentation_metadata(user_id: str, project: dict) -> dict:
+    project["preview_status"] = "ready" if studio_preview.has_build_output(user_id, project["id"]) else "unavailable"
+    return project
 
 
 def list_projects(user_id: str) -> list[dict]:
-    return studio_repo.list_studio_projects(user_id)
+    return [_with_presentation_metadata(user_id, project) for project in studio_repo.list_studio_projects(user_id)]
 
 
 def get_project(user_id: str, workspace_id: str) -> dict:
     project = studio_repo.get_studio_project(user_id, workspace_id)
     project["git"] = git_ops.status(user_id, workspace_id)
-    return project
+    return _with_presentation_metadata(user_id, project)
 
 
 def create_project(user_id: str, payload: dict) -> dict:
@@ -63,17 +79,18 @@ def create_project(user_id: str, payload: dict) -> dict:
             git_ops.commit_all(user_id, workspace_id, "Initial commit by StarWaves Studio")
         except git_ops.GitUnavailableError as error:
             warnings.append(str(error))
-    studio_repo.update_studio_project(
-        user_id, workspace_id, {"git_initialized": git_initialized}
-    )
+    studio_repo.update_studio_project(user_id, workspace_id, {
+        "git_initialized": git_initialized,
+        "last_activity": _activity("created", "Project created"),
+    })
 
-    refreshed = studio_repo.get_studio_project(user_id, workspace_id)
+    refreshed = _with_presentation_metadata(user_id, studio_repo.get_studio_project(user_id, workspace_id))
     refreshed["warnings"] = warnings
     return refreshed
 
 
 def update_project(user_id: str, workspace_id: str, updates: dict) -> dict:
-    return studio_repo.update_studio_project(user_id, workspace_id, updates)
+    return _with_presentation_metadata(user_id, studio_repo.update_studio_project(user_id, workspace_id, updates))
 
 
 def delete_project(user_id: str, workspace_id: str) -> bool:
@@ -94,7 +111,7 @@ def save_plan(user_id: str, workspace_id: str, plan_payload: dict) -> dict:
         ],
         "status": "proposed",
     }
-    return studio_repo.update_studio_project(
+    return _with_presentation_metadata(user_id, studio_repo.update_studio_project(
         user_id,
         workspace_id,
         {
@@ -104,8 +121,9 @@ def save_plan(user_id: str, workspace_id: str, plan_payload: dict) -> dict:
             "stack": plan["stack"] or None,
             "db_preference": plan["db_preference"],
             "auth_enabled": plan["needs_auth"],
+            "last_activity": _activity("plan_saved", "Build plan drafted"),
         },
-    )
+    ))
 
 
 def set_plan_status(user_id: str, workspace_id: str, status: str) -> dict:
@@ -113,11 +131,12 @@ def set_plan_status(user_id: str, workspace_id: str, status: str) -> dict:
     project = studio_repo.get_studio_project(user_id, workspace_id)
     if not project.get("plan"):
         raise ValueError("No build plan has been proposed for this project yet.")
-    return studio_repo.update_studio_project(
+    label = "Plan approved" if status == "approved" else "Plan rejected"
+    return _with_presentation_metadata(user_id, studio_repo.update_studio_project(
         user_id,
         workspace_id,
-        {"plan_status": status},
-    )
+        {"plan_status": status, "last_activity": _activity(f"plan_{status}", label)},
+    ))
 
 
 def write_batch_files(user_id: str, workspace_id: str, files: list[dict]) -> dict:
@@ -152,7 +171,10 @@ def write_batch_files(user_id: str, workspace_id: str, files: list[dict]) -> dic
 
     if written:
         studio_repo.update_studio_project(
-            user_id, workspace_id, {"build_status": "building"}
+            user_id, workspace_id, {
+                "build_status": "building",
+                "last_activity": _activity("build_started", "Build files updated"),
+            }
         )
     return {"written": written, "errors": errors}
 

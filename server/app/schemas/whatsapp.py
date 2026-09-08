@@ -84,9 +84,9 @@ class WhatsAppSettings(BaseModel):
     notifications_enabled: bool = True
     desktop_alerts_enabled: bool = True
     eve_tag: Optional[str] = "@eve"
-    owner_name: Optional[str] = "User"
-    owner_aliases: List[str] = Field(default_factory=lambda: ["@me", "@user"])
-    keywords: List[str] = Field(default_factory=lambda: ["@assistant", "assistant", "urgent", "help", "summary", "schedule"])
+    owner_name: Optional[str] = "Susindran"
+    owner_aliases: List[str] = Field(default_factory=lambda: ["@susindran", "@susin", "@susindran_d"])
+    keywords: List[str] = Field(default_factory=lambda: ["@eve", "eve", "@susindran", "@susin", "urgent", "help", "summary", "schedule"])
     my_number: Optional[str] = None
     my_jid: Optional[str] = None
 

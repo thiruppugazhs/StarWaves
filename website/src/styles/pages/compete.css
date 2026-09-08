@@ -1,0 +1,12 @@
+/* Compete Page Shell (Wave D) — tabbed Contests + Stats */
+
+.compete-page {
+  display: grid;
+  align-content: start;
+  gap: var(--section-gap);
+  min-width: 0;
+}
+
+.compete-page > .tab-nav {
+  justify-self: start;
+}

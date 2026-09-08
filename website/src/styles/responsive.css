@@ -38,12 +38,15 @@
 }
 
 .page-heading > *,
-.dashboard-heading > * {
+.dashboard-heading > *,
+.dashboard-greeting {
   min-width: 0;
 }
 
 .page-heading-actions,
-.dashboard-heading-actions {
+.dashboard-heading-actions,
+.dashboard-inline-actions,
+.page-inline-actions {
   flex-wrap: wrap;
 }
 
@@ -64,6 +67,10 @@
 }
 
 @media (max-width: 768px) {
+  .calendar-page {
+    padding: var(--space-sm) var(--space-sm) var(--space-md);
+  }
+
   .app-breadcrumbs {
     margin-top: calc(var(--space-3xs) * -1);
   }
@@ -79,6 +86,8 @@
 
   .page-heading-actions,
   .dashboard-heading-actions,
+  .dashboard-inline-actions,
+  .page-inline-actions,
   .calendar-actions {
     width: 100%;
     justify-content: flex-start;
@@ -87,6 +96,9 @@
   .page-heading-actions > button,
   .dashboard-heading-actions > button,
   .dashboard-heading-actions > div,
+  .dashboard-inline-actions > button,
+  .dashboard-inline-actions > div,
+  .page-inline-actions > button,
   .calendar-actions > button {
     min-height: 40px;
   }

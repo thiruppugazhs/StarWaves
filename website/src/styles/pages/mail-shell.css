@@ -1,0 +1,217 @@
+/* Mail Shell — split from mails.css (Wave E) */
+.mail-page {
+  margin-left: 96px;
+  transition: margin-left 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.mail-page:has(.mail-folders:hover),
+.mail-page:has(.mail-folders:focus-within),
+.mail-page:has(.mail-account-dropdown) {
+  margin-left: 280px;
+}
+
+.mail-page-heading {
+  align-items: center;
+  gap: 28px;
+}
+
+.mail-page-heading > div:first-child {
+  flex: 0 0 auto;
+}
+
+.mail-page-heading .primary-button,
+.mail-connect-empty .primary-button {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.mail-toolbar {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  margin: 0 0 0 auto;
+  max-width: 620px;
+  min-width: 260px;
+}
+
+.mail-toolbar form {
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  flex: 1;
+  gap: 9px;
+  padding: 0 14px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.mail-toolbar form:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+.mail-toolbar input {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  flex: 1;
+  outline: 0;
+  padding: 13px 0;
+}
+
+.mail-toolbar form button {
+  background: transparent;
+  border: 0;
+  color: var(--text-secondary);
+  display: grid;
+  padding: 3px;
+}
+
+.mail-toolbar > button {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  display: grid;
+  padding: 0 15px;
+  place-items: center;
+}
+
+.mail-toolbar > button:hover {
+  border-color: var(--color-primary);
+}
+
+/* Position the shared TabNav in the mail context */
+.mail-inbox-tabs {
+  margin-top: 16px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.mail-layout {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  height: 680px;
+  max-height: 100%;
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+.mail-state {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  min-height: 260px;
+  padding: 48px;
+  text-align: center;
+}
+
+.mail-state strong {
+  color: var(--text-primary);
+}
+
+.mail-state.error {
+  color: var(--color-danger);
+  min-height: auto;
+}
+
+.mail-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mail-toast button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile & Tablet Web Responsiveness */
+@media (max-width: 900px) {
+  .mail-page-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .mail-toolbar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .mail-folders {
+    position: static;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    max-height: 160px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .mail-page {
+    margin-left: 0 !important;
+  }
+
+  .mail-page:has(.mail-folders:hover),
+  .mail-page:has(.mail-folders:focus-within) {
+    margin-left: 0;
+  }
+
+  .mail-folders:hover,
+  .mail-folders:focus-within {
+    width: 100%;
+  }
+
+  .mail-folders button,
+  .mail-folders a {
+    width: auto;
+    padding: 6px 10px;
+  }
+
+  .mail-folders span,
+  .mail-folders small {
+    opacity: 1;
+  }
+
+  .mail-row {
+    grid-template-columns: 20px 100px minmax(0, 1fr) 50px;
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+}
+
+.mail-retry-btn {
+  margin-top: 8px;
+}

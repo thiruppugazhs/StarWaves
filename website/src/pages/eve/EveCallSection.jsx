@@ -1,3 +1,4 @@
+import '../../styles/pages/eve-call-ui.css'
 import { useEffect, useRef, useState } from 'react'
 import {
   Bot,
@@ -17,10 +18,11 @@ import {
   MessageSquare,
 } from 'lucide-react'
 import { formatElapsed } from '../../utils/callDisplay'
+import { EveInlineAvatar } from '../../components/eve/avatar/EveInlineAvatar'
 
 const IN_PROGRESS_PHASES = ['dialing', 'connecting', 'active']
 
-export function EveCallSection({ callCenter }) {
+export function EveCallSection({ callCenter, avatarPrefs, avatarModel, presetId, onToggleAvatarRenderer }) {
   const {
     phase = 'idle',
     muted = false,
@@ -178,6 +180,27 @@ export function EveCallSection({ callCenter }) {
           </div>
         </div>
       </div>
+
+      {avatarPrefs?.enabled !== false && avatarPrefs?.inlineEnabled !== false && (
+        <div className="eve-call-avatar-row" data-eve-target="eve-call-avatar">
+          <EveInlineAvatar
+            size="lg"
+            presetId={presetId}
+            prefs={avatarPrefs}
+            activeModel={avatarModel}
+            isSending={false}
+            isEveSpeaking={isEveSpeaking}
+            isEveThinking={isEveThinking}
+            thinkingText=""
+            activeTool={null}
+            streamText={eveTranscript}
+            sttStatus={sttStatus}
+            sttRecording={sttRecording}
+            error={error}
+            onToggleRenderer={onToggleAvatarRenderer}
+          />
+        </div>
+      )}
 
       {/* ── Visualizer & Orb Area ── */}
       <div className={`eve-call-visualizer-area ${inProgress ? 'compact' : ''}`}>

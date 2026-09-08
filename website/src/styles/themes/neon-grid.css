@@ -1,0 +1,35 @@
+/* Neon Grid - High-contrast dark cyber spectrum theme where every semantic role has a unique distinct hue */
+html.neon-grid-theme {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121c;
+  --bg-tertiary: #1a1a27;
+  --bg-card: #141420;
+  --bg-card-hover: #1e1e30;
+  --bg-hover: #222238;
+  --bg-overlay: #141420;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #0a0a0f;
+
+  /* Unique color per semantic role */
+  --color-primary: #00f0ff;          /* Electric Cyan */
+  --color-primary-hover: #00c8d6;
+  --color-primary-light: #062b33;
+
+  --color-accent: #3b82f6;           /* Cobalt Blue */
+  --color-success: #10b981;          /* Neon Mint */
+  --color-warning: #f59e0b;          /* Neon Amber */
+  --color-danger: #f43f5e;           /* Hot Rose */
+  --color-purple: #a855f7;           /* Cyber Violet */
+
+  --border-color: #27273a;
+  --border-light: #1c1c2c;
+  --border-heavy: #3e3e5c;
+  --border-focus: #00f0ff;
+
+  --scrollbar-track: #12121c;
+  --scrollbar-thumb: #3e3e5c;
+  --scrollbar-thumb-hover: #00f0ff;
+}

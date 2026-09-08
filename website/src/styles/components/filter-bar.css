@@ -69,3 +69,12 @@
   outline: 2px solid var(--text-primary);
   outline-offset: 2px;
 }
+
+.filter-bar .primary-button,
+.filter-bar .secondary-button {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+  gap: 6px;
+  border-radius: var(--radius-md, 8px);
+}

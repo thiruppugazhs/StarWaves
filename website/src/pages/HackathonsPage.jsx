@@ -1,3 +1,4 @@
+import "../styles/pages/hackathons.css"
 import { useEffect, useState } from 'react'
 import {
   CalendarDays,
@@ -12,7 +13,7 @@ import {
 } from 'lucide-react'
 import { usePersistentState } from '../hooks/usePersistentState'
 import { createHackathon, deleteHackathon, updateHackathon } from '../lib/workspaceApi'
-import { ConfirmDialog, CustomDropdown, EmptyState, FilterBar, MetricCard, MetricGrid, Modal, PageHeader, SearchBar, Alert } from '../components/ui'
+import { ConfirmDialog, CustomDropdown, EmptyState, FilterBar, MetricCard, MetricGrid, Modal, SearchBar, Alert } from '../components/ui'
 
 const emptyHackathon = {
   title: '',
@@ -173,29 +174,6 @@ export function HackathonsPage({ hackathons, setHackathons, canLoadMore, loading
 
   return (
     <section className="hackathons-page">
-      <PageHeader
-        eyebrow="Build & collaborate"
-        title="Hackathons"
-        description="Find a room, a team, and a deadline worth building toward."
-        actions={
-          <>
-            <div className="hackathon-summary">
-              <Rocket size={16} />
-              <span>{hackathons.length} upcoming</span>
-            </div>
-            <button className="primary-button" onClick={() => setFormOpen(true)}>
-              <Plus size={16} /> Add hackathon
-            </button>
-          </>
-        }
-      />
-
-      <MetricGrid className="workspace-insight-grid" ariaLabel="Hackathon overview">
-        <MetricCard className="compact" label="Opportunities" value={hackathons.length} detail="in your pipeline" />
-        <MetricCard className="compact" label="Online" value={hackathons.filter((item) => item.mode === 'Online').length} detail="join from anywhere" />
-        <MetricCard className="compact" label="Next step" value={hackathons.length ? 'Choose' : 'Add one'} detail={hackathons.length ? 'a challenge to pursue' : 'your first challenge'} />
-      </MetricGrid>
-
       <FilterBar
         className="hackathon-toolbar"
         search={
@@ -253,9 +231,20 @@ export function HackathonsPage({ hackathons, setHackathons, canLoadMore, loading
             />
           </>
         }
+        actions={
+          <button className="primary-button" type="button" onClick={() => setFormOpen(true)}>
+            <Plus size={16} /> Add hackathon
+          </button>
+        }
         isFiltered={Boolean(searchQuery || modeFilter !== 'All formats' || sourceFilter !== 'All sources' || sortOrder !== 'Soonest')}
         onReset={clearFilters}
       />
+
+      <MetricGrid className="workspace-insight-grid" ariaLabel="Hackathon overview">
+        <MetricCard className="compact" label="Opportunities" value={hackathons.length} detail="in your pipeline" />
+        <MetricCard className="compact" label="Online" value={hackathons.filter((item) => item.mode === 'Online').length} detail="join from anywhere" />
+        <MetricCard className="compact" label="Next step" value={hackathons.length ? 'Choose' : 'Add one'} detail={hackathons.length ? 'a challenge to pursue' : 'your first challenge'} />
+      </MetricGrid>
       <div className="hackathon-results-meta"><span>{filteredHackathons.length} of {hackathons.length} opportunities</span><span>{filteredHackathons.length ? 'Open one to see the details' : 'Try a different filter'}</span></div>
 
       <div className={`hackathon-list hackathon-layout-${cardLayout}`}>

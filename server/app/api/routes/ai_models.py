@@ -55,11 +55,12 @@ def _preference_payload(preference: dict | None, user_keys: dict[str, str]) -> d
         return None
     provider = preference.get("provider") or "default"
     model = preference.get("model") or "default"
+    assistant_name = preference.get("assistant_name")
     return {
         "provider": provider,
         "model": model,
         "has_api_key": bool(user_keys.get(provider)),
-        "assistant_name": preference.get("assistant_name") or "Eve",
+        "assistant_name": assistant_name,
     }
 
 
@@ -181,7 +182,7 @@ async def save_ai_models(
             "provider": payload.provider,
             "model": payload.model,
             "has_api_key": bool(user_keys.get(payload.provider)),
-            "assistant_name": payload.assistant_name or (current_pref.get("assistant_name") if current_pref else "Eve") or "Eve",
+            "assistant_name": payload.assistant_name or existing_assistant,
         },
         "default_provider": DEFAULT_PROVIDER,
         "default_model": default_model,

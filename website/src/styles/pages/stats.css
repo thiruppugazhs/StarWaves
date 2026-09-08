@@ -231,6 +231,225 @@
   font-weight: 700;
 }
 
+.stats-rating-display {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 20px 0 16px;
+  gap: var(--space-sm);
+}
+
+.stats-rating-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-rating-display strong {
+  font-size: clamp(28px, 2.5vw, 36px);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.stats-rating-display span {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.stats-rating-display em {
+  font-style: normal;
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--color-success);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-success-light);
+}
+
+.stats-solved-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 16px 0 12px;
+}
+
+.stats-solved-heading strong {
+  font-size: clamp(28px, 2.5vw, 36px);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.stats-solved-heading span {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.stats-progress-row {
+  display: grid;
+  gap: 6px;
+  padding: 8px 0;
+}
+
+.stats-progress-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+}
+
+.stats-progress-label-row strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stats-progress-label-row span {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.stats-progress-track i.easy {
+  background: var(--color-success);
+}
+
+.stats-progress-track i.medium {
+  background: var(--color-warning);
+}
+
+.stats-progress-track i.hard {
+  background: var(--color-danger);
+}
+
+.stats-project-rows {
+  display: grid;
+  gap: 12px;
+  padding: 14px 0 6px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.stats-project-item {
+  display: grid;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stats-project-item:last-child {
+  border-bottom: none;
+}
+
+.stats-project-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--text-xs);
+}
+
+.stats-project-meta strong {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-project-meta span {
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.stats-hackathon-list {
+  display: grid;
+  gap: 12px;
+  padding: 14px 0 6px;
+}
+
+.stats-hackathon-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stats-hackathon-item:last-child {
+  border-bottom: none;
+}
+
+.stats-hackathon-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.stats-hackathon-meta strong {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-hackathon-meta span {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.stats-hackathon-mode {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+}
+
+.stats-date-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+}
+
+.stats-date-box strong {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.stats-date-box small {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.stats-four-values {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.stats-leetcode-values {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .stats-progress-track {
   height: 7px;
   overflow: hidden;

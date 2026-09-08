@@ -6,6 +6,7 @@ import logging
 import time
 from typing import Any
 
+from app.core.http import create_async_client
 import httpx
 
 from app.services.ai_models.catalog import AI_PROVIDERS, PROVIDER_DEFAULT_BASE_URLS, _format_model_label
@@ -19,11 +20,15 @@ _live_model_cache: dict[str, tuple[float, list[dict[str, str]]]] = {}
 
 # Model ids filtered out of generic /v1/models lists (non-chat endpoints)
 _NON_CHAT_MODEL_KEYWORDS = ("embed", "whisper", "tts", "dall", "audio", "realtime", "transcribe", "moderation")
-_OPENAI_MODEL_PREFIXES = ("gpt-", "o1", "o3", "o4", "chatgpt")
+# OpenAI has expanded prefixes: gpt-3/4/5, o1/o3/o4, chatgpt, gpt-*. 2026 catalog includes
+# gpt-5.6-*, o4-mini, etc. Keep broad `gpt-` to avoid hiding new chat models.
+_OPENAI_MODEL_PREFIXES = ("gpt-", "o1", "o3", "o4", "chatgpt", "gpt-3", "gpt-4", "gpt-5")
 
 
 def _live_cache_get(provider: str, api_key: str) -> list[dict[str, str]] | None:
-    key = f"{provider}:{api_key[:8]}"
+    # Placeholder "ollama" key must not collide with real keys; truncate safely
+    cache_key = api_key[:8] if api_key and api_key != "ollama" else api_key or "anon"
+    key = f"{provider}:{cache_key}"
     entry = _live_model_cache.get(key)
     if entry and entry[0] > time.monotonic():
         return entry[1]
@@ -31,7 +36,8 @@ def _live_cache_get(provider: str, api_key: str) -> list[dict[str, str]] | None:
 
 
 def _live_cache_set(provider: str, api_key: str, models: list[dict[str, str]]) -> None:
-    key = f"{provider}:{api_key[:8]}"
+    cache_key = api_key[:8] if api_key and api_key != "ollama" else api_key or "anon"
+    key = f"{provider}:{cache_key}"
     _live_model_cache[key] = (time.monotonic() + _LIVE_MODEL_TTL, models)
 
 
@@ -42,7 +48,7 @@ async def _get_models_json(
 ) -> dict[str, Any] | None:
     """GET a provider's models endpoint and return parsed JSON, or None on failure."""
     try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(6.0, connect=3.0)) as client:
+        async with create_async_client(timeout=httpx.Timeout(6.0, connect=3.0)) as client:
             resp = await client.get(url, headers=headers)
         if resp.status_code != 200:
             # Ollama local not running is expected — downgrade to debug
@@ -119,7 +125,20 @@ async def _fetch_anthropic_models(api_key: str) -> list[dict[str, str]]:
 
 async def _fetch_openai_compatible_models(api_key: str, base_url: str, provider: str) -> list[dict[str, str]]:
     """List models from any OpenAI-compatible /v1/models endpoint (OpenRouter, Ollama, OpenCode)."""
-    headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
+    # Ollama placeholder "ollama" must not send auth — local Ollama ignores or rejects it
+    if api_key == "ollama":
+        headers = None
+    else:
+        headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
+    # OpenRouter benefits from Referer/Title headers (ranking, free-tier)
+    if provider == "openrouter" and headers is not None:
+        from app.core.config import settings as _settings
+
+        headers = {**headers, "HTTP-Referer": _settings.frontend_url, "X-Title": "Starwaves"}
+    elif provider == "openrouter" and headers is None:
+        from app.core.config import settings as _settings
+
+        headers = {"HTTP-Referer": _settings.frontend_url, "X-Title": "Starwaves"}
     data = await _get_models_json(provider, f"{base_url.rstrip('/')}/models", headers=headers)
     if data is None:
         return []
@@ -141,7 +160,8 @@ async def fetch_provider_models(
     if not effective and provider not in ("ollama", "opencode", "openrouter", "groq"):
         return []
     # For compatible providers without a key, attempt unauthenticated fetch via base_url
-    effective = effective or ""
+    # Preserve placeholder "ollama" to avoid sending Bearer ollama
+    effective = effective if effective is not None else ""
     cached = _live_cache_get(provider, effective)
     if cached is not None:
         return cached
@@ -172,7 +192,7 @@ async def provider_catalog(user_api_keys: dict[str, str] | None = None) -> list[
     catalog = [
         {
             "id": "default",
-            "label": "StarWaves Built-in AI (Google Gemini)",
+            "label": "Default",
             "available": any(has_server_key(provider) for provider in AI_PROVIDERS),
             "env_configured": True,
             "is_default": True,
@@ -181,7 +201,7 @@ async def provider_catalog(user_api_keys: dict[str, str] | None = None) -> list[
             "models": [
                 {
                     "id": "default",
-                    "label": "Gemini 2.5 Flash (Built-in)",
+                    "label": "Default",
                     "is_default": True,
                 }
             ],

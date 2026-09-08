@@ -1,14 +1,17 @@
+import "../../styles/pages/studio-shared.css"
+import "../../styles/pages/studio-hero.css"
 import { useState } from 'react'
 import { createStudioProject } from '../../lib/studioApi'
 import { StudioHero } from './StudioHero'
 import { deriveProjectName } from './studioConstants'
 import { setStudioBrief } from './studioBrief'
+ 
 
 export function StudioProjectsPage({ onOpenProject }) {
   const [isCreatingFromPrompt, setIsCreatingFromPrompt] = useState(false)
   const [promptError, setPromptError] = useState('')
 
-  const handlePromptSubmit = async (prompt, mode = 'plan', model = 'gpt-5-mini', attachments = []) => {
+  const handlePromptSubmit = async (prompt, mode = 'plan', model = 'openrouter/free', attachments = []) => {
     setIsCreatingFromPrompt(true)
     setPromptError('')
     try {
@@ -32,7 +35,7 @@ export function StudioProjectsPage({ onOpenProject }) {
   }
 
   return (
-    <div className="studio-page">
+    <div className="studio-page studio-page-builder">
       <StudioHero
         isSubmitting={isCreatingFromPrompt}
         onSubmitPrompt={handlePromptSubmit}
@@ -43,6 +46,7 @@ export function StudioProjectsPage({ onOpenProject }) {
           <span>{promptError}</span>
         </div>
       )}
+
     </div>
   )
 }

@@ -1,0 +1,207 @@
+/* Calls Page + Session — split from calls.css (Wave D) */
+/* Calls Page Styles - Monochrome Design System */
+
+.calls-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-section-gap, 22px);
+}
+
+/* Call session panel (dialing / connecting / active / result) */
+.calls-session-panel {
+  background: var(--bg-card, #fafafa);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-surface);
+}
+
+.call-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 340px;
+  overflow: hidden;
+}
+
+.call-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--module-calls), transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.call-screen-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 280px;
+  background:
+    linear-gradient(180deg, var(--bg-tertiary, #e4e4e7), var(--bg-primary, #f4f4f5));
+  overflow: hidden;
+}
+
+html.dark-theme .call-screen-stage {
+  background: linear-gradient(180deg, var(--bg-card, #141414), var(--bg-primary, #080808));
+}
+
+.call-remote-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--bg-primary, #f4f4f5);
+}
+
+.call-local-video {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: clamp(96px, 26%, 220px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--bg-secondary, #ececec);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-md, 9px);
+  box-shadow: var(--shadow-md);
+  z-index: 2;
+}
+
+.call-avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.call-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.call-avatar-large {
+  width: 104px;
+  height: 104px;
+  font-size: 34px;
+}
+
+.call-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-tertiary, #e4e4e7);
+  color: var(--text-primary, #09090b);
+}
+
+.call-screen-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px 18px;
+  text-align: center;
+  background: var(--bg-overlay, rgba(244, 244, 245, 0.94));
+  border-top: 1px solid var(--border-color, #e4e4e7);
+  backdrop-filter: blur(6px);
+}
+
+.call-screen-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+}
+
+.call-screen-status {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--text-muted, #71717a);
+}
+
+.call-screen-error {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--text-primary, #09090b);
+}
+
+.call-screen-hint {
+  margin: 0;
+  padding: 12px 18px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--text-muted, #71717a);
+}
+
+/* In-call controls */
+.call-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 18px;
+  border-top: 1px solid var(--border-color, #e4e4e7);
+}
+
+.call-control-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1px solid var(--border-heavy, #a1a1aa);
+  background: var(--bg-card, #fafafa);
+  color: var(--text-primary, #09090b);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast, 140ms ease),
+    border-color var(--transition-fast, 140ms ease),
+    color var(--transition-fast, 140ms ease);
+}
+
+.call-control-button:hover {
+  background: var(--bg-hover, #e4e4e7);
+}
+
+.call-control-button.active {
+  background: var(--color-primary, #18181b);
+  border-color: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+}
+
+.call-control-end {
+  background: var(--color-primary, #18181b);
+  border-color: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+}
+
+.call-control-end:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.call-control-dismiss {
+  width: auto;
+  border-radius: var(--radius-full, 999px);
+  padding: 0 20px;
+}
+

@@ -23,6 +23,11 @@ export async function listProviderModels(provider, apiKey = null) {
     basePath: BASE_PATH,
     errorMessage: `Could not list models for ${provider}.`,
     missingTokenMessage: TOKEN_MESSAGE,
+    // Idempotent discovery — cache 60s + dedup prevents thundering herd;
+    // retry 429 with backoff (request.js handles Retry-After)
+    useCache: true,
+    useCacheTtl: 60_000,
+    retries: 2,
   })
 }
 

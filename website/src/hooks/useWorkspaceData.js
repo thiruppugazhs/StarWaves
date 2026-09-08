@@ -19,7 +19,18 @@ import {
   CALENDAR_REMINDER_PREFIX,
 } from '../utils/calendarReminders'
 
+function useDebouncedValue(value, delayMs) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebounced(value), delayMs)
+    return () => window.clearTimeout(id)
+  }, [value, delayMs])
+  return debounced
+}
+
 export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
+  const currentUserId = currentUser?.uid ?? null
+  const debouncedRefreshKey = useDebouncedValue(refreshKey, 250)
   const [projects, setProjects] = useState([])
   const [jobs, setJobs] = useState([])
   const [documents, setDocuments] = useState([])
@@ -64,10 +75,10 @@ export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
   }, [importedIcsCalendars])
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUserId) {
       autoPromptNotificationPermission()
     }
-  }, [currentUser])
+  }, [currentUserId])
 
   useEffect(() => {
     try {
@@ -155,113 +166,85 @@ export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
     }
   }, [calendarEventIndex, firedReminderIds, setFiredReminderIds])
 
-  // Google Calendar & Documents Fetch
+  // Consolidated workspace fetch — single debounced effect for all refreshKey-gated resources
+  // Staggered to avoid e2-micro burst (15 GETs + 15 OPTIONS =30 → Nginx burst 60, but JS concurrency limiter =6)
+  // Delays spread the 8 parallel requests (was 3 effects firing 8 at once) across 600ms
   useEffect(() => {
     let active = true
-    if (!currentUser) {
+    if (!currentUserId) {
       setDocuments([])
       setGoogleCalendarEvents([])
-      return () => {
-        active = false
-      }
-    }
-    loadGoogleCalendarData()
-      .then(({ events }) => {
-        if (active) setGoogleCalendarEvents(events)
-      })
-      .catch((error) => {
-        console.error('Could not load Google Calendar:', error)
-        if (active) setGoogleCalendarEvents([])
-      })
-    loadDocuments()
-      .then((savedDocuments) => {
-        if (active) setDocuments(savedDocuments)
-      })
-      .catch((error) => {
-        console.error('Could not load documents:', error)
-        if (active) setDocuments([])
-      })
-    return () => {
-      active = false
-    }
-  }, [currentUser, refreshKey])
-
-  // Core Workspace Data Fetch
-  useEffect(() => {
-    let active = true
-    if (!currentUser) {
       setJobs([])
       setHackathons([])
       setNotifications([])
       setContestSites([])
-      return () => {
-        active = false
-      }
+      setTasks([])
+      return () => { active = false }
     }
+
+    const staggered = (fn, delayMs) =>
+      new Promise((resolve, reject) => {
+        window.setTimeout(() => {
+          Promise.resolve()
+            .then(fn)
+            .then(resolve)
+            .catch(reject)
+        }, delayMs)
+      })
+
+    // Tier 1: immediate (docs + calendar, cheap and cached)
+    loadGoogleCalendarData()
+      .then(({ events }) => { if (active) setGoogleCalendarEvents(events) })
+      .catch((error) => { console.error('Could not load Google Calendar:', error); if (active) setGoogleCalendarEvents([]) })
+    loadDocuments()
+      .then((savedDocuments) => { if (active) setDocuments(savedDocuments) })
+      .catch((error) => { console.error('Could not load documents:', error); if (active) setDocuments([]) })
+
+    // Tier 2: todos staggered 120ms (so not all at t=0)
+    staggered(loadTodos, 120)
+      .then((savedTasks) => { if (active) setTasks(savedTasks) })
+      .catch((error) => { console.error('Could not load todos:', error); if (active) setTasks([]) })
+
+    // Core workspace batch (5) — staggered 0/150/300/450ms, respects request.js GET cache (30s TTL) + concurrency limiter (6)
     Promise.allSettled([
-      loadJobs(),
-      loadHackathons(),
-      loadNotifications(),
-      loadContests(),
-      loadProjects(),
-    ]).then(
-      ([
-        jobsResult,
-        hackathonsResult,
-        notificationsResult,
-        contestsResult,
-        projectsResult,
-      ]) => {
-        if (!active) return
-        const jobsPage = jobsResult.status === 'fulfilled' ? jobsResult.value : { items: [] }
-        const projectsPage = projectsResult.status === 'fulfilled' ? projectsResult.value : { items: [] }
-        const hackathonsPage = hackathonsResult.status === 'fulfilled' ? hackathonsResult.value : { items: [] }
-        const notificationsPage = notificationsResult.status === 'fulfilled' ? notificationsResult.value : { items: [] }
-        setJobs(jobsPage.items)
-        setPagination({
-          jobs: jobsPage,
-          projects: projectsPage,
-          hackathons: hackathonsPage,
-          notifications: notificationsPage,
-          contests: contestsResult.status === 'fulfilled' ? contestsResult.value : {},
-        })
-        setHackathons(
-          hackathonsPage.items,
-        )
-        setNotifications(
-          notificationsPage.items,
-        )
-        const enabledPlatforms = (() => {
-          try {
-            return JSON.parse(
-              localStorage.getItem('starwaves-enabled-contest-platforms') ??
-                '["codeforces","codechef","leetcode"]',
-            )
-          } catch {
-            return ['codeforces', 'codechef', 'leetcode']
-          }
-        })()
-        const rawContestItems = contestsResult.status === 'fulfilled' ? contestsResult.value.items : []
-        const rawContestSites = rawContestItems.reduce((sites, contest) => {
-          const id = contest.platformId || 'contests'
-          const site = sites.find((item) => item.id === id)
-          if (site) site.contests.push(contest)
-          else sites.push({ id, name: id, shortName: id.slice(0, 2).toUpperCase(), description: 'Upcoming contests.', contests: [contest] })
-          return sites
-        }, [])
-        setContestSites(
-          rawContestSites.filter((site) => enabledPlatforms.includes(site.id)),
-        )
-        setProjects((current) => [
-          ...projectsPage.items,
-          ...current.filter((project) => project.source === 'github'),
-        ])
-      },
-    )
-    return () => {
-      active = false
-    }
-  }, [currentUser, refreshKey])
+      loadJobs(), // t=0
+      staggered(loadHackathons, 150),
+      staggered(loadNotifications, 300),
+      staggered(loadContests, 300),
+      staggered(loadProjects, 450),
+    ]).then(([jobsResult, hackathonsResult, notificationsResult, contestsResult, projectsResult]) => {
+      if (!active) return
+      const jobsPage = jobsResult.status === 'fulfilled' ? jobsResult.value : { items: [] }
+      const projectsPage = projectsResult.status === 'fulfilled' ? projectsResult.value : { items: [] }
+      const hackathonsPage = hackathonsResult.status === 'fulfilled' ? hackathonsResult.value : { items: [] }
+      const notificationsPage = notificationsResult.status === 'fulfilled' ? notificationsResult.value : { items: [] }
+      setJobs(jobsPage.items)
+      setPagination({
+        jobs: jobsPage,
+        projects: projectsPage,
+        hackathons: hackathonsPage,
+        notifications: notificationsPage,
+        contests: contestsResult.status === 'fulfilled' ? contestsResult.value : {},
+      })
+      setHackathons(hackathonsPage.items)
+      setNotifications(notificationsPage.items)
+      const enabledPlatforms = (() => {
+        try { return JSON.parse(localStorage.getItem('starwaves-enabled-contest-platforms') ?? '["codeforces","codechef","leetcode"]') } catch { return ['codeforces', 'codechef', 'leetcode'] }
+      })()
+      const rawContestItems = contestsResult.status === 'fulfilled' ? contestsResult.value.items : []
+      const rawContestSites = rawContestItems.reduce((sites, contest) => {
+        const id = contest.platformId || 'contests'
+        const site = sites.find((item) => item.id === id)
+        if (site) site.contests.push(contest)
+        else sites.push({ id, name: id, shortName: id.slice(0, 2).toUpperCase(), description: 'Upcoming contests.', contests: [contest] })
+        return sites
+      }, [])
+      setContestSites(rawContestSites.filter((site) => enabledPlatforms.includes(site.id)))
+      setProjects((current) => [...projectsPage.items, ...current.filter((project) => project.source === 'github')])
+    })
+
+    return () => { active = false }
+  }, [currentUserId, debouncedRefreshKey])
 
   const loadMore = async (type) => {
     const page = pagination[type]
@@ -287,32 +270,10 @@ export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
     } finally { setLoadingMore(false) }
   }
 
-  // Todos Fetch
+  // Competitive Coding Stats Fetch — only on stats page, gated by uid (stable)
   useEffect(() => {
     let active = true
-    if (!currentUser) {
-      setTasks([])
-      return () => {
-        active = false
-      }
-    }
-    loadTodos()
-      .then((savedTasks) => {
-        if (active) setTasks(savedTasks)
-      })
-      .catch((error) => {
-        console.error('Could not load todos:', error)
-        if (active) setTasks([])
-      })
-    return () => {
-      active = false
-    }
-  }, [currentUser, refreshKey])
-
-  // Competitive Coding Stats Fetch
-  useEffect(() => {
-    let active = true
-    if (!currentUser || activePage !== 'stats') {
+    if (!currentUserId || activePage !== 'stats') {
       return () => {
         active = false
       }
@@ -338,19 +299,21 @@ export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
     return () => {
       active = false
     }
-  }, [currentUser, activePage])
+  }, [currentUserId, activePage])
 
-  // GitHub Data Fetch
+  // GitHub Data Fetch — gated by uid, staggered 600ms to avoid burst with core batch
   useEffect(() => {
     let active = true
-    if (!currentUser) {
+    let timeoutId
+    if (!currentUserId) {
       setProjects([])
       setCodingStats((current) => ({ ...current, github: {} }))
       return () => {
         active = false
       }
     }
-    loadGithubData()
+    const run = () =>
+      loadGithubData()
       .then((data) => {
         if (!active) return
         setCodingStats((current) => ({
@@ -389,10 +352,12 @@ export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
           setCodingStats((current) => ({ ...current, github: {} }))
         }
       })
+    timeoutId = window.setTimeout(run, 600)
     return () => {
       active = false
+      window.clearTimeout(timeoutId)
     }
-  }, [currentUser])
+  }, [currentUserId])
 
   return {
     projects,

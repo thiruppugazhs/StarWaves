@@ -2,13 +2,9 @@
 
 from app.db.session import Base, async_session_factory, engine, get_db, init_db, sync_engine
 from app.db.firestore import get_firebase_app, get_firestore_client as get_firestore
-try:
-    from google.cloud.firestore_v1.base_query import FieldFilter
-except Exception:
-    from app.db.sql.query import FieldFilter
-
 from app.db.sql import (
     ArrayUnion,
+    FieldFilter,
     Query,
     SERVER_TIMESTAMP,
     SqlClient,
@@ -26,7 +22,6 @@ __all__ = [
     "engine",
     "get_db",
     "get_db_client",
-    "get_firebase_app",
     "get_firestore",
     "init_db",
     "sync_engine",

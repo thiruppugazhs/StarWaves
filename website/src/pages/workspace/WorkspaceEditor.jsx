@@ -1,6 +1,7 @@
-import { useCallback, useRef, useState } from 'react'
+import '../../styles/pages/workspace-editor.css'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Editor from '@monaco-editor/react'
-import { X, FileCode, FolderOpen, FilePlus, Save, Circle, Play } from 'lucide-react'
+import { X, FileCode, FolderOpen, FilePlus, Circle, Play } from 'lucide-react'
 
 const EXTENSION_LANGUAGE_MAP = {
   js: 'javascript',
@@ -106,6 +107,16 @@ export function WorkspaceEditor({
 
   const activeTabData = tabs.find((tab) => tab.path === activeTab)
 
+  // Keep editor content in sync when file is updated from outside (e.g. Eve AI edit)
+  useEffect(() => {
+    if (editorRef.current && activeTabData) {
+      const currentVal = editorRef.current.getValue()
+      if (currentVal !== activeTabData.content && !isFileDirty(activeTab)) {
+        editorRef.current.setValue(activeTabData.content)
+      }
+    }
+  }, [activeTab, activeTabData?.content, isFileDirty])
+
   if (tabs.length === 0) {
     return (
       <div className="workspace-editor">
@@ -196,47 +207,28 @@ export function WorkspaceEditor({
       )}
 
       {activeTabData && (
-        <>
-          <div className="workspace-editor-monaco">
-            <Editor
-              key={activeTab}
-              height="100%"
-              language={getLanguage(activeTab)}
-              value={activeTabData.content}
-              theme={getTheme()}
-              onChange={(value) => onContentChange(activeTab, value ?? '')}
-              onMount={handleMount}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                wordWrap: 'on',
-                automaticLayout: true,
-                tabSize: 2,
-                renderWhitespace: 'selection',
-                padding: { top: 12, bottom: 12 },
-              }}
-            />
-          </div>
-          <div className="workspace-editor-footer">
-            <div className="workspace-footer-left">
-              <span className="footer-lang">{getLanguageLabel(activeTab)}</span>
-              <span className="footer-sep">·</span>
-              <span>UTF-8</span>
-              <span className="footer-sep">·</span>
-              <span>{activeTabData.content.split('\n').length} lines</span>
-            </div>
-            <div className="workspace-footer-right">
-              <span>Ln {cursorPos.line}, Col {cursorPos.column}</span>
-              {isDirty ? (
-                <span className="footer-dirty"><Circle size={7} fill="currentColor" /> Unsaved</span>
-              ) : (
-                <span className="footer-saved"><Save size={12} /> Saved</span>
-              )}
-            </div>
-          </div>
-        </>
+        <div className="workspace-editor-monaco">
+          <Editor
+            key={activeTab}
+            height="100%"
+            language={getLanguage(activeTab)}
+            value={activeTabData.content}
+            theme={getTheme()}
+            onChange={(value) => onContentChange(activeTab, value ?? '')}
+            onMount={handleMount}
+            options={{
+              minimap: { enabled: false },
+              fontSize: 14,
+              lineNumbers: 'on',
+              scrollBeyondLastLine: false,
+              wordWrap: 'on',
+              automaticLayout: true,
+              tabSize: 2,
+              renderWhitespace: 'selection',
+              padding: { top: 12, bottom: 12 },
+            }}
+          />
+        </div>
       )}
     </div>
   )

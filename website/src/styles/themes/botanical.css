@@ -1,0 +1,35 @@
+/* Botanical - Deep forest dark spectrum theme with organic, earthy hues per role */
+html.botanical-theme {
+  --bg-primary: #0b1411;
+  --bg-secondary: #101c18;
+  --bg-tertiary: #162621;
+  --bg-card: #13221d;
+  --bg-card-hover: #1b2f28;
+  --bg-hover: #1e352d;
+  --bg-overlay: #13221d;
+
+  --text-primary: #e6f4ea;
+  --text-secondary: #97b9a5;
+  --text-muted: #648a73;
+  --text-inverse: #0b1411;
+
+  /* Unique color per semantic role */
+  --color-primary: #10b981;          /* Emerald Flora */
+  --color-primary-hover: #059669;
+  --color-primary-light: #0d281e;
+
+  --color-accent: #14b8a6;           /* Mineral Teal */
+  --color-success: #84cc16;          /* Lime Sprout */
+  --color-warning: #eab308;          /* Pollen Gold */
+  --color-danger: #f87171;           /* Coral Blossom */
+  --color-purple: #c084fc;           /* Wild Lavender */
+
+  --border-color: #1e382e;
+  --border-light: #162a22;
+  --border-heavy: #2d5445;
+  --border-focus: #10b981;
+
+  --scrollbar-track: #101c18;
+  --scrollbar-thumb: #2d5445;
+  --scrollbar-thumb-hover: #10b981;
+}

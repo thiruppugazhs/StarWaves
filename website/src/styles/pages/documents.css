@@ -24,11 +24,126 @@
   width: 100%;
   display: grid;
   gap: 12px;
-  padding-top: 28px;
+  margin: 0;
+}
+
+.document-search-bar {
+  margin-bottom: 4px;
+}
+
+.document-list-card {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.document-list-card:hover {
+  border-color: var(--border-heavy);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.document-list-card.open {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-sm);
+}
+
+.document-list-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--module-documents), transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.document-list-card .contest-site-header {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 14px);
+  padding: 14px 18px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.document-list-card .contest-site-header:hover {
+  background: var(--bg-hover-subtle);
+}
+
+.document-list-card .contest-site-logo {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-radius: 10px;
 }
 
 .document-list-card .contest-site-logo svg {
   color: var(--text-inverse);
+}
+
+.document-list-card .contest-site-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: grid;
+  gap: 3px;
+}
+
+.document-list-card .contest-site-copy strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.document-list-card .contest-site-copy small {
+  max-width: 760px;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.document-list-card .contest-site-header > svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform var(--transition-fast);
+}
+
+.document-list-card.open .contest-site-header > svg {
+  transform: rotate(180deg);
+}
+
+.document-list-card .contest-site-content {
+  padding: 18px 18px 16px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-hover-subtle);
+}
+
+.document-list-card .project-status {
+  padding: 4px 9px;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .document-title-link { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
@@ -166,13 +281,15 @@
   display: grid;
   grid-template-columns: minmax(280px, 0.8fr) minmax(420px, 1.2fr);
   gap: 14px;
-  margin: 22px 0;
+  margin: 0;
+  min-width: 0;
 }
 
 .document-empty-state {
   display: grid;
   min-height: 280px;
-  margin-top: 16px;
+  margin: 0;
+  padding: 40px 24px;
   place-content: center;
   justify-items: center;
   border: 1px dashed var(--border-heavy);
@@ -203,6 +320,8 @@
 
 .document-empty-state > div {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
   margin-top: 20px;
 }
@@ -231,6 +350,7 @@
 .document-cloud-tools > button,
 .workspace-create-tools {
   display: flex;
+  min-width: 0;
   min-height: 78px;
   align-items: center;
   gap: 13px;
@@ -308,67 +428,90 @@
   width: min(560px, 100%);
 }
 
+.drive-search-bar {
+  margin: var(--space-xs) 0;
+}
+
 .drive-file-list {
-  max-height: min(520px, calc(100dvh - 210px));
+  max-height: min(480px, calc(100dvh - 220px));
   overflow-y: auto;
-  padding: 8px 0;
-}
-
-.drive-search {
-  display: flex;
-  height: 44px;
-  align-items: center;
-  gap: 9px;
-  margin: 4px 0 10px;
-  padding: 0 11px;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-}
-
-.drive-search:focus-within {
-  border-color: var(--border-focus);
-  background: var(--bg-card);
-  box-shadow: var(--shadow-focus);
-}
-
-.drive-search input {
-  min-width: 0;
-  flex: 1;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--text-primary);
-  font-size: 11px;
+  padding: 6px 0;
+  display: grid;
+  gap: 4px;
 }
 
 .drive-file-item {
   display: flex;
   width: 100%;
   align-items: center;
-  gap: 11px;
-  padding: 12px 5px;
-  border: 0;
-  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
   background: var(--bg-card);
   color: var(--text-primary);
   text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .drive-file-item:hover {
   background: var(--bg-hover);
+  border-color: var(--border-heavy);
+  transform: translateY(-1px);
 }
 
-.drive-file-item > span {
+.drive-file-item:active {
+  transform: translateY(0);
+}
+
+.drive-file-icon,
+.drive-file-item > span:first-child {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   flex: 0 0 auto;
   place-items: center;
   border-radius: 9px;
   background: var(--color-primary);
   color: var(--text-inverse);
+}
+
+.drive-file-copy,
+.drive-file-item > div {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: grid;
+  gap: 3px;
+}
+
+.drive-file-copy strong,
+.drive-file-item strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drive-file-copy small,
+.drive-file-item small {
+  font-size: 11px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drive-file-item > svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+
+.drive-file-item:hover > svg {
+  color: var(--text-primary);
 }
 
 .drive-state {

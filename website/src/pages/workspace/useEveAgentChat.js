@@ -16,6 +16,7 @@ export function useEveAgentChat({ workspaceId, workspaceName, activeFilePath, on
   const [messages, setMessages] = useState([])
   const [sending, setSending] = useState(false)
   const [streamText, setStreamText] = useState('')
+  const [thinkingText, setThinkingText] = useState('')
   const [activeTool, setActiveTool] = useState(null)
   const [error, setError] = useState('')
   const historyRef = useRef([])
@@ -26,17 +27,20 @@ export function useEveAgentChat({ workspaceId, workspaceName, activeFilePath, on
   }, [])
 
   const commit = useCallback((content) => {
-    historyRef.current = [...historyRef.current, { role: 'assistant', content }]
-    setMessages((log) => [...log, { role: 'assistant', content }])
+    const trimmed = typeof content === 'string' ? content.trim() : ''
+    if (!trimmed) return
+    historyRef.current = [...historyRef.current, { role: 'assistant', content: trimmed }]
+    setMessages((log) => [...log, { role: 'assistant', content: trimmed }])
   }, [])
 
   const send = useCallback(
-    async (rawText) => {
+    async (rawText, modelSelection = null) => {
       const content = rawText.trim()
       if (!content || sending) return
       setError('')
       setSending(true)
       setStreamText('')
+      setThinkingText('')
       setActiveTool(null)
       historyRef.current = [...historyRef.current, { role: 'user', content }]
       setMessages((log) => [...log, { role: 'user', content }])
@@ -59,10 +63,14 @@ export function useEveAgentChat({ workspaceId, workspaceName, activeFilePath, on
           await streamEveMessage({
             messages: apiMessages,
             sessionId: null,
+            modelSelection,
             signal: controller.signal,
             onDelta: (delta) => {
               receivedText += delta
               setStreamText((current) => current + delta)
+            },
+            onThinking: (delta) => {
+              setThinkingText((current) => current + delta)
             },
             onToolStart: (name) => {
               if (FILE_MUTATING_TOOLS.has(name)) filesTouched = true
@@ -77,19 +85,35 @@ export function useEveAgentChat({ workspaceId, workspaceName, activeFilePath, on
           if (controller.signal.aborted) {
             donePayload = { message: receivedText, changed_resources: [], actions: [] }
           } else if (!receivedText) {
+            const isRate = streamError.code === 'rate_limit' || streamError.status === 429 || /rate limit/i.test(String(streamError.message || ''))
+            if (isRate) {
+              setError(String(streamError.message || 'Rate limit exceeded. Please wait a moment and retry.'))
+              return
+            }
             fallbackToRest = true
           } else {
-            setError(streamError.message || 'Eve response was interrupted.')
+            setError(String(streamError.message || 'Eve response was interrupted.'))
             commit(receivedText)
             return
           }
         }
 
         if (fallbackToRest) {
-          const response = await sendEveMessage(apiMessages, null)
-          commit(response.message)
-          if (response.changed_resources?.includes(WORKSPACE_CHANGED_RESOURCE)) onFilesChanged?.()
-          return
+          try {
+            const response = await sendEveMessage(apiMessages, null, modelSelection)
+            commit(response.message)
+            if (response.changed_resources?.includes(WORKSPACE_CHANGED_RESOURCE)) onFilesChanged?.()
+            return
+          } catch (restError) {
+            const status = restError?.status || 502
+            const code = restError?.code
+            const isRate = status === 429 || code === 'rate_limit' || /rate limit/i.test(String(restError.message || ''))
+            const isAuth = status === 401 || code === 'auth' || /authentication|api key/i.test(String(restError.message || ''))
+            if (isRate) setError(String(restError.message || 'Rate limit exceeded. Please wait a moment and retry.'))
+            else if (isAuth) setError(String(restError.message || 'Authentication failed. Check Settings → AI Models.'))
+            else setError(String(restError.message || 'Eve is unavailable right now.'))
+            return
+          }
         }
 
         const finalText = donePayload?.message ?? receivedText
@@ -112,16 +136,17 @@ export function useEveAgentChat({ workspaceId, workspaceName, activeFilePath, on
           } catch {}
         }
       } catch (turnError) {
-        setError(turnError.message || 'Eve is unavailable right now.')
+        setError(String(turnError.message || 'Eve is unavailable right now.'))
       } finally {
         abortRef.current = null
         setSending(false)
         setStreamText('')
+        setThinkingText('')
         setActiveTool(null)
       }
     },
     [activeFilePath, commit, onAction, onFilesChanged, sending, workspaceId, workspaceName],
   )
 
-  return { messages, sending, streamText, activeTool, error, send, stop }
+  return { messages, sending, streamText, thinkingText, activeTool, error, send, stop }
 }

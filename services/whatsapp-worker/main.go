@@ -10,19 +10,14 @@ import (
 	"syscall"
 	"time"
 
-	"database/sql"
 	"starwaves-whatsapp-worker/internal/api"
 	"starwaves-whatsapp-worker/internal/session"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	sqlite "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 )
-
-func init() {
-	sql.Register("sqlite3", &sqlite.Driver{})
-}
 
 func splitCSV(s string) []string {
 	parts := strings.Split(s, ",")

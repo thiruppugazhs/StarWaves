@@ -63,21 +63,21 @@ class TestTokenValidation:
 
 
 class TestGetCurrentUserDependency:
-    def test_missing_header_raises_401(self):
+    async def test_missing_header_raises_401(self):
         with pytest.raises(HTTPException) as exc_info:
-            get_current_user(authorization=None)
+            await get_current_user(authorization=None)
         assert exc_info.value.status_code == 401
         assert "required" in exc_info.value.detail.lower()
 
-    def test_non_bearer_scheme_raises_401(self):
+    async def test_non_bearer_scheme_raises_401(self):
         with pytest.raises(HTTPException) as exc_info:
-            get_current_user(authorization="Basic abc123")
+            await get_current_user(authorization="Basic abc123")
         assert exc_info.value.status_code == 401
 
-    def test_bearer_with_garbage_token_raises_401(self):
+    async def test_bearer_with_garbage_token_raises_401(self):
         with pytest.raises(HTTPException):
-            get_current_user(authorization="Bearer garbage")
+            await get_current_user(authorization="Bearer garbage")
 
-    def test_bearer_with_valid_token_returns_user(self):
-        user = get_current_user(authorization=f"Bearer {make_token()}")
+    async def test_bearer_with_valid_token_returns_user(self):
+        user = await get_current_user(authorization=f"Bearer {make_token()}")
         assert user["uid"] == TEST_USER["uid"]

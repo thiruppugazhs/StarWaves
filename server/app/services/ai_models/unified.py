@@ -156,7 +156,11 @@ async def _fetch_gemini_unified(api_key: str) -> list[dict[str, Any]]:
 
 async def _fetch_openrouter_unified(api_key: str | None, base_url: str | None) -> list[dict[str, Any]]:
     base = (base_url or "https://openrouter.ai/api/v1").rstrip("/")
-    headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
+    headers: dict[str, str] | None = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+    # OpenRouter ranking headers — also required for free-tier model listing
+    from app.core.config import settings as _s
+
+    headers = {**(headers or {}), "HTTP-Referer": _s.frontend_url, "X-Title": "Starwaves"}
     # OpenRouter's default /models omits speech; must also fetch ?output_modalities=speech
     urls = [f"{base}/models", f"{base}/models?output_modalities=speech"]
     seen: set[str] = set()
@@ -215,8 +219,13 @@ async def _fetch_groq_unified(api_key: str, base_url: str | None) -> list[dict[s
     return out
 
 
-async def _fetch_openai_compat_unified(provider: str, api_key: str, base_url: str) -> list[dict[str, Any]]:
-    data = await _get_models_json(provider, f"{base_url.rstrip('/')}/models", headers={"Authorization": f"Bearer {api_key}"} if api_key else None)
+async def _fetch_openai_compat_unified(provider: str, api_key: str | None, base_url: str) -> list[dict[str, Any]]:
+    # Placeholder "ollama" must not send Bearer
+    if api_key == "ollama":
+        hdrs = None
+    else:
+        hdrs = {"Authorization": f"Bearer {api_key}"} if api_key else None
+    data = await _get_models_json(provider, f"{base_url.rstrip('/')}/models", headers=hdrs)
     if data is None:
         return []
     out: list[dict[str, Any]] = []
@@ -280,11 +289,12 @@ async def discover_all_models(user_keys: dict[str, str] | None = None, include_f
         elif provider_id == "groq":
             add(_fetch_groq_unified(api_key or "", base_url), "groq")
         elif provider_id in ("ollama", "opencode"):
-            # Generic OpenAI-compatible
+            # Generic OpenAI-compatible — skip placeholder auth
             from app.services.ai_models.catalog import PROVIDER_DEFAULT_BASE_URLS
+
             url = base_url or PROVIDER_DEFAULT_BASE_URLS.get(provider_id, "")
             if url:
-                add(_fetch_openai_compat_unified(provider_id, api_key, url), provider_id)
+                add(_fetch_openai_compat_unified(provider_id, api_key if api_key != "ollama" else None, url), provider_id)
 
     if not tasks:
         return []

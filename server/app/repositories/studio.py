@@ -28,6 +28,8 @@ _STUDIO_DEFAULTS = {
     "git_initialized": False,
     "github_repo_url": None,
     "published_template_id": None,
+    "preview_status": "unavailable",
+    "last_activity": None,
 }
 
 
@@ -83,11 +85,7 @@ def create_studio_project(
         raise ValueError("Project name cannot be empty.")
 
     workspaces = ws_repo._load_workspaces_metadata(user_id)
-    base_slug = ws_repo._sanitize_workspace_id(name_clean.lower().replace(" ", "-"))
-    ws_id = base_slug or "project"
-    existing_ids = {ws["id"] for ws in workspaces}
-    if ws_id in existing_ids:
-        ws_id = f"{base_slug}-{uuid.uuid4().hex[:6]}"
+    ws_id = str(uuid.uuid4())
 
     ws_root = ws_repo._workspace_root(user_id, ws_id)
     import os
@@ -106,6 +104,8 @@ def create_studio_project(
         "auth_enabled": auth_enabled,
         "created_at": now,
         "updated_at": now,
+        "last_activity": {"type": "created", "label": "Project created", "occurred_at": now},
+        "preview_status": "unavailable",
     }
     workspaces.append(project)
     ws_repo._save_workspaces_metadata(user_id, workspaces)
@@ -130,6 +130,8 @@ def update_studio_project(user_id: str, workspace_id: str, updates: dict) -> dic
         "published_template_id",
         "stack",
         "template_id",
+        "preview_status",
+        "last_activity",
     )
     target = None
     for entry in workspaces:

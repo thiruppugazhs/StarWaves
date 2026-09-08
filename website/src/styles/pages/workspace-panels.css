@@ -1,0 +1,183 @@
+/* Workspace Terminal/Browser Panels — App Theme Styled */
+
+/* Terminal Panel */
+.workspace-terminal {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.workspace-terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 32px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.workspace-terminal-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  font-size: var(--text-xs, 12px);
+  color: var(--text-muted);
+  min-height: 60px;
+  background: var(--bg-card);
+  font-family: 'Consolas', 'Monaco', ui-monospace, monospace;
+}
+
+/* ── Browser Panel ── */
+.workspace-center.browser-open {
+  flex-direction: row;
+}
+
+.workspace-center-stack {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  gap: 0;
+}
+
+.workspace-browser {
+  display: flex;
+  flex-direction: column;
+  width: clamp(320px, 40%, 640px);
+  min-width: 0;
+  height: 100%;
+  border: none;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.workspace-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  height: 34px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.workspace-browser-bar form {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+input.workspace-browser-url {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  padding: 3px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs, 4px);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: var(--text-xs, 12px);
+  font-family: inherit;
+}
+
+input.workspace-browser-url:focus-visible {
+  outline: 1px solid var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.workspace-browser-url-label {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs, 4px);
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  font-size: var(--text-xs, 12px);
+  font-style: italic;
+  user-select: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.workspace-browser-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-xs, 4px);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition-fast, 140ms ease), color var(--transition-fast, 140ms ease);
+}
+
+.workspace-browser-btn:hover:not(:disabled),
+.workspace-browser-btn:focus-visible {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.workspace-browser-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.workspace-browser-frame {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  background: var(--bg-card, #ffffff);
+}
+
+.workspace-browser-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-xs, 12px);
+}
+
+.workspace-browser-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.workspace-browser-empty p {
+  margin: 0;
+  max-width: 280px;
+  line-height: 1.5;
+}

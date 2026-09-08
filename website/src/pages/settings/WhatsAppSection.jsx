@@ -12,8 +12,8 @@ import {
 import { whatsappSocket } from '../../lib/whatsappSocket'
 import { WhatsAppQrModal } from '../../components/whatsapp/WhatsAppQrModal'
 
-const DEFAULT_KEYWORDS = ['@assistant', 'assistant', 'urgent', 'help', 'summary', 'schedule']
-const KEYWORD_PRESETS = ['@assistant', 'urgent', 'help', 'summary', 'schedule', 'meeting', 'status']
+const DEFAULT_KEYWORDS = ['@eve', 'eve', '@susindran', '@susin', 'urgent', 'help', 'summary', 'schedule']
+const KEYWORD_PRESETS = ['@eve', 'urgent', 'help', 'summary', 'schedule', 'meeting', 'status']
 
 export function WhatsAppSection() {
   const [status, setStatus] = useState({ connected: false })
@@ -22,8 +22,8 @@ export function WhatsAppSection() {
     auto_reply_prompt: '',
     notifications_enabled: true,
     keywords: DEFAULT_KEYWORDS,
-    eve_tag: '@assistant',
-    owner_name: 'User',
+    eve_tag: '@eve',
+    owner_name: 'Susindran',
   })
   const [keywordInput, setKeywordInput] = useState('')
   const [promptInput, setPromptInput] = useState('')

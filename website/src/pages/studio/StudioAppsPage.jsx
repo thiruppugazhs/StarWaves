@@ -1,6 +1,8 @@
-import { useState } from 'react'
-import { AppWindow, ExternalLink, FileCode, Play, Plus, RefreshCw } from 'lucide-react'
-import { ConfirmDialog, EmptyState, LoadingState, PageHeader, SectionHeading } from '../../components/ui'
+import "../../styles/pages/studio-shared.css"
+import "../../styles/pages/studio-gallery.css"
+import { useMemo, useState } from 'react'
+import { AppWindow, ExternalLink, FileCode, Play, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { ConfirmDialog, EmptyState, LoadingState, SearchBar, SectionHeading } from '../../components/ui'
 import { startPreview } from '../../lib/studioApi'
 import { ProjectCard } from './ProjectCard'
 import { useStudioProjects } from './useStudioProjects'
@@ -16,9 +18,21 @@ export function StudioAppsPage({ onOpenProject, onNavigate }) {
   const [runError, setRunError] = useState('')
   const [projectToDelete, setProjectToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const draftProjects = projects.filter((project) => project.build_status !== 'ready')
-  const builtApps = projects.filter((project) => project.build_status === 'ready')
+  const filteredProjects = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase()
+    if (!normalizedQuery) return projects
+
+    return projects.filter((project) =>
+      [project.name, project.description, project.stack]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(normalizedQuery)),
+    )
+  }, [projects, searchQuery])
+
+  const draftProjects = filteredProjects.filter((project) => project.build_status !== 'ready')
+  const builtApps = filteredProjects.filter((project) => project.build_status === 'ready')
 
   const handleRunApp = async (project) => {
     if (runningId) return
@@ -48,28 +62,30 @@ export function StudioAppsPage({ onOpenProject, onNavigate }) {
   }
 
   return (
-    <div className="studio-page">
-      <PageHeader
-        title="Studio Apps"
-        description="Apps Eve has finished building — jump back in or run them anytime."
-        actions={
-          <>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={() => onNavigate?.('studio')}
-            >
-              <Plus size={15} />
-              New App
-            </button>
-            <button type="button" className="secondary-button" onClick={refresh}>
-              <RefreshCw size={15} />
-              Refresh
-            </button>
-          </>
-        }
-      />
-
+    <div className="studio-page studio-page-gallery">
+      <header className="studio-section-header studio-gallery-header">
+        <SearchBar
+          className="studio-apps-search"
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search apps"
+          ariaLabel="Search apps"
+        />
+        <div className="page-inline-actions">
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() => onNavigate?.('studio')}
+        >
+          <Plus size={15} />
+          New App
+        </button>
+        <button type="button" className="secondary-button" onClick={refresh}>
+          <RefreshCw size={15} />
+          Refresh
+        </button>
+        </div>
+      </header>
       {(error || runError) && (
         <div className="studio-error-banner" role="alert">
           <span>{runError || error}</span>
@@ -119,6 +135,10 @@ export function StudioAppsPage({ onOpenProject, onNavigate }) {
                           <FileCode size={12} /> {project.file_count} files
                         </span>
                         <span className="studio-file-count">Updated {formatDate(project.updated_at)}</span>
+                        <span className={`studio-preview-state ${project.preview_status}`}>
+                          {project.preview_status === 'ready' ? 'Preview ready' : 'No preview yet'}
+                        </span>
+                        {project.last_activity && <span className="studio-file-count">{project.last_activity.label}</span>}
                       </div>
                     </div>
                     <div className="studio-project-card-actions">
@@ -129,6 +149,9 @@ export function StudioAppsPage({ onOpenProject, onNavigate }) {
                       >
                         <Play size={14} />
                         Open Builder
+                      </button>
+                      <button type="button" className="studio-delete-btn" onClick={() => setProjectToDelete(project)}>
+                        <Trash2 size={13} /> Delete
                       </button>
                       <button
                         type="button"
@@ -144,11 +167,22 @@ export function StudioAppsPage({ onOpenProject, onNavigate }) {
                 ))}
               </div>
             </section>
-          ) : draftProjects.length === 0 ? (
+          ) : draftProjects.length === 0 && projects.length === 0 ? (
             <EmptyState
               icon={AppWindow}
               title="No finished apps yet"
               description='Ask Eve to build one — try "Build a habit tracker app" in Studio.'
+            />
+          ) : draftProjects.length === 0 ? (
+            <EmptyState
+              icon={AppWindow}
+              title="No matching apps"
+              description="Try a different app name, description, or technology."
+              action={
+                <button type="button" className="secondary-button" onClick={() => setSearchQuery('')}>
+                  Clear search
+                </button>
+              }
             />
           ) : null}
         </>

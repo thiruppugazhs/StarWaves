@@ -1,3 +1,8 @@
+import "../../styles/pages/studio-shared.css"
+import "../../styles/pages/studio-builder.css"
+import "../../styles/pages/studio-stage.css"
+import "../../styles/pages/studio-planning.css"
+import "../../styles/pages/studio-questions.css"
 import { useCallback, useEffect, useState } from 'react'
 import {
   ArrowLeft,

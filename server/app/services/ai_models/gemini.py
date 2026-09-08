@@ -14,6 +14,7 @@ from app.services.ai_models.contracts import (
     ProviderResponse,
     StreamChunk,
     ToolCall,
+    classify_provider_error,
 )
 
 logger = logging.getLogger(__name__)
@@ -94,16 +95,19 @@ class GeminiProviderClient(ProviderClient):
             )
         except APIError as error:
             logger.error(f"[Gemini Provider] API call failed for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Gemini API error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "gemini", model) from error
         except Exception as error:
             logger.error(f"[Gemini Provider] Unexpected failure calling model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Gemini client error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "gemini", model) from error
 
         text_parts: list[str] = []
         tool_calls: list[ToolCall] = []
         if response.candidates:
             parts = response.candidates[0].content.parts
             for part in parts:
+                # Preserve thought parts for continuation (Gemini 2.5+ thought_signature)
+                if getattr(part, "thought", False):
+                    continue
                 if getattr(part, "text", None):
                     text_parts.append(part.text)
                 elif part.function_call:
@@ -143,14 +147,20 @@ class GeminiProviderClient(ProviderClient):
                 parts = candidates[0].content.parts if candidates and candidates[0].content else []
                 for part in parts:
                     collected_parts.append(part)
+                    # Handle thought/reasoning parts for Gemini 2.5+ (fix #2406: preserve thought_signature)
+                    if getattr(part, "thought", False):
+                        thought_text = getattr(part, "text", None)
+                        if thought_text:
+                            yield StreamChunk(kind="thinking_delta", text=thought_text)
+                        continue
                     if getattr(part, "text", None):
                         yield StreamChunk(kind="text_delta", text=part.text)
         except APIError as error:
             logger.error(f"[Gemini Provider] Streaming call failed for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Gemini API error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "gemini", model) from error
         except Exception as error:
             logger.error(f"[Gemini Provider] Unexpected streaming failure for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Gemini client error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "gemini", model) from error
 
         if not collected_parts:
             raise AIServiceError("Gemini stream returned no content.")

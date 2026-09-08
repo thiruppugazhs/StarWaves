@@ -9,12 +9,12 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 10px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm, 6px);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
   font-weight: 600;
   cursor: pointer;
@@ -39,10 +39,11 @@
 }
 
 .model-selector-label {
-  max-width: 160px;
+  max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 12px;
 }
 
 .model-selector-chevron {
@@ -62,8 +63,8 @@
 .model-selector-menu {
   position: absolute;
   z-index: 1050;
-  min-width: 260px;
-  max-width: 320px;
+  min-width: 240px;
+  max-width: 300px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md, 8px);
@@ -100,7 +101,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-secondary);
 }
@@ -112,13 +113,22 @@
 
 .model-selector-search-input {
   flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 13px;
+  min-width: 0;
+  width: auto;
+  min-height: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 11px !important;
   line-height: 1.4;
   color: var(--text-primary);
-  padding: 0;
+}
+
+.model-selector-search-box:focus-within {
+  background: var(--bg-hover);
 }
 
 .model-selector-search-input::placeholder {
@@ -154,7 +164,7 @@
   padding: 16px 12px;
   text-align: center;
   color: var(--text-secondary);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -162,7 +172,7 @@
 
 .model-selector-empty small {
   color: var(--text-tertiary);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
 }
 
 .model-selector-group {
@@ -175,7 +185,7 @@
 
 .model-selector-group-label {
   padding: 4px 10px;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -193,11 +203,11 @@
   justify-content: space-between;
   gap: 8px;
   width: 100%;
-  padding: 6px 10px;
+  padding: 5px 10px;
   border: none;
   background: transparent;
   color: var(--text-primary);
-  font-size: 0.78rem;
+  font-size: 11px;
   text-align: left;
   cursor: pointer;
   transition: background var(--transition-fast, 100ms ease);
@@ -217,6 +227,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 11px;
 }
 
 .model-selector-item-check {

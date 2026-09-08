@@ -1,0 +1,293 @@
+/* Settings WhatsApp Eve — split from settings.css (Wave F) */
+/* WhatsApp Eve Trigger Keywords & Prompt Section */
+.whatsapp-keywords-section,
+.whatsapp-prompt-section {
+  padding-top: 18px;
+  margin-top: 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+.whatsapp-keywords-header,
+.whatsapp-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.whatsapp-keywords-title,
+.whatsapp-prompt-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.whatsapp-keywords-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-keywords-reset-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-keywords-desc,
+.whatsapp-prompt-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0 0 12px 0;
+}
+
+.whatsapp-keyword-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+  min-height: 28px;
+}
+
+.whatsapp-keyword-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: border-color 0.15s ease;
+}
+
+.whatsapp-keyword-tag:hover {
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-keyword-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.whatsapp-keyword-remove-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.whatsapp-keyword-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.whatsapp-keyword-text-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 8px 12px;
+  font-size: 0.84375rem;
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.whatsapp-keyword-text-input:focus {
+  border-color: var(--border-focus, #52525b);
+}
+
+.whatsapp-keyword-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.whatsapp-keyword-add-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.whatsapp-keyword-add-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.whatsapp-keyword-presets {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.whatsapp-keyword-presets-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.whatsapp-keyword-presets-list {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.whatsapp-keyword-preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-keyword-preset-chip:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-keyword-preset-chip.is-added {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.whatsapp-prompt-textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 10px 14px;
+  font-size: 0.84375rem;
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  margin-bottom: 8px;
+  transition: border-color 0.15s ease;
+}
+
+.whatsapp-prompt-textarea:focus {
+  border-color: var(--border-focus, #52525b);
+}
+
+.whatsapp-prompt-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.whatsapp-prompt-save-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-prompt-save-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.whatsapp-prompt-save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+
+ /* Eve Avatar Settings — scoped */
+.eve-avatar-preview-grid { display: grid; grid-template-columns: minmax(220px, 340px) minmax(0,1fr); gap: var(--space-md); align-items: start; padding: var(--space-sm) var(--space-md) var(--space-md); }
+@media (max-width: 760px) { .eve-avatar-preview-grid { grid-template-columns: 1fr; } }
+.eve-avatar-controls { display: grid; gap: var(--space-sm); min-width: 0; }
+.eve-avatar-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); font-weight: var(--font-weight-medium); color: var(--text-primary); white-space: nowrap; }
+.eve-avatar-banner { margin: 0 var(--space-md) var(--space-md); padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-secondary); font-size: var(--text-sm); }
+.eve-avatar-banner.is-error { border-color: var(--border-heavy); border-left: 3px solid var(--color-danger, #c2410c); }
+.eve-avatar-banner.is-success { border-left: 3px solid var(--color-primary); }
+.eve-avatar-controls .form-row { display: grid; gap: 6px; min-width: 0; }
+.eve-avatar-controls .form-label { font-size: var(--text-xs); font-weight: var(--font-weight-semibold); color: var(--text-secondary); }
+.eve-avatar-controls .form-hint,
+.eve-avatar-upload-row .form-hint { display: flex; align-items: center; gap: 4px; font-size: var(--text-xs); line-height: 1.45; color: var(--text-tertiary); }
+.eve-avatar-controls .form-row-inline { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.eve-avatar-controls .form-row-inline .form-label { flex: 0 0 auto; }
+.eve-avatar-controls input[type="range"] { flex: 1 1 120px; min-width: 0; accent-color: var(--color-primary); }
+.eve-avatar-controls .form-value { font-size: var(--text-sm); font-weight: var(--font-weight-semibold); color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.eve-avatar-controls .checkbox-row { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--text-primary); cursor: pointer; }
+.eve-avatar-controls .checkbox-row input { flex-shrink: 0; accent-color: var(--color-primary); }
+.eve-avatar-model-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: var(--space-sm); padding: var(--space-sm) var(--space-md) var(--space-md); }
+@media (max-width: 520px) { .eve-avatar-model-grid { grid-template-columns: 1fr; } }
+.eve-avatar-model-card { display: grid; gap: 8px; align-content: start; padding: 12px; border-radius: var(--radius-md); background: var(--bg-card); border: 1px solid var(--border-color); text-align: left; font: inherit; width: 100%; min-width: 0; cursor: pointer; transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast); }
+.eve-avatar-model-card:hover { border-color: var(--border-heavy); transform: translateY(-1px); }
+.eve-avatar-model-card.is-active { border-color: var(--border-heavy); box-shadow: 0 0 0 1px var(--border-heavy), var(--shadow-sm); }
+.eve-avatar-model-card:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.eve-avatar-model-select { display: grid; gap: 6px; padding: 0; margin: 0; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; min-width: 0; }
+.eve-avatar-model-select:disabled { cursor: default; }
+.eve-avatar-model-select:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.eve-avatar-model-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.eve-avatar-model-thumb { flex: 0 0 auto; width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--bg-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
+.eve-avatar-model-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-sm); font-weight: var(--font-weight-semibold); color: var(--text-primary); }
+.eve-avatar-model-meta { font-size: var(--text-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.03em; }
+.eve-avatar-model-attrib { font-size: 11px; color: var(--text-tertiary); line-height: 1.35; }
+.eve-avatar-model-delete { margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 11px; color: var(--text-secondary); background: transparent; border: 1px solid var(--border-color); padding: 3px 7px; border-radius: var(--radius-full); width: fit-content; cursor: pointer; }
+.eve-avatar-model-delete:hover { border-color: var(--border-heavy); color: var(--text-primary); }
+.eve-avatar-model-delete:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.eve-avatar-upload-row { display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; padding: var(--space-sm) var(--space-md) var(--space-md); }
+.eve-avatar-upload-row .btn-secondary { flex-shrink: 0; }
+.eve-avatar-upload-row .form-hint { flex: 1 1 200px; min-width: 0; }
+.eve-avatar-upload-row input[type=file] { display: none; }
+@media (prefers-reduced-motion: reduce) { .eve-avatar-model-card:hover { transform: none; } }

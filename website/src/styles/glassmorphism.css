@@ -1,0 +1,297 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Starwaves — Glassmorphism Layer
+   Applies frosted-glass surfaces across the design system using --glass-*
+   tokens from tokens.css. All surfaces remain legible on all 25 presets.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. Topbar ─────────────────────────────────────────────────────────────── */
+
+.topbar {
+  background: var(--glass-bg-topbar);
+  border-bottom-color: var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) var(--glass-saturation);
+  box-shadow: 0 1px 0 var(--glass-border), 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* ── 2. Sidebar ────────────────────────────────────────────────────────────── */
+
+.sidebar {
+  background: var(--glass-bg-sidebar);
+  backdrop-filter: blur(var(--glass-blur)) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) var(--glass-saturation);
+  box-shadow:
+    inset -1px 0 0 var(--glass-border-subtle),
+    6px 0 24px rgba(0, 0, 0, 0.06),
+    var(--shadow-inset);
+}
+
+.sidebar.expanded {
+  background: var(--glass-bg-sidebar);
+  box-shadow:
+    inset -1px 0 0 var(--glass-border-card),
+    8px 0 32px rgba(0, 0, 0, 0.09);
+}
+
+/* ── 3. Cards ──────────────────────────────────────────────────────────────── */
+
+.card,
+.profile-card,
+.hackathon-source-settings,
+.project-overview-card {
+  background: var(--glass-bg-card);
+  border-color: var(--glass-border-card);
+  backdrop-filter: blur(12px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(12px) var(--glass-saturation);
+  box-shadow: var(--glass-shadow);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card:hover,
+  .profile-card:hover,
+  .hackathon-source-settings:hover,
+  .project-overview-card:hover {
+    box-shadow: var(--glass-shadow-lifted);
+    border-color: var(--glass-border);
+  }
+}
+
+.workspace-settings-card,
+.coding-settings-card {
+  background: var(--glass-bg-card);
+  border-color: var(--glass-border-card);
+  backdrop-filter: blur(12px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(12px) var(--glass-saturation);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ── 4. Modals ─────────────────────────────────────────────────────────────── */
+
+.modal,
+.todo-modal,
+.delete-account-modal,
+.drive-modal,
+.document-modal,
+.project-edit-modal,
+.job-modal {
+  background: var(--glass-bg-overlay);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(24px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(24px) var(--glass-saturation);
+  box-shadow: var(--glass-shadow-modal);
+}
+
+.modal-backdrop,
+.todo-modal-backdrop,
+.delete-account-backdrop {
+  backdrop-filter: blur(8px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(8px) var(--glass-saturation);
+}
+
+/* ── 5. Dropdowns ──────────────────────────────────────────────────────────── */
+
+.custom-dropdown-menu {
+  background: var(--glass-bg-dropdown);
+  border-color: var(--glass-border);
+  backdrop-filter: blur(20px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(20px) var(--glass-saturation);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.14),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 var(--glass-border);
+}
+
+.custom-dropdown-search {
+  background: var(--glass-bg-dropdown);
+  border-bottom-color: var(--glass-border-card);
+}
+
+/* ── 6. Settings Cards ─────────────────────────────────────────────────────── */
+
+.settings-card {
+  background: var(--glass-bg-card);
+  border-color: var(--glass-border-card);
+  backdrop-filter: blur(12px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(12px) var(--glass-saturation);
+  box-shadow: var(--glass-shadow);
+}
+
+.settings-card-header {
+  background: transparent;
+  border-bottom-color: var(--glass-border-subtle);
+}
+
+/* ── 7. Search Palette ─────────────────────────────────────────────────────── */
+
+.search-palette-overlay {
+  backdrop-filter: blur(10px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(10px) var(--glass-saturation);
+}
+
+.search-palette {
+  background: var(--glass-bg-overlay);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(24px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(24px) var(--glass-saturation);
+  box-shadow: var(--glass-shadow-modal);
+}
+
+/* ── 8. MetricCard ─────────────────────────────────────────────────────────── */
+
+.metric-card {
+  background: var(--glass-bg-card);
+  border-color: var(--glass-border-card);
+  backdrop-filter: blur(10px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(10px) var(--glass-saturation);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ── 9. Alerts ─────────────────────────────────────────────────────────────── */
+
+.alert {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-color: var(--glass-border-card);
+}
+
+/* ── 10. Eve Panel ─────────────────────────────────────────────────────────── */
+
+.eve-panel {
+  background: var(--glass-bg-sidebar);
+  backdrop-filter: blur(var(--glass-blur)) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) var(--glass-saturation);
+  border-left-color: var(--glass-border-subtle);
+}
+
+/* ── 11. Tab Nav ───────────────────────────────────────────────────────────── */
+
+.tab-nav {
+  background: var(--glass-bg-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-color: var(--glass-border-card);
+}
+
+/* ── 12. Inputs & Form Controls ───────────────────────────────────────────── */
+
+input:not([type]):not(.search-bar-input),
+input[type="text"]:not(.search-bar-input),
+input[type="email"],
+input[type="password"],
+input[type="search"]:not(.search-bar-input),
+input[type="url"],
+input[type="number"],
+input[type="date"],
+input[type="file"],
+select,
+textarea:not(.eve-composer-textarea):not(.studio-prompt-textarea):not(.whatsapp-composer-input),
+.modal form input,
+.modal form select,
+.modal form textarea,
+.project-edit-form input,
+.project-edit-form select,
+.project-edit-form textarea {
+  background: var(--glass-bg-input);
+  border: 1px solid var(--glass-border-input);
+  backdrop-filter: blur(12px) var(--glass-saturation);
+  -webkit-backdrop-filter: blur(12px) var(--glass-saturation);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 0 var(--glass-border-subtle);
+}
+
+input:not([type]):not(.search-bar-input):focus,
+input[type="text"]:not(.search-bar-input):focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:not(.search-bar-input):focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="file"]:focus,
+select:focus,
+textarea:not(.eve-composer-textarea):not(.studio-prompt-textarea):not(.whatsapp-composer-input):focus,
+.modal form input:focus,
+.modal form select:focus,
+.modal form textarea:focus,
+.project-edit-form input:focus,
+.project-edit-form select:focus,
+.project-edit-form textarea:focus {
+  background: var(--glass-bg-input-focus);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-light), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Frameless embedded inputs/textareas inside cards and composers must stay shadowless and transparent */
+.search-bar-input,
+.search-bar input,
+.eve-composer textarea,
+.eve-composer-textarea,
+.eve-composer-field textarea,
+.studio-prompt-input,
+.studio-prompt-textarea,
+.whatsapp-composer textarea,
+.whatsapp-composer-input,
+.whatsapp-message-composer textarea {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+input[type="file"]::file-selector-button {
+  background: var(--glass-bg-card);
+  border: 1px solid var(--glass-border-card);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  margin-right: 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), inset 0 1px 0 var(--glass-border-subtle);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: var(--glass-bg-input-focus);
+  border-color: var(--border-focus);
+}
+
+/* ── 13. Reduced-motion: strip blur, keep alpha ───────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar,
+  .sidebar,
+  .sidebar.expanded,
+  .card,
+  .profile-card,
+  .hackathon-source-settings,
+  .project-overview-card,
+  .workspace-settings-card,
+  .coding-settings-card,
+  .modal,
+  .todo-modal,
+  .delete-account-modal,
+  .drive-modal,
+  .document-modal,
+  .project-edit-modal,
+  .job-modal,
+  .modal-backdrop,
+  .todo-modal-backdrop,
+  .delete-account-backdrop,
+  .custom-dropdown-menu,
+  .settings-card,
+  .search-palette,
+  .search-palette-overlay,
+  .metric-card,
+  .alert,
+  .eve-panel,
+  .tab-nav,
+  input,
+  select,
+  textarea {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

@@ -1,7 +1,7 @@
 import os
 from PIL import Image
 
-source_img_path = r"C:\Users\susin\.gemini\antigravity\brain\a1b59300-cdff-427f-a888-ed97b15806bb\.user_uploaded\media__1784904478836.png"
+source_img_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "website", "public", "logo.png"))
 
 if os.path.exists(source_img_path):
     img = Image.open(source_img_path).convert("RGBA")
@@ -16,10 +16,7 @@ if os.path.exists(source_img_path):
     
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "website"))
     targets = [
-        os.path.join(base_dir, "favicon.ico"),
-        os.path.join(base_dir, "public", "favicon.ico"),
-        os.path.join(base_dir, "public", "favicon.png"),
-        os.path.join(base_dir, "public", "starwaves-logo.png")
+        os.path.join(base_dir, "public", "logo.png")
     ]
     
     dist_dir = os.path.join(base_dir, "dist")

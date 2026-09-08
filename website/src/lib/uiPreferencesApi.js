@@ -1,4 +1,4 @@
-import { apiRequest, clearRequestCache } from './request'
+import { apiRequest, invalidateCacheForPath } from './request'
 
 export function getUiPreferences() {
   return apiRequest('/ui/preferences', { method: 'GET' })
@@ -13,7 +13,7 @@ export function updateUiTokens(tokens, page = null, reason = null) {
     method: 'PUT',
     body: JSON.stringify({ tokens, page, reason }),
   }).then((res) => {
-    clearRequestCache()
+    invalidateCacheForPath('/ui/preferences')
     return res
   })
 }
@@ -23,7 +23,7 @@ export function updateUiCss(css, page = null) {
     method: 'PUT',
     body: JSON.stringify({ css, page }),
   }).then((res) => {
-    clearRequestCache()
+    invalidateCacheForPath('/ui/preferences')
     return res
   })
 }
@@ -33,7 +33,7 @@ export function updateUiVisibility(target, visible, page = null) {
     method: 'PUT',
     body: JSON.stringify({ target, visible, page }),
   }).then((res) => {
-    clearRequestCache()
+    invalidateCacheForPath('/ui/preferences')
     return res
   })
 }
@@ -43,7 +43,7 @@ export function resetUiPreferences(page = null, version = null) {
     method: 'POST',
     body: JSON.stringify({ page, version }),
   }).then((res) => {
-    clearRequestCache()
+    invalidateCacheForPath('/ui/preferences')
     return res
   })
 }
@@ -53,14 +53,14 @@ export function restoreUiVersion(version) {
     method: 'POST',
     body: JSON.stringify({ version }),
   }).then((res) => {
-    clearRequestCache()
+    invalidateCacheForPath('/ui/preferences')
     return res
   })
 }
 
 export function clearUiPreferences() {
   return apiRequest('/ui/preferences', { method: 'DELETE' }).then((res) => {
-    clearRequestCache()
+    invalidateCacheForPath('/ui/preferences')
     return res
   })
 }

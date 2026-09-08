@@ -1,4 +1,9 @@
 /** WhatsAppConversation — single responsibility: compose conversation UI from feature subcomponents. */
+import '../../../styles/pages/whatsapp-conversation.css'
+import '../../../styles/pages/whatsapp-composer.css'
+import '../../../styles/pages/whatsapp-bubbles.css'
+import '../../../styles/pages/whatsapp-bubbles-extra.css'
+import '../../../styles/pages/whatsapp-media.css'
 import { useRef, useState, useMemo } from 'react'
 import { Search, X } from 'lucide-react'
 import { WhatsAppConversationHeader } from './WhatsAppConversationHeader'

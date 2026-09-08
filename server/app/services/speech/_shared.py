@@ -89,12 +89,12 @@ def google_tts_available() -> bool:
     return bool(settings.google_cloud_tts_api_key)
 
 
-def elevenlabs_available() -> bool:
-    return bool(settings.elevenlabs_api_key)
-
-
 def openrouter_tts_available() -> bool:
     return bool(settings.openrouter_api_key)
+
+
+def elevenlabs_available() -> bool:
+    return bool(settings.elevenlabs_api_key)
 
 
 ELEVENLABS_VOICES: list[dict[str, str]] = [
@@ -141,7 +141,7 @@ def tts_catalog() -> list[dict[str, Any]]:
         },
         {
             "id": "elevenlabs",
-            "label": "ElevenLabs (Ultra-realistic Voice)",
+            "label": "ElevenLabs Turbo v2.5",
             "available": elevenlabs_available(),
             "voices": ELEVENLABS_VOICES,
         },
@@ -174,7 +174,7 @@ def _valid_tts_voice(provider: str, voice: str) -> bool:
     if provider == "browser":
         return not voice
     if provider == "elevenlabs":
-        return any(item["id"] == voice for item in ELEVENLABS_VOICES) or bool(voice)
+        return any(item["id"] == voice for item in ELEVENLABS_VOICES)
     if provider == "google":
         return any(item["id"] == voice for item in GOOGLE_TTS_VOICES)
     if provider == "openrouter":
@@ -217,8 +217,8 @@ def resolve_speech_preference(database: SqlClient, user_uid: str) -> dict[str, s
     """Resolve a user's STT/TTS provider choice, falling back to browser."""
     stt_provider = DEFAULT_STT_PROVIDER
     stt_model = ""
-    tts_provider = "elevenlabs" if elevenlabs_available() else DEFAULT_TTS_PROVIDER
-    tts_voice = "21m00Tcm4TlvDq8ikWAM" if elevenlabs_available() else ""
+    tts_provider = DEFAULT_TTS_PROVIDER
+    tts_voice = ""
     preference = load_speech_preference(database, user_uid)
     if preference:
         stt_provider = preference.get("stt_provider") or DEFAULT_STT_PROVIDER

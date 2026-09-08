@@ -16,6 +16,7 @@ from app.services.eve.tools.utility import UTILITY_TOOLS
 from app.services.eve.tools.web import WEB_TOOLS
 from app.services.eve.tools.whatsapp import WHATSAPP_TOOLS
 from app.services.eve.tools.workspace import WORKSPACE_TOOLS
+from app.services.eve.tools.avatar import AVATAR_EDITOR_TOOLS
 
 EVE_TOOLS = (
     WORKSPACE_TOOLS
@@ -34,4 +35,5 @@ EVE_TOOLS = (
     + CALENDAR_TOOLS
     + HTTP_TOOLS
     + UI_TOOLS
+    + AVATAR_EDITOR_TOOLS
 )

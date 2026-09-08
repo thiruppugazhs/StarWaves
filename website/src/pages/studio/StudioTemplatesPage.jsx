@@ -1,6 +1,8 @@
+import "../../styles/pages/studio-shared.css"
+import "../../styles/pages/studio-gallery.css"
 import { useCallback, useEffect, useState } from 'react'
-import { LayoutTemplate } from 'lucide-react'
-import { EmptyState, FormField, LoadingState, Modal, PageHeader } from '../../components/ui'
+import { LayoutTemplate, Search, Sparkles } from 'lucide-react'
+import { EmptyState, FormField, LoadingState, Modal } from '../../components/ui'
 import {
   listStudioTemplates,
   remixStudioTemplate,
@@ -14,6 +16,7 @@ export function StudioTemplatesPage({ onOpenProject }) {
   const [remixName, setRemixName] = useState('')
   const [isRemixing, setIsRemixing] = useState(false)
   const [remixError, setRemixError] = useState('')
+  const [activeCategory, setActiveCategory] = useState('all')
 
   const loadTemplates = useCallback(async () => {
     setIsLoading(true)
@@ -53,17 +56,38 @@ export function StudioTemplatesPage({ onOpenProject }) {
     }
   }
 
+  const categories = ['all', ...new Set(templates.map((template) => template.category).filter(Boolean))]
+  const visibleTemplates = templates
+    .filter((template) => activeCategory === 'all' || template.category === activeCategory)
+    .sort((a, b) => Number(b.featured) - Number(a.featured) || (a.sort_order ?? 0) - (b.sort_order ?? 0))
+
   return (
-    <div className="studio-page">
-      <PageHeader
-        title="Studio Templates"
-        description="Curated starters plus templates you published from your own projects."
-        actions={
-          <button type="button" className="secondary-button" onClick={loadTemplates}>
-            Refresh
-          </button>
-        }
-      />
+    <div className="studio-page studio-page-gallery">
+      <header className="studio-section-header studio-gallery-header">
+        <div>
+          <span className="studio-eyebrow"><Sparkles size={13} /> Studio library</span>
+          <h2>Start with a strong foundation.</h2>
+          <p>Remix a curated stack or return to one of your own patterns.</p>
+        </div>
+        <div className="page-inline-actions">
+        <button type="button" className="secondary-button" onClick={loadTemplates}>
+          Refresh
+        </button>
+        </div>
+      </header>
+
+      {templates.length > 0 && (
+        <div className="studio-template-toolbar">
+          <div className="studio-template-filters" aria-label="Template categories">
+            {categories.map((category) => (
+              <button key={category} type="button" className={activeCategory === category ? 'active' : ''} onClick={() => setActiveCategory(category)}>
+                {category === 'all' ? 'All templates' : category}
+              </button>
+            ))}
+          </div>
+          <span className="studio-template-count"><Search size={14} /> {visibleTemplates.length} available</span>
+        </div>
+      )}
 
       {error && (
         <div className="studio-error-banner" role="alert">
@@ -82,16 +106,18 @@ export function StudioTemplatesPage({ onOpenProject }) {
         />
       ) : (
         <div className="studio-template-grid">
-          {templates.map((template) => (
+          {visibleTemplates.map((template) => (
             <article key={template.id} className="studio-template-card">
               <header>
                 <LayoutTemplate size={18} />
                 <h3>{template.name}</h3>
+                {template.featured && <span className="studio-template-featured">Featured</span>}
                 <span className={`studio-template-kind ${template.kind}`}>
                   {template.kind === 'custom' ? 'Yours' : 'Curated'}
                 </span>
               </header>
               {template.description && <p>{template.description}</p>}
+              {template.tags?.length > 0 && <div className="studio-template-tags">{template.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>}
               {template.stack && <span className="studio-stack-tag">{template.stack}</span>}
               <button
                 type="button"

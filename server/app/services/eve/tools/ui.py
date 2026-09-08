@@ -17,9 +17,10 @@ UI_TOOLS = [
                     "description": f"Optional page to inspect. One of: {', '.join(_WORKSPACE_PAGES_LIST)} or custom:<slug>",
                 }
             },
+            "required": [],
             "additionalProperties": False,
         },
-        "strict": True,
+        "strict": False,
     },
     {
         "type": "function",
@@ -54,7 +55,7 @@ UI_TOOLS = [
             "required": ["css"],
             "additionalProperties": False,
         },
-        "strict": True,
+        "strict": False,
     },
     {
         "type": "function",
@@ -70,7 +71,7 @@ UI_TOOLS = [
             "required": ["target", "visible"],
             "additionalProperties": False,
         },
-        "strict": True,
+        "strict": False,
     },
     {
         "type": "function",
@@ -82,16 +83,17 @@ UI_TOOLS = [
                 "page": {"type": "string", "description": "Optional page to reset."},
                 "version": {"type": "integer", "minimum": 1, "description": "Optional historical version to restore."},
             },
+            "required": [],
             "additionalProperties": False,
         },
-        "strict": True,
+        "strict": False,
     },
     {
         "type": "function",
         "name": "list_ui_history",
         "description": "List UI version history (last 20 versions) with version, timestamp, cause, and snapshot. Use to find a version to restore via reset_ui.",
-        "parameters": {"type": "object", "properties": {}, "additionalProperties": False},
-        "strict": True,
+        "parameters": {"type": "object", "properties": {}, "required": [], "additionalProperties": False},
+        "strict": False,
     },
     {
         "type": "function",
@@ -108,6 +110,6 @@ UI_TOOLS = [
             "required": ["slug", "title", "description"],
             "additionalProperties": False,
         },
-        "strict": True,
+        "strict": False,
     },
 ]

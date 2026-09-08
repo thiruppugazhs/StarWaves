@@ -1,9 +1,9 @@
 import {
+  Activity,
   Bell,
   BriefcaseBusiness,
   CalendarDays,
   CheckSquare2,
-  FileText,
   FolderKanban,
   Gauge,
   Rocket,
@@ -16,15 +16,15 @@ export const DASHBOARD_BREAKPOINTS = { lg: 1200, md: 900, sm: 620, xs: 0 }
 export const DASHBOARD_COLS = { lg: 12, md: 10, sm: 6, xs: 2 }
 
 export const dashboardWidgets = [
-  { id: 'today', title: 'Today overview', icon: Gauge, destination: 'calendar' },
-  { id: 'todo', title: 'Todo list', icon: CheckSquare2, destination: 'todo' },
-  { id: 'calendar', title: 'Upcoming events', icon: CalendarDays, destination: 'calendar' },
-  { id: 'competitive-coding', title: 'Competitive coding', icon: Trophy, destination: 'competitive-coding' },
-  { id: 'hackathons', title: 'Hackathons', icon: Rocket, destination: 'hackathons' },
-  { id: 'projects', title: 'Project progress', icon: FolderKanban, destination: 'projects' },
-  { id: 'jobs', title: 'Job applications', icon: BriefcaseBusiness, destination: 'jobs' },
-  { id: 'documents', title: 'Recent documents', icon: FileText, destination: 'documents' },
-  { id: 'notifications', title: 'Notifications', icon: Bell, destination: null },
+  { id: 'today', title: 'Today overview', icon: Gauge, destination: 'calendar', module: 'work' },
+  { id: 'todo', title: 'Todo list', icon: CheckSquare2, destination: 'todo', module: 'todo' },
+  { id: 'calendar', title: 'Upcoming events', icon: CalendarDays, destination: 'calendar', module: 'calendar' },
+  { id: 'competitive-coding', title: 'Competitive coding', icon: Trophy, destination: 'compete', module: 'growth' },
+  { id: 'hackathons', title: 'Hackathons', icon: Rocket, destination: 'hackathons', module: 'growth' },
+  { id: 'projects', title: 'Project progress', icon: FolderKanban, destination: 'projects', module: 'projects' },
+  { id: 'jobs', title: 'Job applications', icon: BriefcaseBusiness, destination: 'jobs', module: 'growth' },
+  { id: 'documents', title: 'Recent activity', icon: Activity, destination: 'documents', module: 'documents' },
+  { id: 'notifications', title: 'Notifications', icon: Bell, destination: null, module: 'comm' },
 ]
 
 const item = (i, x, y, w, h, minW = 2, minH = 3) => ({

@@ -1,3 +1,5 @@
+import '../../styles/pages/workspace-overview.css'
+import { useMemo, useState } from 'react'
 import {
   Clock3,
   Edit2,
@@ -7,7 +9,7 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react'
-import { EmptyState, LoadingState } from '../../components/ui'
+import { EmptyState, LoadingState, SearchBar } from '../../components/ui'
 
 function formatDate(value) {
   const date = new Date(value)
@@ -24,6 +26,19 @@ export function WorkspaceOverview({
   onOpenRenameWorkspace,
   onOpenDeleteWorkspace,
 }) {
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredWorkspaces = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase()
+    if (!normalizedQuery) return workspaces
+
+    return workspaces.filter((workspace) =>
+      [workspace.name, workspace.id]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(normalizedQuery)),
+    )
+  }, [searchQuery, workspaces])
+
   if (loading && workspaces.length === 0) {
     return (
       <div className="ws-overview">
@@ -35,13 +50,14 @@ export function WorkspaceOverview({
   return (
     <div className="ws-overview">
       <header className="ws-overview-header">
-        <div>
-          <h2>Workspaces</h2>
-          <p>
-            Each card is an isolated folder — open one to code in the built-in editor
-            {workspaces.length > 0 ? ` · ${workspaces.length} total` : ''}
-          </p>
-        </div>
+        <h2>Workspaces</h2>
+        <SearchBar
+          className="ws-overview-search"
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search workspaces"
+          ariaLabel="Search workspaces"
+        />
       </header>
 
       {workspaces.length === 0 ? (
@@ -55,9 +71,20 @@ export function WorkspaceOverview({
             </button>
           }
         />
+      ) : filteredWorkspaces.length === 0 ? (
+        <EmptyState
+          icon={Folder}
+          title="No matching workspaces"
+          description="Try a different workspace name or ID."
+          action={
+            <button type="button" className="secondary-button" onClick={() => setSearchQuery('')}>
+              Clear search
+            </button>
+          }
+        />
       ) : (
         <div className="ws-overview-grid">
-          {workspaces.map((ws) => {
+          {filteredWorkspaces.map((ws) => {
             const isActive = ws.id === activeWorkspaceId
             const updated = formatDate(ws.updated_at)
             return (

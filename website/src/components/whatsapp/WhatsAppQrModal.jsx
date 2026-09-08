@@ -1,3 +1,4 @@
+import '../../styles/pages/whatsapp-qr.css'
 import { useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { RefreshCw, Smartphone, Copy, Check, Radio } from 'lucide-react'
@@ -50,7 +51,7 @@ export function WhatsAppQrModal({
               {loading || !qrCode ? (
                 <div className="whatsapp-qr-loading">
                   <RefreshCw size={32} className="animate-spin" />
-                  <span style={{ marginTop: '8px', fontSize: '0.8125rem' }}>Fetching live WhatsApp QR...</span>
+                  <span className="whatsapp-qr-loading-text">Fetching live WhatsApp QR...</span>
                 </div>
               ) : (
                 <img src={qrCode} alt="WhatsApp QR Code" className="whatsapp-qr-image" />
@@ -148,10 +149,9 @@ export function WhatsAppQrModal({
                   <span className="whatsapp-pairing-digits">{pairingCode}</span>
                   <button
                     type="button"
-                    className="secondary-button"
+                    className="secondary-button whatsapp-qr-copy-btn"
                     onClick={() => handleCopyCode(pairingCode)}
                     title="Copy pairing code"
-                    style={{ minHeight: '34px', padding: '6px 10px' }}
                   >
                     {copied ? <Check size={14} /> : <Copy size={14} />}
                     {copied ? 'Copied' : 'Copy'}
@@ -163,7 +163,7 @@ export function WhatsAppQrModal({
               </div>
             )}
 
-            <div className="whatsapp-qr-actions" style={{ marginTop: '8px' }}>
+            <div className="whatsapp-qr-actions whatsapp-qr-actions--spaced">
               <button
                 type="button"
                 className="secondary-button"

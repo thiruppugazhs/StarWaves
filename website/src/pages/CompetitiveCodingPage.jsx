@@ -1,6 +1,7 @@
+import "../styles/pages/coding.css"
 import { useMemo, useState } from 'react'
-import { CalendarDays, ChevronDown, Clock3, Filter, SlidersHorizontal, Trophy } from 'lucide-react'
-import { CustomDropdown, EmptyState, FilterBar, MetricCard, MetricGrid, PageHeader, SearchBar } from '../components/ui'
+import { CalendarDays, ChevronDown, Clock3, Filter, Search, SlidersHorizontal, Trophy } from 'lucide-react'
+import { CustomDropdown, EmptyState, FilterBar, MetricCard, MetricGrid, SearchBar } from '../components/ui'
 import { usePersistentState } from '../hooks/usePersistentState'
 
 export function CompetitiveCodingPage({ contestSites }) {
@@ -32,16 +33,6 @@ export function CompetitiveCodingPage({ contestSites }) {
 
   return (
     <section className="competitive-coding-page">
-      <PageHeader
-        eyebrow="Practice & compete"
-        title="Competitive Coding"
-        description="Keep your next challenge in sight across every platform."
-        actions={<div className="contest-summary">
-          <Trophy size={16} />
-          <span>{contestSites.length} platforms</span>
-        </div>}
-      />
-
       <MetricGrid className="workspace-insight-grid" ariaLabel="Competitive coding overview">
         <MetricCard className="compact" label="Platforms" value={contestSites.length} detail="connected sources" />
         <MetricCard className="compact" label="Upcoming" value={allContests.length} detail="contests to explore" />

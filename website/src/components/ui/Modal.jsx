@@ -4,6 +4,8 @@ import { X } from 'lucide-react'
 
 export function Modal({ isOpen, onClose, title, subtitle, children, className = '', backdropClassName = '', hideHeading = false }) {
   const modalRef = useRef(null)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
   const titleId = useId()
   const descriptionId = useId()
 
@@ -22,13 +24,14 @@ export function Modal({ isOpen, onClose, title, subtitle, children, className = 
       Array.from(modalRef.current?.querySelectorAll(focusableSelector) ?? [])
 
     window.requestAnimationFrame(() => {
+      if (modalRef.current?.contains(document.activeElement)) return
       const preferredFocus = modalRef.current?.querySelector('[data-modal-initial-focus]')
       ;(preferredFocus || focusableElements()[0] || modalRef.current)?.focus()
     })
 
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape' && onClose) {
-        onClose()
+      if (event.key === 'Escape' && onCloseRef.current) {
+        onCloseRef.current()
       }
       if (event.key !== 'Tab') return
 
@@ -57,7 +60,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, className = 
       document.body.style.overflow = previousOverflow
       previouslyFocused?.focus?.()
     }
-  }, [isOpen, onClose])
+  }, [isOpen])
 
   if (!isOpen) return null
 

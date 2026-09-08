@@ -1,8 +1,9 @@
+import "../styles/pages/calls-page.css"
+import "../styles/pages/calls-layout.css"
 import { useCallback, useEffect, useState } from 'react'
 import { AlertCircle, Bot, Loader, Phone, PhoneCall, PhoneIncoming, RefreshCw, Video } from 'lucide-react'
 import { CallScreen } from '../components/calls/CallScreen'
 import { ScheduledCallsSection } from '../components/calls/ScheduledCallsSection'
-import { PageHeader } from '../components/ui'
 import { getRecentCalls, getTwilioConfig } from '../lib/callsApi'
 import {
   callStatusLabel,
@@ -88,40 +89,34 @@ export function CallsPage({ callCenter, user }) {
 
   return (
     <section className="calls-page">
-      <PageHeader
-        eyebrow="Communication"
-        title="Calls"
-        actions={
-          <>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={handleCallEve}
-              title="Start voice call with Eve AI Assistant"
-            >
-              <PhoneCall size={15} />
-              <span>Call Eve</span>
-            </button>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={handleRequestEveCall}
-              title="Have Eve initiate an incoming call to you"
-            >
-              <PhoneIncoming size={15} />
-              <span>Eve Call Me</span>
-            </button>
-            <button
-              className="icon-button"
-              onClick={loadRecent}
-              disabled={loadingRecent}
-              title="Refresh recent calls"
-            >
-              <RefreshCw size={16} className={loadingRecent ? 'calls-spin' : ''} />
-            </button>
-          </>
-        }
-      />
+      <div className="page-inline-actions">
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={handleCallEve}
+          title="Start voice call with Eve AI Assistant"
+        >
+          <PhoneCall size={15} />
+          <span>Call Eve</span>
+        </button>
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={handleRequestEveCall}
+          title="Have Eve initiate an incoming call to you"
+        >
+          <PhoneIncoming size={15} />
+          <span>Eve Call Me</span>
+        </button>
+        <button
+          className="icon-button"
+          onClick={loadRecent}
+          disabled={loadingRecent}
+          title="Refresh recent calls"
+        >
+          <RefreshCw size={16} className={loadingRecent ? 'calls-spin' : ''} />
+        </button>
+      </div>
 
       {inCall && (
         <div className="calls-session-panel">
@@ -196,7 +191,7 @@ export function CallsPage({ callCenter, user }) {
           </div>
 
           {twilioEnabled && (
-            <div className="calls-provider-toggle" role="group" aria-label="Call provider" style={{ marginBottom: 12 }}>
+            <div className="calls-provider-toggle" role="group" aria-label="Call provider">
               <button type="button" className={`calls-mode-option ${provider === 'in_app' ? 'active' : ''}`} onClick={() => setProvider('in_app')} aria-pressed={provider === 'in_app'}>In-App</button>
               <button type="button" className={`calls-mode-option ${provider === 'twilio' ? 'active' : ''}`} onClick={() => setProvider('twilio')} aria-pressed={provider === 'twilio'}>Phone (Twilio)</button>
             </div>

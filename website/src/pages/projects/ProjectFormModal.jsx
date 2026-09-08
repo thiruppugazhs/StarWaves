@@ -9,7 +9,7 @@ export function ProjectFormModal({ isOpen, onClose, form, setForm, error, setErr
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="document-modal" subtitle="Projects" title="Add project">
+    <Modal isOpen={isOpen} onClose={onClose} className="project-edit-modal" subtitle="Projects" title="Add project">
       <form className="project-edit-form" onSubmit={onSubmit}>
         {error && (
           <Alert variant="error" onDismiss={() => setError('')}>
@@ -44,8 +44,10 @@ export function ProjectFormModal({ isOpen, onClose, form, setForm, error, setErr
               ))}
             </select>
           </label>
+        </div>
+        <div className="project-edit-form-row">
           <label>
-            Progress
+            Progress (%)
             <input type="number" min="0" max="100" value={form.progress} onChange={(event) => updateField('progress', event.target.value)} />
           </label>
           <label>
@@ -67,7 +69,7 @@ export function ProjectFormModal({ isOpen, onClose, form, setForm, error, setErr
             <input type="url" value={form.liveUrl} onChange={(event) => updateField('liveUrl', event.target.value)} />
           </label>
         </div>
-        <div className="todo-modal-actions">
+        <div className="modal-actions">
           <button className="secondary-button" type="button" onClick={onClose} disabled={saving}>
             Cancel
           </button>

@@ -1,3 +1,4 @@
+import '../../styles/pages/workspace-toolbar.css'
 import { useEffect, useRef, useState } from 'react'
 import {
   FolderOpen,
@@ -20,6 +21,7 @@ import {
 export function WorkspaceToolbar({
   workspaces = [],
   activeWorkspace,
+  onBackToOverview,
   onSwitchWorkspace,
   onOpenCreateWorkspace,
   onOpenRenameWorkspace,
@@ -85,7 +87,18 @@ export function WorkspaceToolbar({
           {dropdownOpen && (
             <div className="workspace-selector-menu" role="menu">
               <div className="workspace-menu-header">
-                <span><Layers size={11} /> Workspaces</span>
+                <button
+                  type="button"
+                  className="workspace-menu-overview-btn"
+                  onClick={() => {
+                    setDropdownOpen(false)
+                    onBackToOverview?.()
+                  }}
+                  title="View all workspaces"
+                >
+                  <Layers size={11} />
+                  <span>All Workspaces</span>
+                </button>
                 <button
                   type="button"
                   className="workspace-menu-add-btn"

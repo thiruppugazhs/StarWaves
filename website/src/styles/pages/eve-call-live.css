@@ -1,0 +1,310 @@
+/* Eve Call Live (captions/controls) — split from eve.css (Wave D) */
+/* ── Live Transcripts / Captions Stream ── */
+.eve-call-captions-drawer {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 120px;
+  background: var(--bg-card, var(--bg-primary));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.8rem 1rem;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.eve-call-captions-drawer.idle-mode {
+  min-height: 100px;
+}
+
+.eve-call-captions-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 1.25rem 0;
+}
+
+.eve-call-captions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.eve-call-caption-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.caption-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.eve-call-caption-bubble.user .caption-avatar {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border-color: var(--color-primary);
+}
+
+.caption-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.caption-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.caption-author {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.caption-time {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+
+.caption-text {
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  margin: 0;
+  word-break: break-word;
+}
+
+.eve-call-caption-bubble.user .caption-text {
+  color: var(--text-primary);
+}
+
+/* ── Bottom Controls & Input Footer ── */
+.eve-call-bottom-toolbar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.eve-call-text-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  background: var(--bg-card, var(--bg-primary));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.3rem 0.4rem 0.3rem 0.8rem;
+  box-sizing: border-box;
+  transition: border-color var(--transition-fast);
+}
+
+.eve-call-text-input-row:focus-within {
+  border-color: var(--border-heavy, var(--text-primary));
+}
+
+.eve-call-text-input-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.86rem;
+  outline: none;
+  padding: 0.35rem 0;
+}
+
+.eve-call-text-input-row input::placeholder {
+  color: var(--text-muted);
+}
+
+.eve-call-text-send-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs, 6px);
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.eve-call-text-send-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.eve-call-text-send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.eve-call-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.eve-call-ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.eve-call-ctrl-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-heavy);
+}
+
+.eve-call-ctrl-btn.active-mute {
+  background: var(--bg-secondary);
+  border-color: var(--border-heavy);
+  color: var(--text-muted);
+}
+
+.eve-call-ctrl-btn.active-talk {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border-color: var(--color-primary);
+}
+
+.eve-call-hangup-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border: 1px solid var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.eve-call-hangup-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.eve-call-start-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border: 1px solid var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.eve-call-start-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.eve-call-start-btn.secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.eve-call-start-btn.secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-heavy);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Ref composer/queue styling — theme-aware (tokens for both light
+   and dark; deep-black refinement only under html.dark-theme)
+   ═══════════════════════════════════════════════════════════════ */
+.eve-queued-grip {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.eve-queue-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full, 999px);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast, 140ms ease);
+  line-height: 1;
+}
+
+.eve-queue-pill-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-heavy);
+  color: var(--text-primary);
+}
+
+.eve-queue-pill-btn.primary {
+  background: var(--bg-tertiary);
+  border-color: var(--border-heavy);
+  color: var(--text-primary);
+}
+
+.eve-queue-pill-btn.primary:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.eve-queue-pill-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+

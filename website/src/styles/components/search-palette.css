@@ -120,64 +120,6 @@
   border-radius: var(--radius-xs, 4px);
 }
 
-/* ── Categories Navigation ── */
-.search-palette-categories {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 20px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.search-palette-categories::-webkit-scrollbar {
-  display: none;
-}
-
-.search-palette-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 28px;
-  padding: 0 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-full, 9999px);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all var(--transition-fast, 0.15s ease);
-}
-
-.search-palette-pill:hover {
-  color: var(--text-primary);
-  border-color: var(--border-heavy);
-  background: var(--bg-hover);
-}
-
-.search-palette-pill.active {
-  color: var(--text-inverse);
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.search-palette-pill-count {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: var(--radius-full, 9999px);
-  background: rgba(125, 125, 125, 0.18);
-}
-
-.search-palette-pill.active .search-palette-pill-count {
-  background: rgba(255, 255, 255, 0.25);
-  color: var(--text-inverse);
-}
-
 /* ── Body & Results List ── */
 .search-palette-body {
   flex: 1;

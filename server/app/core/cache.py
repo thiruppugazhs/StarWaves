@@ -178,7 +178,7 @@ def build_cache_key(prefix: str, user_id: str | None = None, **params: Any) -> s
         return prefix
     # Stable JSON + short hash keeps Redis keys bounded even for paginated cursors
     payload = _json.dumps(filtered, sort_keys=True, default=str, separators=(",", ":"))
-    digest = hashlib.md5(payload.encode()).hexdigest()[:12]
+    digest = hashlib.sha256(payload.encode()).hexdigest()[:12]
     if user_id:
         return f"{prefix}:{user_id}:{digest}"
     return f"{prefix}:anon:{digest}"

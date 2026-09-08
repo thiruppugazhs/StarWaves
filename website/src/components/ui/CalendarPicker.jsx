@@ -18,7 +18,7 @@ function buildDays(month) {
   })
 }
 
-export function CalendarPicker({ value = null, onChange, placeholder = 'dd------yyyy' }) {
+export function CalendarPicker({ value = null, onChange, placeholder = 'Select date' }) {
   const rootRef = useRef(null)
   const today = useMemo(() => new Date(), [])
   const [open, setOpen] = useState(false)
@@ -46,7 +46,13 @@ export function CalendarPicker({ value = null, onChange, placeholder = 'dd------
 
   return (
     <div className="calendar-picker" ref={rootRef}>
-      <button type="button" className="calendar-picker-input" onClick={() => setOpen((current) => !current)} aria-expanded={open}>
+      <button
+        type="button"
+        className="calendar-picker-input"
+        onClick={() => setOpen((current) => !current)}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+      >
         <span className={displayValue ? '' : 'calendar-picker-placeholder'}>{displayValue || placeholder}</span>
         <ChevronDown size={16} className={open ? 'chevron-open' : ''} />
       </button>
@@ -64,7 +70,9 @@ export function CalendarPicker({ value = null, onChange, placeholder = 'dd------
             {days.map((date) => (
               <button
                 key={date.toISOString()}
+                type="button"
                 className={`${date.getMonth() === month.getMonth() ? '' : 'outside-month'} ${isSameDay(date, value) ? 'selected' : ''} ${isSameDay(date, today) ? 'today' : ''}`}
+                aria-label={date.toLocaleDateString(undefined, { dateStyle: 'full' })}
                 onClick={() => selectDate(date)}
               >{date.getDate()}</button>
             ))}

@@ -1,41 +1,89 @@
 /* Todo Page Styles */
 
-.todo-page-heading {
-  gap: 32px;
+.todo-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 100%;
+  gap: var(--section-gap);
+}
+
+.todo-page > .empty-state {
+  flex: 1 1 auto;
+  min-height: clamp(280px, 42vh, 420px);
+  height: 100%;
+  padding: var(--space-xl) var(--space-lg);
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+}
+
+.todo-page > .empty-state .empty-icon {
+  background: var(--bg-card);
+  box-shadow: none;
 }
 
 .todo-add-trigger {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 7px;
 }
 
-.todo-container {
-  width: 100%;
-  padding-top: 24px;
-}
-
 .todo-filters {
+  margin: 0;
+}
+
+.todo-progress {
   display: flex;
-  gap: 4px;
-  margin: 0 0 10px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
 }
 
-.todo-filters button {
-  padding: 7px 11px;
-  color: var(--text-secondary);
-  background: transparent;
-  border: 0;
-  border-radius: 7px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: capitalize;
-}
-
-.todo-filters button:hover,
-.todo-filters button.active {
-  color: var(--text-primary);
+.todo-progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-full);
   background: var(--bg-tertiary);
+  overflow: hidden;
+}
+
+.todo-progress-track i {
+  display: block;
+  height: 100%;
+  width: var(--progress, 0%);
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+  transition: width var(--transition-normal);
+}
+
+.todo-progress span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.todo-item.is-overdue {
+  box-shadow: inset 2px 0 0 var(--color-danger);
+}
+
+.todo-item.is-overdue .todo-item-copy small {
+  color: var(--color-danger);
+}
+
+.todo-overdue-flag {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-danger);
 }
 
 .todo-list {
@@ -154,6 +202,12 @@
   border-color: var(--color-primary-hover);
 }
 
+.todo-item-actions {
+  display: flex;
+  gap: var(--space-3xs);
+  align-items: center;
+}
+
 .todo-delete {
   width: 34px;
   height: 34px;
@@ -162,44 +216,37 @@
   color: var(--text-muted);
   background: transparent;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   opacity: 0;
   transition: opacity var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
 }
 
 .todo-item:hover .todo-delete,
+.todo-item:focus-within .todo-delete,
 .todo-delete:focus-visible {
   opacity: 1;
 }
 
 .todo-delete:hover {
-  color: var(--color-danger);
+  color: var(--text-primary);
   background: var(--bg-tertiary);
 }
 
-.todo-empty {
-  min-height: 180px;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 8px;
-  color: var(--text-muted);
+.todo-delete:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
 }
 
-.todo-empty p {
-  margin: 0;
-  font-size: 13px;
-}
-
-@media (max-width: 640px) {
+@media (max-width: 768px), (pointer: coarse) {
   .todo-delete {
     opacity: 1;
   }
+}
 
+@media (max-width: 640px) {
   .todo-filters {
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 4px;
   }
 }
-

@@ -58,6 +58,11 @@ class CallRepository:
     def set_phone_number(self, call_id: str, phone: str) -> None:
         self._document(call_id).update({"phone_number": phone, "updated_at": _now_iso()})
 
+    def append_message(self, call_id: str, message: dict) -> None:
+        """Append an arbitrary message (e.g. Twilio Say prompt) to the call."""
+        self._document(call_id).update({"messages": ArrayUnion([message]), "updated_at": _now_iso()})
+        self.prune_messages(call_id)
+
     def get(self, call_id: str) -> dict | None:
         doc = self._document(call_id).get()
         if not doc.exists:

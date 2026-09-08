@@ -1,0 +1,258 @@
+/* Header Eve Modal Shell — split from header.css (Wave F) */
+/* ── Backdrop ── */
+.eve-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.48);
+  animation: eve-backdrop-in 200ms ease-out;
+}
+
+/* ── Panel Shell ── */
+.eve-assistant-panel {
+  width: min(480px, 100vw);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-card);
+  box-shadow: -16px 0 48px rgba(0, 0, 0, 0.18);
+  animation: eve-panel-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.eve-assistant-panel.wide {
+  width: min(680px, 100vw);
+}
+
+/* ── Header ── */
+.eve-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.eve-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.eve-panel-avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-radius: 50%;
+}
+
+.eve-panel-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  opacity: 0;
+  animation: eve-avatar-pulse 3s ease-in-out infinite;
+}
+
+.eve-panel-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.eve-panel-header p {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.eve-panel-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ── Sessions Bar ── */
+.eve-sessions-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.eve-session-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 11px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px dashed var(--border-heavy);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.eve-session-new:hover,
+.eve-session-new:focus-visible,
+.eve-session-new.active {
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-style: solid;
+  outline: 0;
+}
+
+.eve-session-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.eve-session-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.eve-session-tab {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  max-width: 180px;
+  height: 28px;
+  padding: 0 4px 0 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  transition: all var(--transition-fast);
+}
+
+.eve-session-tab.active {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--border-heavy);
+}
+
+.eve-session-tab-select {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.eve-session-tab-select span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eve-session-tab-select:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 1px;
+  border-radius: var(--radius-full);
+}
+
+.eve-session-tab-delete {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+  transition: all var(--transition-fast);
+}
+
+.eve-session-tab:hover .eve-session-tab-delete,
+.eve-session-tab-delete:focus-visible {
+  opacity: 1;
+}
+
+.eve-session-tab-delete:hover,
+.eve-session-tab-delete:focus-visible {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  outline: 0;
+}
+
+.eve-session-loading {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.eve-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  margin-right: 6px;
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.eve-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  animation: eve-dot-breathe 2.5s ease-in-out infinite;
+}
+
+/* ── Context Banner ── */
+.eve-context-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.eve-context-banner svg {
+  flex: 0 0 auto;
+  opacity: 0.7;
+}
+

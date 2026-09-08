@@ -1,21 +1,26 @@
 {
   "crons": [
     {
-      "path": "/api/v1/cron/process-jobs",
-      "schedule": "0 0 * * *"
+      "path": "/api/v1/cron/execute-schedules",
+      "schedule": "*/15 * * * *"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "starwaves.vercel.app"
+        }
+      ],
+      "destination": "https://starwaves.susindran.in/$1",
+      "permanent": true
     }
   ],
   "rewrites": [
     {
-      "source": "/api/v1/:path*",
-      "destination": "http://13.203.228.229/api/v1/:path*"
-    },
-    {
-      "source": "/health",
-      "destination": "http://13.203.228.229/health"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]

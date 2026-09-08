@@ -1,0 +1,223 @@
+/* Calls Layout + Recent — split from calls.css (Wave D) */
+/* Calls layout */
+.calls-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) 1fr;
+  gap: var(--layout-section-gap, 22px);
+  align-items: start;
+}
+
+.calls-dialer-card,
+.calls-recent-card {
+  background: var(--bg-card, #fafafa);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--layout-card-padding, 20px);
+  box-shadow: var(--shadow-surface);
+}
+
+.calls-dialer-header h2,
+.calls-recent-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #09090b);
+}
+
+.calls-dialer-header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-muted, #71717a);
+}
+
+.calls-mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 18px 0 16px;
+  padding: 4px;
+  background: var(--bg-tertiary, #e4e4e7);
+  border-radius: var(--radius-md, 9px);
+}
+
+.calls-provider-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 4px;
+  background: var(--bg-tertiary, #e4e4e7);
+  border-radius: var(--radius-md, 9px);
+}
+
+.calls-mode-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  color: var(--text-muted, #71717a);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast, 140ms ease),
+    color var(--transition-fast, 140ms ease);
+}
+
+.calls-mode-option.active {
+  background: var(--color-primary, #18181b);
+  color: var(--text-inverse, #f4f4f5);
+}
+
+.calls-dialer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calls-dialer-form label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary, #71717a);
+}
+
+.calls-dialer-form input {
+  width: 100%;
+  padding: 11px 12px;
+  background: var(--bg-tertiary, #e4e4e7);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-primary, #09090b);
+  font: inherit;
+  font-size: 14px;
+}
+
+.calls-dialer-form input:focus-visible {
+  outline: 2px solid var(--border-focus, #71717a);
+  outline-offset: 1px;
+}
+
+.calls-dial-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Recent calls */
+.calls-recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.calls-recent-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-primary, #09090b);
+  background: var(--bg-tertiary, #e4e4e7);
+  border: 1px solid var(--border-color, #e4e4e7);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.calls-recent-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 16px;
+  color: var(--text-muted, #71717a);
+  text-align: center;
+  font-size: 14px;
+}
+
+.calls-recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.calls-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--border-color, #e4e4e7);
+}
+
+.calls-recent-item:last-child {
+  border-bottom: 0;
+}
+
+.calls-recent-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-primary-light, #e4e4e7);
+  color: var(--text-primary, #09090b);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.calls-recent-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.calls-recent-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #09090b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calls-recent-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+  white-space: nowrap;
+}
+
+.calls-recent-direction {
+  color: var(--text-muted, #71717a);
+}
+
+.calls-recent-direction.incoming {
+  color: var(--text-primary, #09090b);
+  font-weight: 500;
+}
+
+.calls-recent-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+

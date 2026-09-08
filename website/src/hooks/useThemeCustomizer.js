@@ -7,29 +7,44 @@ import {
 
 const STORAGE_KEY = 'starwaves.custom_theme'
 
+// Crimson Noir is the default (ADR 0028): fresh visitors with no stored
+// preference land on dark. Stored 'light' is always respected.
+function prefersDarkTheme() {
+  const stored = localStorage.getItem('starwaves.theme')
+  return stored ? stored === 'dark' : true
+}
+
 export function useThemeCustomizer() {
   const [themeState, setThemeState] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
-        return {
-          preset: parsed.preset || 'custom',
-          colors: parsed.colors || THEME_PRESETS.dark.colors,
-          fontFamily: parsed.fontFamily || 'inter',
-          radius: parsed.radius || 'modern',
-          density: parsed.density || 'default',
-          elevation: parsed.elevation || 'subtle',
-          motion: parsed.motion || 'normal',
+        if (parsed && typeof parsed === 'object') {
+          const isDark = prefersDarkTheme()
+          const fallbackPreset = isDark ? 'dark' : 'light'
+          const activePreset = parsed.preset && THEME_PRESETS[parsed.preset] ? parsed.preset : fallbackPreset
+          return {
+            preset: activePreset,
+            mode: parsed.mode || (THEME_PRESETS[activePreset] ? THEME_PRESETS[activePreset].mode : (isDark ? 'dark' : 'light')),
+            colors: (parsed.preset === 'custom' && parsed.colors) ? parsed.colors : THEME_PRESETS[activePreset].colors,
+            fontFamily: parsed.fontFamily || 'inter',
+            radius: parsed.radius || 'modern',
+            density: parsed.density || 'default',
+            elevation: parsed.elevation || 'subtle',
+            motion: parsed.motion || 'normal',
+          }
         }
       } catch {
         /* fallback */
       }
     }
-    const isDark = localStorage.getItem('starwaves.theme') === 'dark'
+    const isDark = prefersDarkTheme()
+    const defaultPreset = isDark ? 'dark' : 'light'
     return {
-      preset: isDark ? 'dark' : 'light',
-      colors: THEME_PRESETS[isDark ? 'dark' : 'light'].colors,
+      preset: defaultPreset,
+      mode: THEME_PRESETS[defaultPreset].mode,
+      colors: THEME_PRESETS[defaultPreset].colors,
       fontFamily: 'inter',
       radius: 'modern',
       density: 'default',
@@ -44,19 +59,34 @@ export function useThemeCustomizer() {
     applyThemeVariables(themeState)
   }, [themeState])
 
+  useEffect(() => {
+    const handleExternalThemeChange = (event) => {
+      if (event.detail && typeof event.detail === 'object') {
+        setThemeState((prev) => ({
+          ...prev,
+          ...event.detail,
+        }))
+      }
+    }
+    window.addEventListener('starwaves:theme-change', handleExternalThemeChange)
+    return () => {
+      window.removeEventListener('starwaves:theme-change', handleExternalThemeChange)
+    }
+  }, [])
+
   const selectPreset = useCallback((presetId) => {
     const preset = THEME_PRESETS[presetId]
     if (!preset) return
-    const isDarkPreset = preset.mode === 'dark'
     const nextState = {
       ...themeState,
       preset: presetId,
+      mode: preset.mode,
       colors: preset.colors,
     }
     setThemeState(nextState)
-    document.documentElement.classList.toggle('dark-theme', isDarkPreset)
-    localStorage.setItem('starwaves.theme', isDarkPreset ? 'dark' : 'light')
+    applyThemeVariables(nextState)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState))
+    window.dispatchEvent(new CustomEvent('starwaves:theme-change', { detail: nextState }))
     setIsSaved(true)
     setTimeout(() => setIsSaved(false), 2000)
   }, [themeState])
@@ -92,10 +122,11 @@ export function useThemeCustomizer() {
   const resetToDefault = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY)
     resetThemeVariables()
-    const isDark = localStorage.getItem('starwaves.theme') === 'dark'
+    const isDark = prefersDarkTheme()
     const defaultPreset = isDark ? 'dark' : 'light'
     const defaultState = {
       preset: defaultPreset,
+      mode: THEME_PRESETS[defaultPreset].mode,
       colors: THEME_PRESETS[defaultPreset].colors,
       fontFamily: 'inter',
       radius: 'modern',
@@ -104,6 +135,8 @@ export function useThemeCustomizer() {
       motion: 'normal',
     }
     setThemeState(defaultState)
+    applyThemeVariables(defaultState)
+    window.dispatchEvent(new CustomEvent('starwaves:theme-change', { detail: defaultState }))
     setIsSaved(true)
     setTimeout(() => setIsSaved(false), 2000)
   }, [])

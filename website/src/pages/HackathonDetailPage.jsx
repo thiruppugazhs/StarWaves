@@ -1,3 +1,4 @@
+import "../styles/pages/hackathons.css"
 import { useState } from 'react'
 import {
   ArrowLeft,
@@ -107,7 +108,7 @@ export function HackathonDetailPage({ hackathon, onBack, onSave, onDelete }) {
         <ArrowLeft size={16} /> Back to hackathons
       </button>
 
-      <div className="page-heading hackathon-detail-header">
+      <div className="hackathon-detail-header">
         <div>
           <div className="hackathon-card-topline">
             <span className="hackathon-card-source">
@@ -119,28 +120,28 @@ export function HackathonDetailPage({ hackathon, onBack, onSave, onDelete }) {
             Organized by <strong>{hackathon.organizer || 'Not specified'}</strong>
           </p>
         </div>
-        <div className="page-heading-actions">
-          {isManual && (
-            <>
-              <button className="secondary-button" type="button" onClick={openEdit}>
-                <Pencil size={15} /> Edit details
-              </button>
-              <button className="secondary-button" type="button" onClick={() => setDeleteId(hackathon.id)}>
-                <Trash2 size={15} /> Delete
-              </button>
-            </>
-          )}
-          {hackathon.url && (
-            <a
-              className="primary-button"
-              href={hackathon.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ExternalLink size={15} /> Open external page
-            </a>
-          )}
-        </div>
+      </div>
+      <div className="page-inline-actions">
+        {isManual && (
+          <>
+            <button className="secondary-button" type="button" onClick={openEdit}>
+              <Pencil size={15} /> Edit details
+            </button>
+            <button className="secondary-button" type="button" onClick={() => setDeleteId(hackathon.id)}>
+              <Trash2 size={15} /> Delete
+            </button>
+          </>
+        )}
+        {hackathon.url && (
+          <a
+            className="primary-button"
+            href={hackathon.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink size={15} /> Open external page
+          </a>
+        )}
       </div>
 
       <div className="workspace-insight-grid hackathon-detail-insights" aria-label="Hackathon overview">

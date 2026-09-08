@@ -5,6 +5,7 @@ import logging
 import httpx
 
 from app.core.config import settings
+from app.core.http import create_sync_client
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ def initiate_twilio_call(to_number: str, twiml_url: str, status_callback_url: st
         data["StatusCallbackEvent"] = "initiated,ringing,answered,completed"
     headers = {"Authorization": _auth_header(sid, token)}
     try:
-        with httpx.Client(timeout=httpx.Timeout(10.0, connect=5.0)) as client:
+        with create_sync_client(timeout=httpx.Timeout(10.0, connect=5.0)) as client:
             resp = client.post(url, data=data, headers=headers)
             if resp.status_code >= 400:
                 raise TwilioError(f"Twilio API {resp.status_code}: {resp.text[:400]}")
@@ -59,7 +60,7 @@ def fetch_twilio_call(sid_call: str) -> dict:
     sid, token, _ = get_twilio_client()
     url = f"{TWILIO_API_BASE}/Accounts/{sid}/Calls/{sid_call}.json"
     headers = {"Authorization": _auth_header(sid, token)}
-    with httpx.Client(timeout=httpx.Timeout(8.0, connect=3.0)) as client:
+    with create_sync_client(timeout=httpx.Timeout(8.0, connect=3.0)) as client:
         resp = client.get(url, headers=headers)
         if resp.status_code >= 400:
             raise TwilioError(f"Twilio fetch {resp.status_code}: {resp.text[:300]}")

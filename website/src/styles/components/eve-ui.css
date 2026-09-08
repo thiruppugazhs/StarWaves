@@ -45,6 +45,7 @@
   border-radius: 999px;
 }
 .eve-ui-banner-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+.eve-ui-banner-error { color: var(--color-danger); font-size: 12px; }
 
 /* Hide/show hook for Eve visibility tool */
 [data-eve-target] { transition: opacity var(--transition-fast), display var(--transition-fast); }

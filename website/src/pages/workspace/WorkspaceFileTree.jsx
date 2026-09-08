@@ -1,3 +1,4 @@
+import '../../styles/pages/workspace-filetree.css'
 import { useState, useMemo } from 'react'
 import {
   ChevronRight,
@@ -70,6 +71,8 @@ function TreeNode({ node, activeFile, onFileSelect, depth = 0 }) {
           style={{ paddingLeft: `${depth * 16 + 10}px` }}
           onClick={() => setExpanded(!expanded)}
           title={node.path}
+          aria-expanded={expanded}
+          aria-label={`${expanded ? 'Collapse' : 'Expand'} ${node.name}`}
         >
           {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           {expanded ? <FolderOpen size={15} className="tree-folder-icon" /> : <Folder size={15} className="tree-folder-icon" />}
@@ -99,6 +102,8 @@ function TreeNode({ node, activeFile, onFileSelect, depth = 0 }) {
         style={{ paddingLeft: `${depth * 16 + 10}px` }}
         onClick={() => onFileSelect(node.path)}
         title={node.path}
+        aria-current={isActive ? 'true' : undefined}
+        aria-label={`Open ${node.name}`}
       >
         <span className="tree-file-icon">
           {FileIcon && <FileIcon size={15} />}

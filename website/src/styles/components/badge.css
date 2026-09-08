@@ -1,0 +1,94 @@
+/* Badge Component Styles */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.badge-default {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 24%, transparent);
+}
+
+.badge-primary {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.badge-accent {
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+.badge-success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid color-mix(in srgb, var(--color-success) 25%, transparent);
+}
+
+.badge-warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 25%, transparent);
+}
+
+.badge-danger,
+.badge-error {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
+}
+
+.badge-purple {
+  background: var(--color-purple-light);
+  color: var(--color-purple);
+  border: 1px solid color-mix(in srgb, var(--color-purple) 25%, transparent);
+}
+
+.badge-module-work {
+  background: var(--module-work-light);
+  color: var(--module-work);
+  border: 1px solid color-mix(in srgb, var(--module-work) 25%, transparent);
+}
+
+.badge-module-studio {
+  background: var(--module-studio-light);
+  color: var(--module-studio);
+  border: 1px solid color-mix(in srgb, var(--module-studio) 25%, transparent);
+}
+
+.badge-module-eve {
+  background: var(--module-eve-light);
+  color: var(--module-eve);
+  border: 1px solid color-mix(in srgb, var(--module-eve) 25%, transparent);
+}
+
+.badge-module-growth {
+  background: var(--module-growth-light);
+  color: var(--module-growth);
+  border: 1px solid color-mix(in srgb, var(--module-growth) 25%, transparent);
+}
+
+.badge-module-whatsapp {
+  background: var(--module-whatsapp-light);
+  color: var(--module-whatsapp);
+  border: 1px solid color-mix(in srgb, var(--module-whatsapp) 25%, transparent);
+}
+
+.badge-module-mail {
+  background: var(--module-mail-light);
+  color: var(--module-mail);
+  border: 1px solid color-mix(in srgb, var(--module-mail) 25%, transparent);
+}

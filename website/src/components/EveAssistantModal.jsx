@@ -1,7 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Bot, Maximize2, Play, Plus, Send, ShieldCheck, X } from 'lucide-react'
+import { Bot, Maximize2, Play, Send, ShieldCheck, X } from 'lucide-react'
 import { ConfirmDialog } from './ui/ConfirmDialog'
+import { EveModalSessions } from './eve/EveModalSessions'
 import {
   createEveSession,
   deleteEveSession,
@@ -10,6 +11,7 @@ import {
   sendEveMessage,
 } from '../lib/eveApi'
 import { Markdown } from './ui/Markdown'
+import { previewFor } from '../utils/evePreview'
 
 const STARTER_MESSAGES = [{
   role: 'assistant',
@@ -40,21 +42,8 @@ const EVE_TOOLS_LIST = [
 ]
 
 const MAX_CHARS = 4000
-const MAX_PREVIEW_LENGTH = 60
 
-function previewFor(messages) {
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const content = messages[index].content
-    if (content) {
-      return content.length > MAX_PREVIEW_LENGTH
-        ? `${content.slice(0, MAX_PREVIEW_LENGTH - 1).trimEnd()}\u2026`
-        : content
-    }
-  }
-  return 'New chat'
-}
-
-export function EveAssistantModal({ isOpen, onClose, onNavigate, onWorkspaceChanged }) {
+export function EveAssistantModal({ isOpen, onClose, onNavigate, onWorkspaceChanged, editorContext = null }) {
   const [messages, setMessages] = useState(STARTER_MESSAGES)
   const [draft, setDraft] = useState('')
   const [error, setError] = useState('')
@@ -206,7 +195,10 @@ export function EveAssistantModal({ isOpen, onClose, onNavigate, onWorkspaceChan
   }
 
   const sendPrompt = async (content, baseMessages, sessionIdOverride = null) => {
-    const nextMessages = [...baseMessages, { role: 'user', content }]
+    const trimmed = typeof content === 'string' ? content.trim() : content
+    if (!trimmed) return { messages: baseMessages, sessionId: sessionIdOverride }
+    const sanitizedBase = Array.isArray(baseMessages) ? baseMessages.filter((m) => typeof m.content === 'string' && m.content.trim().length > 0) : baseMessages
+    const nextMessages = [...sanitizedBase, { role: 'user', content: trimmed }]
     setMessages(nextMessages)
     setDraft('')
     setError('')
@@ -222,9 +214,11 @@ export function EveAssistantModal({ isOpen, onClose, onNavigate, onWorkspaceChan
         ...current,
       ])
     }
-    const response = await sendEveMessage(nextMessages, nextSessionId)
-    const assistantMessage = { role: 'assistant', content: response.message }
-    const finalMessages = [...nextMessages, assistantMessage]
+    const apiMessages = nextMessages.filter((m) => typeof m.content === 'string' && m.content.trim().length > 0).map((m) => ({ role: m.role, content: m.content.trim() }))
+    const response = await sendEveMessage(apiMessages.length ? apiMessages : nextMessages, nextSessionId, null, editorContext)
+    const assistantText = typeof response.message === 'string' ? response.message.trim() : ''
+    const assistantMessage = assistantText ? { role: 'assistant', content: assistantText } : null
+    const finalMessages = assistantMessage ? [...nextMessages, assistantMessage] : nextMessages
     setMessages(finalMessages)
     setSessions((current) => [
       { id: nextSessionId, title: sessionTitle, updated_at: new Date().toISOString(), preview: previewFor(finalMessages) },
@@ -278,6 +272,8 @@ export function EveAssistantModal({ isOpen, onClose, onNavigate, onWorkspaceChan
       } else if (action.type === 'open_custom_page' && action.slug) {
         if (action.preferences) window.dispatchEvent(new CustomEvent('eve-ui-update', { detail: { preferences: action.preferences } }))
         onNavigate?.(`custom-${action.slug}`)
+      } else if (action.type === 'avatar_editor_action') {
+        window.dispatchEvent(new CustomEvent('starwaves:avatar-editor-action', { detail: action }))
       }
     })
   }
@@ -331,7 +327,7 @@ export function EveAssistantModal({ isOpen, onClose, onNavigate, onWorkspaceChan
             {/* ── Header ── */}
             <header className="eve-panel-header">
               <div className="eve-panel-heading">
-                <div className="eve-avatar" aria-hidden="true"><Bot size={22} /></div>
+                <div className="eve-panel-avatar" aria-hidden="true"><Bot size={22} /></div>
                 <div>
                   <h2 id={titleId}>Eve</h2>
                   <p id={descriptionId}>AI workspace assistant</p>
@@ -348,49 +344,14 @@ export function EveAssistantModal({ isOpen, onClose, onNavigate, onWorkspaceChan
               </div>
             </header>
 
-            {/* ── Sessions Bar ── */}
-            <div className="eve-sessions-bar" aria-label="Eve conversations">
-              <button
-                className={`eve-session-new ${activeSessionId === null ? 'active' : ''}`}
-                type="button"
-                onClick={startNewChat}
-                aria-pressed={activeSessionId === null}
-              >
-                <Plus size={14} />
-                <span>New chat</span>
-              </button>
-              <div className="eve-session-tabs" role="tablist" aria-label="Saved Eve conversations">
-                {isLoadingSessions ? (
-                  <span className="eve-session-loading">Loading conversations…</span>
-                ) : (
-                  sessions.map((session) => (
-                    <div
-                      className={`eve-session-tab ${session.id === activeSessionId ? 'active' : ''}`}
-                      key={session.id}
-                    >
-                      <button
-                        className="eve-session-tab-select"
-                        type="button"
-                        role="tab"
-                        aria-selected={session.id === activeSessionId}
-                        onClick={() => selectSession(session.id)}
-                        title={session.title}
-                      >
-                        <span>{session.title}</span>
-                      </button>
-                      <button
-                        className="eve-session-tab-delete"
-                        type="button"
-                        onClick={() => setSessionToDelete(session)}
-                        aria-label={`Delete conversation ${session.title}`}
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+            <EveModalSessions
+              sessions={sessions}
+              activeSessionId={activeSessionId}
+              isLoadingSessions={isLoadingSessions}
+              onNewChat={startNewChat}
+              onSelectSession={selectSession}
+              onDeleteSession={setSessionToDelete}
+            />
 
             {/* ── Context Banner ── */}
             <div className="eve-context-banner" aria-label="Eve workspace access">

@@ -1,0 +1,105 @@
+/* Eve Desktop Overlay page — transparent chromeless window that floats above all apps. */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.avatar-overlay-root {
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fill the canvas entirely */
+.avatar-overlay-root .eve-avatar,
+.avatar-overlay-root .eve-avatar-card,
+.avatar-overlay-root .eve-avatar-canvas,
+.avatar-overlay-root canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Strip the card chrome entirely */
+.avatar-overlay-root .eve-avatar-card {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Drag cursor when hovering the avatar itself */
+.avatar-overlay-root {
+  cursor: grab;
+}
+.avatar-overlay-root:active {
+  cursor: grabbing;
+}
+
+/* ─── Right-click context menu ──────────────────────────── */
+
+.overlay-context-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 160px;
+  background: color-mix(in srgb, var(--bg-surface, #1a1a2e) 90%, transparent);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid color-mix(in srgb, var(--color-primary, #a83b59) 30%, transparent);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(255,255,255,0.04);
+  padding: 4px;
+  animation: overlay-menu-in 0.12s ease-out;
+}
+
+@keyframes overlay-menu-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.overlay-context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary, #f0f0f0);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.overlay-context-menu-item:hover {
+  background: color-mix(in srgb, var(--color-primary, #a83b59) 16%, transparent);
+  color: var(--text-primary, #f0f0f0);
+}
+
+.overlay-context-menu-item.is-danger:hover {
+  background: color-mix(in srgb, var(--color-danger, #e11d48) 18%, transparent);
+  color: var(--color-danger, #f43f5e);
+}
+
+.overlay-context-menu-sep {
+  height: 1px;
+  background: color-mix(in srgb, var(--border-subtle, #333) 80%, transparent);
+  margin: 3px 8px;
+}

@@ -8,21 +8,26 @@
 
 ```text
 starwaves/
-├── website/          React 19 + Vite frontend (monochrome design system)
+├── website/          React 19 + Vite frontend (monochrome + spectrum design system)
 ├── server/           FastAPI Python backend (SQLAlchemy 2.0 + PostgreSQL)
 ├── services/         Microservices
 │   └── whatsapp-worker/   Go (WhatsMeow) WhatsApp bridge
 ├── nginx/            Reverse proxy config
 ├── sql/              Canonical DB schema + migrations + indexes
-├── docker-compose.yml
-└── context.md        Living project snapshot
+├── docs/adr/         Architecture Decision Records (0001, _template, README)
+├── AGENTS.md         Permanent agent rules (no sub-agents, context.md, ADRs)
+├── context.md        Living project snapshot (current state only)
+├── CHANGELOG.md      History log (moved from context.md)
+├── PROJECT_MAP.md    This file — agent fast-path index
+├── opencode.json     Preloads AGENTS.md + PROJECT_MAP.md via instructions
+└── docker-compose.yml
 ```
 
 ---
 
 ## Frontend (`website/`)
 
-**Stack**: React 19, Vite, Vanilla CSS (monochrome tokens), Monaco Editor, lucide-react, Framer Motion
+**Stack**: React 19, Vite, Vanilla CSS (monochrome + spectrum tokens), Monaco Editor, lucide-react, Framer Motion
 
 ### Key Directories
 
@@ -40,7 +45,7 @@ starwaves/
 | `src/pages/workspace/` | WorkspacePage + IDE components (editor, browser, eve panel) |
 | `src/pages/landing/` | Cinematic landing (Framer Motion sections, scoped cinema.css) |
 | `src/styles/` | tokens.css, base.css, components/, pages/, themes/ |
-| `src/themes/` | 22 presets (10 mono + 12 duotone) + engine |
+| `src/themes/` | 25 presets (10 mono + 12 duo + 3 spectrum) + engine |
 | `src/config/` | navigation.js, search/ package |
 | `src/utils/` | Pure transformers (speech, calendar, projectLifecycle, fileSize) |
 | `src-tauri/` | Tauri v2 desktop shell scaffold |
@@ -207,11 +212,11 @@ Core → nothing (foundation)
 | File | Purpose |
 |------|---------|
 | `extensions.sql` | pgvector extension |
-| `schema.sql` | 16 CREATE TABLE statements |
+| `schema.sql` | 18 CREATE TABLE statements (incl. `user_sessions`, `ai_usage`) |
 | `migrations.sql` | Idempotent ALTER TABLE backfills |
 | `indexes.sql` | Performance composites + HNSW vector index |
 
-Key tables: `users`, `projects`, `jobs`, `todos`, `documents`, `contacts`, `calls`, `eve_memories`, `eve_sessions`, `whatsapp_chats`, `whatsapp_messages`, `workspace_files`, `notifications`, `hackathons`, `profiles`
+Key tables: `users`, `projects`, `jobs`, `todos`, `documents`, `contacts`, `calls`, `eve_memories`, `eve_sessions`, `whatsapp_chats`, `whatsapp_messages`, `workspace_files`, `notifications`, `hackathons`, `profiles`, `user_sessions`, `ai_usage` (+ `user_settings`/`workspace_files` etc.)
 
 ---
 
@@ -231,7 +236,7 @@ Key tables: `users`, `projects`, `jobs`, `todos`, `documents`, `contacts`, `call
 | `nginx/` | Reverse proxy: 5r/s rate limit, Gzip, 20MB cap, security headers |
 | `website/Dockerfile` | Multi-stage Node.js build + Nginx SPA |
 | `server/Dockerfile` | Python 3.12-slim + Uvicorn |
-| `vercel.json` | SPA rewrites + cron `/api/v1/cron/execute-schedules` |
+| `vercel.json` | SPA rewrites `((?!api/).*)` + cron `*/15 * * * *` → `/api/v1/cron/execute-schedules` |
 
 ---
 
@@ -261,6 +266,23 @@ curl -i http://localhost/health
 ```
 
 ---
+
+## Docs & ADRs (`docs/`)
+
+| Path | Purpose |
+|------|---------|
+| `docs/adr/README.md` | ADR index + rules (numbering, lifecycle, commit gate) |
+| `docs/adr/_template.md` | ADR template (Status, Context, Decision, Consequences, Alternatives) |
+| `docs/adr/0001-*.md` | ADR 0001 — No sub-agents, context.md first, ADRs required |
+
+ADRs: `docs/adr/NNNN-kebab-case-title.md` (zero-padded, sequential). Create via `_template.md`; commit with code; update `context.md` `Last updated`.
+
+## Agent Rules (`AGENTS.md` §1)
+
+- **No sub-agents** (§1.6): Direct execution only — never delegate via `Task`/sub-agents. Use `Grep` (with `include`) + `Read` on 1–2 files from `PROJECT_MAP.md`, `Bash`/`Edit`/`Write` directly; `TodoWrite` for large work.
+- **Tiered loading** (§1.5): Tier 0 `AGENTS.md`+`PROJECT_MAP.md` (preloaded) → Tier 1 `PROJECT_MAP.md` → Tier 2 `context.md` (conditional) → Tier 3 targeted `Grep`/`Read`. No `Glob **/*` scans.
+- **context.md** (§1.1): Living snapshot <15k, updated in same commit as code (single `Last updated` one-liner; old detail → `CHANGELOG.md`).
+- **ADRs required** (§1.7): Non-trivial architecture → ADR in `docs/adr/` with lifecycle `Proposed→Accepted→Superseded`.
 
 ## Files to Ignore
 

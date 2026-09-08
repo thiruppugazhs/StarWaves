@@ -10,11 +10,14 @@ from app.services.ai_models.contracts import (
     ProviderResponse,
     StreamChunk,
     ToolCall,
+    classify_provider_error,
 )
 
 logger = logging.getLogger(__name__)
 
-MAX_TOKENS = 4096
+# Increased from 4096 to support Claude Sonnet 4.6/5 (1M context, 64k output)
+# Still within Messages API max; provider will cap if model limits lower.
+MAX_TOKENS = 8192
 
 
 def _convert_tool(tool: dict[str, Any]) -> dict[str, Any]:
@@ -30,8 +33,11 @@ class AnthropicProviderClient(ProviderClient):
     """Anthropic (Claude) provider adapter using the Messages API."""
 
     def build_client(self, client_options: dict[str, Any]) -> Anthropic:
+        # Support custom base_url (ANTHROPIC_URL) and default_headers for beta 1M context
         try:
-            return Anthropic(**client_options)
+            options = dict(client_options)
+            # Anthropic SDK accepts base_url, default_headers, api_key
+            return Anthropic(**options)
         except Exception as error:
             logger.error(f"[Anthropic Provider] Failed to initialize client: {type(error).__name__}: {error}", exc_info=True)
             raise AIServiceError(f"Anthropic client initialization failed: {type(error).__name__}: {error}") from error
@@ -75,10 +81,10 @@ class AnthropicProviderClient(ProviderClient):
             )
         except APIError as error:
             logger.error(f"[Anthropic Provider] API call failed for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Anthropic API error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "anthropic", model) from error
         except Exception as error:
             logger.error(f"[Anthropic Provider] Unexpected failure calling model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Anthropic client error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "anthropic", model) from error
 
         return self._response_from(response)
 
@@ -103,12 +109,12 @@ class AnthropicProviderClient(ProviderClient):
                 final_message = stream.get_final_message()
         except APIError as error:
             logger.error(f"[Anthropic Provider] Streaming call failed for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Anthropic API error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "anthropic", model) from error
         except AIServiceError:
             raise
         except Exception as error:
             logger.error(f"[Anthropic Provider] Unexpected streaming failure for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Anthropic client error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "anthropic", model) from error
         yield StreamChunk(kind="final", response=self._response_from(final_message))
 
     def continuation(self, response: ProviderResponse) -> list[Any]:

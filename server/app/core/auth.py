@@ -30,15 +30,14 @@ def create_user_token(user_data: dict, device_id: str | None = None, jti: str | 
     return auth_serializer().dumps(payload)
 
 
-def _is_jti_revoked(jti: str) -> bool:
-    """Check whether a device session jti is revoked/expired. Cached 60s."""
+def _is_jti_revoked_sync(jti: str) -> bool:
+    """Sync helper — blocking. Use _is_jti_revoked_async when in async context."""
     try:
         from app.core.cache import cache_get, cache_set
         cache_key = f"session_revoked:{jti}"
         cached = cache_get(cache_key)
         if cached is not None:
             return bool(cached)
-        # Lazy DB lookup — use sync_engine to avoid async dependency
         from app.db.session import sync_engine
         from sqlalchemy import text
 
@@ -59,7 +58,6 @@ def _is_jti_revoked(jti: str) -> bool:
                 try:
                     from datetime import datetime, timezone
 
-                    # expires_at may be str or datetime
                     if isinstance(expires_at, str):
                         exp = datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
                     else:
@@ -77,7 +75,26 @@ def _is_jti_revoked(jti: str) -> bool:
         return False
 
 
-def _touch_jti(jti: str) -> None:
+def _is_jti_revoked(jti: str) -> bool:
+    """Backward-compat sync wrapper — delegates to _is_jti_revoked_sync."""
+    return _is_jti_revoked_sync(jti)
+
+
+async def _is_jti_revoked_async(jti: str) -> bool:
+    """Non-blocking variant for async request path (offloads sync DB via to_thread)."""
+    try:
+        import asyncio
+        from app.core.cache import cache_get
+        cache_key = f"session_revoked:{jti}"
+        cached = cache_get(cache_key)
+        if cached is not None:
+            return bool(cached)
+        return await asyncio.to_thread(_is_jti_revoked_sync, jti)
+    except Exception:
+        return False
+
+
+def _touch_jti_sync(jti: str) -> None:
     try:
         from app.db.session import sync_engine
         from sqlalchemy import text
@@ -94,6 +111,23 @@ def _touch_jti(jti: str) -> None:
         pass
 
 
+def _touch_jti(jti: str) -> None:
+    return _touch_jti_sync(jti)
+
+
+def _touch_jti_async(jti: str) -> None:
+    """Fire-and-forget background touch that never blocks the event loop."""
+    try:
+        import asyncio
+        try:
+            loop = asyncio.get_running_loop()
+            loop.run_in_executor(None, _touch_jti_sync, jti)
+        except RuntimeError:
+            _touch_jti_sync(jti)
+    except Exception:
+        pass
+
+
 def _validate_token_payload(token: str) -> dict | None:
     try:
         data = auth_serializer().loads(token, max_age=86400 * 30)
@@ -102,9 +136,28 @@ def _validate_token_payload(token: str) -> dict | None:
             if jti and isinstance(jti, str):
                 if _is_jti_revoked(jti):
                     return None
-                # best-effort touch — don't block
+                # best-effort touch — fire-and-forget off the event loop
                 try:
-                    _touch_jti(jti)
+                    _touch_jti_async(jti)
+                except Exception:
+                    pass
+            return data
+    except (BadSignature, SignatureExpired):
+        pass
+    return None
+
+
+async def _validate_token_payload_async(token: str) -> dict | None:
+    """Async counterpart that does not block the event loop."""
+    try:
+        data = auth_serializer().loads(token, max_age=86400 * 30)
+        if isinstance(data, dict) and "uid" in data:
+            jti = data.get("jti")
+            if jti and isinstance(jti, str):
+                if await _is_jti_revoked_async(jti):
+                    return None
+                try:
+                    _touch_jti_async(jti)
                 except Exception:
                     pass
             return data
@@ -130,7 +183,36 @@ def get_current_user_from_token(token: str) -> dict:
     )
 
 
-def get_current_user(
+async def get_current_user_from_token_async(token: str) -> dict:
+    data = await _validate_token_payload_async(token)
+    if data is not None:
+        return data
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="The authentication token is invalid or expired.",
+    )
+
+
+async def get_current_user(
+    authorization: str | None = Header(default=None),
+) -> dict:
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="An authentication token is required.",
+        )
+    token = authorization.removeprefix("Bearer ").strip()
+    data = await _validate_token_payload_async(token)
+    if data is not None:
+        return data
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="The authentication token is invalid or expired.",
+    )
+
+
+# Keep sync alias for tests / non-async callers (backward-compatible)
+def get_current_user_sync(
     authorization: str | None = Header(default=None),
 ) -> dict:
     if not authorization or not authorization.startswith("Bearer "):

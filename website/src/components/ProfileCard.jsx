@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CheckCircle2, Clock, Link2, LogOut, Mail, ShieldCheck, Trash2, User, X } from 'lucide-react'
+import { CheckCircle2, Clock, Link2, LogOut, Mail, Pencil, ShieldCheck, Trash2, User, X } from 'lucide-react'
 import {
   clearAuthSession,
   fetchCombinedAccounts,
@@ -142,17 +142,18 @@ export function ProfileCard({ user, onProfileUpdated, onSignOut }) {
           <div className="profile-card-actions">
             <button
               type="button"
-              className="profile-edit-button"
+              className="secondary-button profile-card-btn"
               onClick={() => {
                 setDisplayName(user.fullName)
                 setEditing(true)
               }}
             >
+              <Pencil size={14} />
               Edit profile
             </button>
             <button
               type="button"
-              className="profile-signout-button"
+              className="secondary-button profile-card-btn"
               onClick={handleSignOut}
               title="Sign out of account"
             >
@@ -194,21 +195,12 @@ export function ProfileCard({ user, onProfileUpdated, onSignOut }) {
               : 'Verify your email address to secure your account and enable workspace notifications.'}
           </p>
 
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+          <div className="profile-verification-actions">
             {isVerified ? (
               <button
                 type="button"
                 disabled
-                className="secondary-button"
-                style={{
-                  fontSize: '12px',
-                  padding: '6px 12px',
-                  cursor: 'default',
-                  opacity: 0.85,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
+                className="secondary-button profile-verified-badge"
               >
                 <CheckCircle2 size={13} />
                 Verified
@@ -218,16 +210,15 @@ export function ProfileCard({ user, onProfileUpdated, onSignOut }) {
                 type="button"
                 onClick={handleSendVerification}
                 disabled={loadingMail}
-                className="secondary-button"
-                style={{ fontSize: '12px', padding: '6px 12px' }}
+                className="secondary-button profile-verify-btn"
               >
                 Verify Email
               </button>
             )}
           </div>
 
-          {mailMsg && <p className="combine-feedback success" style={{ marginTop: '10px' }} role="status">{mailMsg}</p>}
-          {mailError && <p className="combine-feedback error" style={{ marginTop: '10px' }} role="alert">{mailError}</p>}
+          {mailMsg && <p className="combine-feedback success profile-feedback-spaced" role="status">{mailMsg}</p>}
+          {mailError && <p className="combine-feedback error profile-feedback-spaced" role="alert">{mailError}</p>}
         </div>
 
         {/* Combined Accounts & SMTP Access Sharing */}

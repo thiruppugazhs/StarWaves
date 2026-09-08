@@ -1,3 +1,5 @@
+import "../styles/pages/dashboard.css"
+import "../styles/pages/dashboard-customize.css"
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ResponsiveGridLayout, useContainerWidth } from 'react-grid-layout'
 import {
@@ -33,7 +35,7 @@ const formatDate = (value, options = {}) =>
 
 const calendarEventDestinations = {
   task: 'todo',
-  contest: 'competitive-coding',
+  contest: 'compete',
   hackathon: 'hackathons',
   project: 'projects',
   job: 'jobs',
@@ -91,7 +93,11 @@ function RecordList({ items, empty = 'Nothing to show.', onNavigate, onOpenNotif
 function WidgetCard({ definition, editing, children, total, onOpen }) {
   const Icon = definition.icon
   return (
-    <article className={`dashboard-widget ${editing ? 'is-editing' : ''}`}>
+    <article
+      className={`dashboard-widget ${editing ? 'is-editing' : ''}`}
+      data-widget={definition.id}
+      data-module={definition.module || 'work'}
+    >
       <header className="dashboard-widget-header dashboard-widget-drag-handle">
         <span className="dashboard-widget-icon"><Icon size={17} /></span>
         <div>
@@ -169,6 +175,56 @@ export function DashboardPage({
   const visibleWidgets = dashboardWidgets.filter(
     ({ id }) => !hiddenWidgetIds.includes(id),
   )
+  const activityFeed = useMemo(() => {
+    const entries = [
+      ...documents.map((document) => ({
+        id: `document-${document.id}`,
+        title: document.name,
+        meta: `${document.type} · ${document.size}`,
+        date: document.modifiedAt,
+        destination: 'documents',
+      })),
+      ...projects.map((project) => ({
+        id: `project-${project.id}`,
+        title: project.name,
+        meta: `Project · ${project.progress}%`,
+        date: project.updatedAt,
+        destination: 'project-detail',
+        destinationId: project.id,
+      })),
+      ...jobs.map((job) => ({
+        id: `job-${job.id}`,
+        title: job.role,
+        meta: job.company,
+        date: job.appliedDate,
+        destination: 'jobs',
+      })),
+    ]
+    return entries
+      .filter(({ date }) => date && !Number.isNaN(new Date(date).getTime()))
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 3)
+      .map(({ date, ...entry }) => ({ ...entry, badge: formatDate(date) }))
+  }, [documents, projects, jobs])
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 15000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const greetingHour = now.getHours()
+  const greeting =
+    greetingHour < 5 ? 'Up late' : greetingHour < 12 ? 'Good morning' : greetingHour < 17 ? 'Good afternoon' : greetingHour < 22 ? 'Good evening' : 'Good night'
+  const todayLabel = now.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  })
+  const timeLabel = now.toLocaleTimeString(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+  })
 
   useEffect(() => {
     localStorage.setItem(
@@ -267,7 +323,7 @@ export function DashboardPage({
         title: contest.name,
         meta: contest.site,
         badge: formatDate(contest.startsAt),
-        destination: 'competitive-coding',
+        destination: 'compete',
       }))} onNavigate={onNavigate} />,
     },
     hackathons: {
@@ -321,14 +377,7 @@ export function DashboardPage({
       }))} onNavigate={onNavigate} />,
     },
     documents: {
-      total: documents.length,
-      body: <RecordList items={[...documents].sort((a, b) => new Date(b.modifiedAt) - new Date(a.modifiedAt)).slice(0, 3).map((document) => ({
-        id: document.id,
-        title: document.name,
-        meta: `${document.type} · ${document.size}`,
-        badge: formatDate(document.modifiedAt),
-        destination: 'documents',
-      }))} onNavigate={onNavigate} />,
+      body: <RecordList items={activityFeed} empty="No recent activity." onNavigate={onNavigate} />,
     },
     notifications: {
       total: notifications.filter((notification) => notification.unread).length,
@@ -344,9 +393,12 @@ export function DashboardPage({
 
   return (
     <div className={`dashboard-page dashboard-density-${density}`}>
-      <div className="page-heading dashboard-heading">
-        <div><p>Overview</p><h1>Dashboard</h1></div>
-        <div className="dashboard-heading-actions">
+      <header className="dashboard-heading">
+        <div className="dashboard-greeting">
+          <p>{todayLabel} · {timeLabel}</p>
+          <h1>{greeting}. Here&apos;s your command center.</h1>
+        </div>
+        <div className="dashboard-heading-actions dashboard-inline-actions">
           {editing && <span className="dashboard-edit-status"><LayoutGrid size={15} /> Editing layout</span>}
           <button className="secondary-button" type="button" onClick={() => setCustomizeOpen(true)}>
             <SlidersHorizontal size={16} /> Customize
@@ -365,7 +417,7 @@ export function DashboardPage({
             )}
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="dashboard-grid-shell" ref={containerRef}>
         {mounted && (
@@ -377,13 +429,12 @@ export function DashboardPage({
             rowHeight={34}
             margin={[16, 16]}
             containerPadding={[0, 0]}
-            gridConfig={{ allowOverlap: false, preventCollision: true }}
             dragConfig={{ enabled: editing, handle: '.dashboard-widget-drag-handle', cancel: 'button,a', threshold: 4 }}
             resizeConfig={{ enabled: editing, handles: ['se', 's', 'e'] }}
             onLayoutChange={(_, nextLayouts) => saveGridLayouts(nextLayouts)}
           >
             {visibleWidgets.map((definition) => (
-              <div key={definition.id}>
+              <div key={definition.id} className="dashboard-grid-item">
                 <WidgetCard
                   definition={definition}
                   editing={editing}

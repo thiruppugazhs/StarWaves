@@ -35,6 +35,8 @@ def _to_response(project: dict) -> StudioProjectResponse:
         github_repo_url=project.get("github_repo_url"),
         published_template_id=project.get("published_template_id"),
         file_count=project.get("file_count", 0),
+        preview_status=project.get("preview_status", "unavailable"),
+        last_activity=project.get("last_activity"),
         created_at=project["created_at"],
         updated_at=project["updated_at"],
     )
@@ -59,6 +61,10 @@ async def list_templates(
                     "stack": project.get("stack", ""),
                     "kind": "custom",
                     "source_project_id": project["id"],
+                    "category": "custom",
+                    "tags": [tag for tag in [project.get("stack"), project.get("db_preference")] if tag],
+                    "featured": False,
+                    "sort_order": 1000,
                 }
             )
     return StudioTemplateListResponse(templates=templates)

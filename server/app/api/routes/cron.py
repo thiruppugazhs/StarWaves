@@ -100,12 +100,12 @@ def run_eve_schedules_job(database: SqlClient) -> dict[str, Any]:
 
 
 def run_stale_calls_cleanup_job(database: SqlClient) -> dict[str, Any]:
-    """Job 2: Clean up calls stuck in ringing state (> 45s)."""
+    """Job 2: Clean up calls stuck in ringing state (> 45s). Bounded 200 for e2-micro parity."""
     cleaned_count = 0
     errors = []
     try:
         now_ts = datetime.now(timezone.utc).timestamp()
-        query = database.collection("calls").where(filter=FieldFilter("status", "==", "ringing"))
+        query = database.collection("calls").where(filter=FieldFilter("status", "==", "ringing")).limit(200)
         for doc in query.stream():
             data = doc.to_dict() or {}
             created_at = data.get("created_at")
@@ -124,14 +124,14 @@ def run_stale_calls_cleanup_job(database: SqlClient) -> dict[str, Any]:
 
 
 def run_daily_maintenance_job(database: SqlClient) -> dict[str, Any]:
-    """Job 3: General daily workspace maintenance and cleanup."""
+    """Job 3: General daily workspace maintenance and cleanup. Bounded 500."""
     cleaned_notifications = 0
     errors = []
     try:
         now_ts = datetime.now(timezone.utc).timestamp()
         # Clean up read notifications older than 30 days
         thirty_days_ago = now_ts - (30 * 86400)
-        query = database.collection_group("notifications").where(filter=FieldFilter("read", "==", True))
+        query = database.collection_group("notifications").where(filter=FieldFilter("read", "==", True)).limit(500)
         for doc in query.stream():
             data = doc.to_dict() or {}
             created_at = data.get("created_at")

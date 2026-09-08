@@ -64,16 +64,7 @@ def resolve_voice_config(database: SqlClient | None, user_uid: str | None) -> Ai
 
 def _choose_tts(sentence: str, tts_provider: str | None, tts_voice: str | None, language: str = "en-US"):
     """Synthesize one sentence via fastest available server TTS, return (b64, mime, provider_used)."""
-    # Try ElevenLabs, then openrouter fish, then google, else none
-    try:
-        if tts_provider == "elevenlabs" or (tts_provider is None and settings.elevenlabs_api_key):
-            from app.services.speech.elevenlabs import synthesize_speech_elevenlabs
-
-            voice = tts_voice or settings.elevenlabs_voice_id or "21m00Tcm4TlvDq8ikWAM"
-            audio, mime = synthesize_speech_elevenlabs(sentence, language, voice, 1.0, 0.0)
-            return base64.b64encode(audio).decode(), mime, "elevenlabs"
-    except Exception as e:
-        logger.debug(f"voice_fast TTS elevenlabs failed: {e}")
+    # Try openrouter fish streaming fallback to non-stream synthesize, then google, else none
     try:
         if tts_provider == "openrouter" or (tts_provider is None and settings.openrouter_api_key):
             from app.services.speech.openrouter_tts import synthesize_speech_openrouter
@@ -115,7 +106,7 @@ def stream_voice_reply(
     from app.services.ai_models import get_provider_client  # local to avoid cycle
 
     user_uid = (user or {}).get("uid")
-    cfg = resolve_voice_config(database, user_uid if isinstance(database, Client) else None)
+    cfg = resolve_voice_config(database, user_uid if isinstance(database, SqlClient) else None)
 
     # Build minimal conversation — last prompt only, no history for speed (optionally include last 2)
     conversation = [{"role": "user", "content": prompt_text[:2000]}]
@@ -201,7 +192,7 @@ def voice_reply_blocking(
 ) -> str:
     """One-shot fast voice reply (no tools, no RAG) — used by Twilio TwiML where
     the whole reply must be known before rendering XML. ~300-600ms with groq 8b."""
-    cfg = resolve_voice_config(database if isinstance(database, Client) else None, (user or {}).get("uid"))
+    cfg = resolve_voice_config(database if isinstance(database, SqlClient) else None, (user or {}).get("uid"))
     conversation = [{"role": "user", "content": prompt_text[:2000]}]
     try:
         from app.services.ai_models import get_provider_client, run_tool_loop

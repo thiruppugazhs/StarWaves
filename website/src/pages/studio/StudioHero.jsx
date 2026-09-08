@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowUp, Paperclip, Plus, Sparkles, X } from 'lucide-react'
+import { ArrowUp, Paperclip, Plus, X, Zap } from 'lucide-react'
 import { CustomDropdown } from '../../components/ui/CustomDropdown'
 import { ModelSelectorDropdown } from '../../components/ui/ModelSelectorDropdown'
 import { formatFileSize } from '../../utils/fileSize'
@@ -20,7 +20,7 @@ export function StudioHero({
 }) {
   const [prompt, setPrompt] = useState('')
   const [mode, setMode] = useState('plan')
-  const [model, setModel] = useState('')
+  const [model, setModel] = useState('openrouter/free')
   const [attachments, setAttachments] = useState([])
   const textareaRef = useRef(null)
   const fileInputRef = useRef(null)
@@ -94,98 +94,100 @@ export function StudioHero({
 
   return (
     <section className="studio-hero">
-      <div className="studio-hero-badge">
-        <Sparkles size={13} aria-hidden="true" />
-        AI Fullstack Studio
-      </div>
-      <h1 className="studio-hero-title">Build something with Eve</h1>
-      <p className="studio-hero-subtitle">
-        Describe an app idea or attach specifications — Eve plans the architecture, writes the code, and launches live previews.
-      </p>
+      <div className="studio-hero-glow" aria-hidden="true" />
+      <div className="studio-hero-gradient studio-hero-gradient-primary" aria-hidden="true" />
+      <div className="studio-hero-gradient studio-hero-gradient-secondary" aria-hidden="true" />
 
-      <form className="studio-prompt-card" onSubmit={handleSubmit}>
-        {attachments.length > 0 && (
-          <div className="studio-prompt-attachments" aria-label="Attached files">
-            {attachments.map((file) => (
-              <span key={file.id} className="studio-prompt-attachment-chip">
-                <Paperclip size={12} aria-hidden="true" />
-                <span className="studio-prompt-attachment-name" title={file.name}>{file.name}</span>
-                <span className="studio-prompt-attachment-size">{formatFileSize(file.size)}</span>
-                <button
-                  type="button"
-                  className="studio-prompt-attachment-remove"
-                  onClick={() => removeAttachment(file.id)}
-                  aria-label={`Remove ${file.name}`}
-                >
-                  <X size={11} aria-hidden="true" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-        <textarea
-          ref={textareaRef}
-          className="studio-prompt-input"
-          value={prompt}
-          onChange={(event) => setPrompt(event.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={
-            mode === 'build'
-              ? 'Build directly in one go: e.g. SaaS dashboard with metrics, billing table, and dark mode…'
-              : 'Plan & interview: describe your vision, Eve will ask questions and draft architecture…'
-          }
-          rows={2}
-          aria-label="Describe the app you want to build"
-        />
-        <input ref={fileInputRef} type="file" multiple hidden onChange={handleAddFiles} />
-        <div className="studio-prompt-row">
-          <button
-            type="button"
-            className="studio-prompt-attach"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Plus size={14} aria-hidden="true" />
-            Add files
-          </button>
-          <div className="studio-prompt-tools">
-            <ModelSelectorDropdown
-              className="studio-prompt-mode"
-              value={model}
-              onChange={(m) => setModel(m.model || m.value)}
-              placeholder="Model"
-            />
-            <CustomDropdown
-              className="studio-prompt-mode"
-              value={mode}
-              options={MODE_OPTIONS}
-              onChange={setMode}
-              ariaLabel="Plan or Build mode"
-            />
+      <div className="studio-hero-content">
+        <h1 className="studio-hero-title">
+          What will you build?
+        </h1>
+
+        <form className="studio-prompt-card" onSubmit={handleSubmit}>
+          {attachments.length > 0 && (
+            <div className="studio-prompt-attachments" aria-label="Attached files">
+              {attachments.map((file) => (
+                <span key={file.id} className="studio-prompt-attachment-chip">
+                  <Paperclip size={12} aria-hidden="true" />
+                  <span className="studio-prompt-attachment-name" title={file.name}>{file.name}</span>
+                  <span className="studio-prompt-attachment-size">{formatFileSize(file.size)}</span>
+                  <button
+                    type="button"
+                    className="studio-prompt-attachment-remove"
+                    onClick={() => removeAttachment(file.id)}
+                    aria-label={`Remove ${file.name}`}
+                  >
+                    <X size={11} aria-hidden="true" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <textarea
+            ref={textareaRef}
+            className="studio-prompt-input"
+            value={prompt}
+            onChange={(event) => setPrompt(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={
+              mode === 'build'
+                ? 'Build directly: e.g. SaaS dashboard with metrics, billing table, and dark mode…'
+                : 'Describe your vision — Eve will ask questions and draft the architecture…'
+            }
+            rows={2}
+            aria-label="Describe the app you want to build"
+          />
+          <input ref={fileInputRef} type="file" multiple hidden onChange={handleAddFiles} />
+          <div className="studio-prompt-row">
             <button
-              type="submit"
-              className="studio-prompt-submit"
-              disabled={!canSubmit}
-              aria-label="Create project from prompt"
-              title="Create project (Enter)"
+              type="button"
+              className="studio-prompt-attach"
+              onClick={() => fileInputRef.current?.click()}
             >
-              <ArrowUp size={17} aria-hidden="true" />
+              <Plus size={14} aria-hidden="true" />
+              Add files
             </button>
+            <div className="studio-prompt-tools">
+              <ModelSelectorDropdown
+                className="studio-prompt-mode"
+                value={model}
+                onChange={(m) => setModel(m.model || m.value)}
+                direction="up"
+                placeholder="Model"
+              />
+              <CustomDropdown
+                className="studio-prompt-mode"
+                value={mode}
+                options={MODE_OPTIONS}
+                onChange={setMode}
+                ariaLabel="Plan or Build mode"
+              />
+              <button
+                type="submit"
+                className={`studio-prompt-submit ${isSubmitting ? 'loading' : ''}`}
+                disabled={!canSubmit}
+                aria-label="Create project from prompt"
+                title="Create project (Enter)"
+              >
+                {isSubmitting ? <Zap size={15} aria-hidden="true" /> : <ArrowUp size={17} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
 
-      <div className="studio-suggestions" aria-label="Prompt suggestions">
-        <span className="studio-suggestions-label">Try asking:</span>
-        {PROMPT_SUGGESTIONS.map((item) => (
-          <button
-            key={item.label}
-            type="button"
-            className="studio-suggestion-chip"
-            onClick={() => handleSuggestionClick(item.prompt)}
-          >
-            {item.label}
-          </button>
-        ))}
+        <div className="studio-suggestions" aria-label="Prompt suggestions">
+          <span className="studio-suggestions-label">Try asking:</span>
+          {PROMPT_SUGGESTIONS.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              className="studio-suggestion-chip"
+              onClick={() => handleSuggestionClick(item.prompt)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   )

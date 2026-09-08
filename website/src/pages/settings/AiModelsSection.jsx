@@ -99,8 +99,11 @@ export function AiModelsSection({ user }) {
   // Live-fetch models via provider API whenever a provider is selected without a
   // typed key — backend resolves the saved user key, then the server env key,
   // then falls back to the static catalog (GET /settings/ai-models/models/{provider}).
+  // Uses cached + deduped request (60s TTL, 2 retries for 429) to avoid thundering herd.
   useEffect(() => {
     if (isDefault || apiKey.trim()) return
+    // Skip if we already have live models for this provider (cached)
+    if (liveModels[selectedProvider]?.length) return
     let cancelled = false
     setLoadingModels(true)
     setLiveError('')
@@ -115,8 +118,10 @@ export function AiModelsSection({ user }) {
           )
         }
       })
-      .catch(() => {
+      .catch((err) => {
         // Static catalog from the loaded providers list remains as fallback
+        // 429 is retried automatically (retries:2); only surface non-transient errors
+        if (!cancelled && err?.status !== 429) setLiveError('')
       })
       .finally(() => {
         if (!cancelled) setLoadingModels(false)
@@ -124,7 +129,7 @@ export function AiModelsSection({ user }) {
     return () => {
       cancelled = true
     }
-  }, [selectedProvider, isDefault, apiKey])
+  }, [selectedProvider, isDefault, apiKey, liveModels])
 
   // Live fetch models via provider API when user types a new key (uses /settings/ai-models/models/{provider}?api_key=...)
   useEffect(() => {
@@ -147,10 +152,10 @@ export function AiModelsSection({ user }) {
         const models = res.models || []
         if (models.length) {
           setLiveModels((prev) => ({ ...prev, [selectedProvider]: models }))
-          const ids = new Set(models.map((m) => m.id))
-          if (!ids.has(selectedModel)) {
-            setSelectedModel(models[0]?.id || selectedModel)
-          }
+          setSelectedModel((current) => {
+            const ids = new Set(models.map((m) => m.id))
+            return ids.has(current) ? current : models[0]?.id || current
+          })
         }
       } catch (e) {
         if (!cancelled) setLiveError(e.message || 'Could not fetch models for this key.')
@@ -162,7 +167,7 @@ export function AiModelsSection({ user }) {
       cancelled = true
       clearTimeout(timer)
     }
-  }, [selectedProvider, apiKey, isDefault, selectedModel])
+  }, [selectedProvider, apiKey, isDefault])
 
   const handleProviderChange = (providerId) => {
     setSelectedProvider(providerId)

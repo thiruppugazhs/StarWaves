@@ -5,7 +5,7 @@ class AiModelPreferenceUpdate(BaseModel):
     provider: str = Field(min_length=1, max_length=64)
     model: str = Field(min_length=1, max_length=128)
     api_key: str | None = Field(default=None, max_length=512)
-    assistant_name: str | None = Field(default=None, max_length=64)
+    assistant_name: str | None = Field(default=None, max_length=32)
 
 
 class AiModelDescriptor(BaseModel):
@@ -35,5 +35,5 @@ class AiModelPreferenceResponse(BaseModel):
 class AiModelsResponse(BaseModel):
     providers: list[AiProviderDescriptor]
     preference: AiModelPreferenceResponse | None = None
-    default_provider: str = "openai"
-    default_model: str = "gpt-5-mini"
+    default_provider: str = "openrouter"
+    default_model: str = "openrouter/free"

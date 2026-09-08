@@ -14,6 +14,15 @@ CURATED_TEMPLATES = {
     for template in [*WEB_TEMPLATES, *SAAS_TEMPLATES, *API_TEMPLATES, *FULLSTACK_TEMPLATES]
 }
 
+_TEMPLATE_METADATA = {
+    "react-vite": {"category": "web", "tags": ["React", "Vite", "Frontend"], "featured": True, "sort_order": 10},
+    "react-saas": {"category": "product", "tags": ["SaaS", "Dashboard", "Auth"], "featured": True, "sort_order": 20},
+    "fastapi-api": {"category": "backend", "tags": ["FastAPI", "Python", "API"], "featured": False, "sort_order": 30},
+    "node-express-api": {"category": "backend", "tags": ["Express", "Node.js", "API"], "featured": False, "sort_order": 40},
+    "fullstack-react-fastapi": {"category": "fullstack", "tags": ["React", "FastAPI", "SQLite"], "featured": True, "sort_order": 50},
+    "static-site": {"category": "web", "tags": ["HTML", "CSS", "Static"], "featured": False, "sort_order": 60},
+}
+
 
 def list_curated_templates() -> list[dict]:
     """Curated catalog summaries (no file bodies)."""
@@ -25,6 +34,7 @@ def list_curated_templates() -> list[dict]:
             "stack": t.get("stack", ""),
             "kind": "curated",
             "source_project_id": None,
+            **_TEMPLATE_METADATA.get(t["id"], {"category": "web", "tags": [], "featured": False, "sort_order": 999}),
         }
         for t in CURATED_TEMPLATES.values()
     ]

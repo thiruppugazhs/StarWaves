@@ -193,13 +193,13 @@ export function WhatsAppMessageBubble({
             })()}
             {(msg.is_forwarded || msg.isForwarded) && (
               <div className="whatsapp-forwarded-tag">
-                <CornerUpLeft size={13} style={{ transform: 'scaleX(-1)' }} />
+                <CornerUpLeft size={13} className="whatsapp-forwarded-flip" />
                 <span>Forwarded</span>
               </div>
             )}
             {quotedMsg && (
               <div
-                className="whatsapp-quoted-preview"
+                className="whatsapp-quoted-preview whatsapp-quoted-clickable"
                 onClick={(e) => {
                   e.stopPropagation()
                   const el = document.getElementById(`whatsapp-msg-${quotedMsg.id}`)
@@ -209,7 +209,9 @@ export function WhatsAppMessageBubble({
                     setTimeout(() => el.classList.remove('whatsapp-message-highlight'), 1600)
                   }
                 }}
-                style={{ cursor: 'pointer' }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const el = document.getElementById(`whatsapp-msg-${quotedMsg.id}`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('whatsapp-message-highlight'); setTimeout(() => el.classList.remove('whatsapp-message-highlight'), 1600) } } }}
                 title="Click to jump to quoted message"
               >
                 <div className="whatsapp-quoted-body">
@@ -273,7 +275,7 @@ export function WhatsAppMessageBubble({
                     />
                   ))}
                 </div>
-                <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>0:08</span>
+                <span className="whatsapp-audio-time">0:08</span>
               </div>
             ) : msg.media && (msg.media.thumbnail_base64 || ['image', 'gif', 'video', 'sticker'].includes(msg.media.type) || msg.media.url) ? (
               <div
@@ -292,7 +294,7 @@ export function WhatsAppMessageBubble({
                 title={msg.media.type !== 'sticker' ? 'Click to open fullscreen' : undefined}
               >
                 {(msg.media.url || msg.media.thumbnail_base64) ? (
-                  <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                  <div className="whatsapp-media-wrapper-relative">
                     <img
                       src={msg.media.url || msg.media.thumbnail_base64}
                       alt={msg.media.filename || 'Media attachment'}
@@ -317,22 +319,16 @@ export function WhatsAppMessageBubble({
               </div>
             ) : msg.media?.type === 'document' ? (
               <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 12px',
-                  background: 'rgba(255,255,255,0.08)',
-                  borderRadius: 8,
-                  marginBottom: 6,
-                  cursor: 'pointer',
-                }}
+                className="whatsapp-doc-card"
                 onClick={() => onDownloadMedia(msg.media, 'document')}
                 title="Click to download document"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onDownloadMedia(msg.media, 'document') } }}
               >
                 <FileText size={18} />
-                <span style={{ fontSize: '0.8125rem', fontWeight: 500, flex: 1 }}>{(msg.media.filename || 'Document').replace(/\.enc$/i, '')}</span>
-                <Download size={14} style={{ opacity: 0.7 }} />
+                <span className="whatsapp-doc-name">{(msg.media.filename || 'Document').replace(/\.enc$/i, '')}</span>
+                <Download size={14} className="whatsapp-doc-icon-muted" />
               </div>
             ) : null}
 
@@ -359,14 +355,14 @@ export function WhatsAppMessageBubble({
             )}
 
             <div className="whatsapp-message-meta">
-              {msg.is_starred && <Star size={11} fill="currentColor" style={{ opacity: 0.8 }} />}
+              {msg.is_starred && <Star size={11} fill="currentColor" className="whatsapp-star-icon" />}
               <span>{formatMessageTime(msg.timestamp)}</span>
               {isOutgoing && (
-                <span>
+                <span className="whatsapp-message-status">
                   {msg.status === 'read' ? (
                     <CheckCheck size={14} />
                   ) : msg.status === 'delivered' ? (
-                    <CheckCheck size={14} style={{ opacity: 0.6 }} />
+                    <CheckCheck size={14} className="whatsapp-check-muted" />
                   ) : (
                     <Check size={14} />
                   )}

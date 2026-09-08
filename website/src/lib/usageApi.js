@@ -2,7 +2,7 @@ import { apiRequest } from './request'
 
 export function getUsageSummary(days) {
   const qs = days ? `?days=${days}` : ''
-  return apiRequest(`/usage/summary${qs}`, { method: 'GET', useCache: false })
+  return apiRequest(`/usage/summary${qs}`, { method: 'GET' })
 }
 
 export function getUsageLogs({ limit = 50, provider, days } = {}) {
@@ -11,5 +11,5 @@ export function getUsageLogs({ limit = 50, provider, days } = {}) {
   if (provider) p.set('provider', String(provider))
   if (days) p.set('days', String(days))
   const qs = p.toString() ? `?${p.toString()}` : ''
-  return apiRequest(`/usage/logs${qs}`, { method: 'GET', useCache: false })
+  return apiRequest(`/usage/logs${qs}`, { method: 'GET' })
 }

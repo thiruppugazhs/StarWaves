@@ -11,6 +11,7 @@ import { parseQuestionsFromMessage } from './questionUtils'
 const CHAT_SESSION_KEY_PREFIX = 'starwaves.studio.chat_session.'
 const TEXT_EXTENSION_PATTERN = /\.(txt|md|json|js|jsx|ts|tsx|html|css|py|csv|xml|yaml|yml|sql|sh|log|rs|go|java|c|cpp|h)$/i
 const ATTACHMENT_TEXT_MAX_LENGTH = 40000
+const DEFAULT_MODEL_SELECTION = { provider: 'openrouter', model: 'openrouter/free' }
 
 function isPlanMessage(content) {
   if (!content || typeof content !== 'string') return false
@@ -43,7 +44,7 @@ export function BuilderChat({ projectId, projectName, onActions, onAssistantRepl
   }
   const [messages, setMessages] = useState(() => [starter])
   const [draft, setDraft] = useState('')
-  const [selectedModel, setSelectedModel] = useState('gpt-5-mini')
+  const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL_SELECTION)
   const [attachments, setAttachments] = useState([])
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
@@ -54,7 +55,11 @@ export function BuilderChat({ projectId, projectName, onActions, onAssistantRepl
   useEffect(() => {
     const brief = takeStudioBrief(projectId)
     if (brief?.model) {
-      setSelectedModel(brief.model)
+      setSelectedModel(
+        typeof brief.model === 'string'
+          ? { provider: brief.provider || DEFAULT_MODEL_SELECTION.provider, model: brief.model }
+          : brief.model,
+      )
     }
     const isBuild = brief?.mode === 'build'
     const dynamicStarter = {
@@ -126,7 +131,8 @@ export function BuilderChat({ projectId, projectName, onActions, onAssistantRepl
     setAttachments([])
     setError('')
     setIsSending(true)
-    const nextMessages = [...messages, { role: 'user', content }]
+    const sanitizedBase = messages.filter((m) => typeof m.content === 'string' && m.content.trim().length > 0)
+    const nextMessages = [...sanitizedBase, { role: 'user', content }]
     setMessages(nextMessages)
 
     try {
@@ -136,13 +142,14 @@ export function BuilderChat({ projectId, projectName, onActions, onAssistantRepl
         sessionId = created.session.id
         storeSessionId(projectId, sessionId)
       }
-      const apiMessages = nextMessages.map(({ role, content: text }) => ({ role, content: text }))
-      const response = await sendEveMessage(apiMessages, sessionId)
-      setMessages([...nextMessages, { role: 'assistant', content: response.message }])
+      const apiMessages = nextMessages.filter((m) => typeof m.content === 'string' && m.content.trim().length > 0).map(({ role, content: text }) => ({ role, content: text.trim() }))
+      const response = await sendEveMessage(apiMessages.length ? apiMessages : nextMessages, sessionId, selectedModel)
+      const assistantText = typeof response.message === 'string' ? response.message.trim() : ''
+      if (assistantText) setMessages([...nextMessages, { role: 'assistant', content: assistantText }])
       onActions?.(response.actions)
       onAssistantReply?.()
     } catch (sendError) {
-      setError(sendError.message || 'Eve could not respond. Try again.')
+      setError(String(sendError.message || 'Eve could not respond. Try again.'))
     } finally {
       setIsSending(false)
     }
@@ -152,7 +159,13 @@ export function BuilderChat({ projectId, projectName, onActions, onAssistantRepl
     if (!text || isSending) return
     setError('')
     setIsSending(true)
-    const nextMessages = [...messages, { role: 'user', content: text }]
+    const trimmed = typeof text === 'string' ? text.trim() : text
+    if (!trimmed) {
+      setIsSending(false)
+      return
+    }
+    const sanitizedBase = messages.filter((m) => typeof m.content === 'string' && m.content.trim().length > 0)
+    const nextMessages = [...sanitizedBase, { role: 'user', content: trimmed }]
     setMessages(nextMessages)
 
     try {
@@ -162,9 +175,10 @@ export function BuilderChat({ projectId, projectName, onActions, onAssistantRepl
         sessionId = created.session.id
         storeSessionId(projectId, sessionId)
       }
-      const apiMessages = nextMessages.map(({ role, content: msgText }) => ({ role, content: msgText }))
-      const response = await sendEveMessage(apiMessages, sessionId)
-      setMessages([...nextMessages, { role: 'assistant', content: response.message }])
+      const apiMessages = nextMessages.filter((m) => typeof m.content === 'string' && m.content.trim().length > 0).map(({ role, content: msgText }) => ({ role, content: msgText.trim() }))
+      const response = await sendEveMessage(apiMessages.length ? apiMessages : nextMessages, sessionId, selectedModel)
+      const assistantText = typeof response.message === 'string' ? response.message.trim() : ''
+      if (assistantText) setMessages([...nextMessages, { role: 'assistant', content: assistantText }])
       onActions?.(response.actions)
       onAssistantReply?.()
     } catch (sendError) {
@@ -183,8 +197,12 @@ export function BuilderChat({ projectId, projectName, onActions, onAssistantRepl
         </div>
         <ModelSelectorDropdown
           className="builder-model-dropdown"
-          value={selectedModel}
-          onChange={(m) => setSelectedModel(m.model || m.value)}
+          value={selectedModel.model}
+          activeModel={selectedModel}
+          onChange={(selection) => setSelectedModel({
+            provider: selection.provider,
+            model: selection.model,
+          })}
         />
       </div>
 

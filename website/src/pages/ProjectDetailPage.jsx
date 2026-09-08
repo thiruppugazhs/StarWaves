@@ -1,3 +1,5 @@
+import "../styles/pages/project-detail.css"
+import "../styles/pages/project-lifecycle.css"
 import { useState } from 'react'
 import {
   ArrowLeft,
@@ -129,30 +131,7 @@ export function ProjectDetailPage({ project, onBack, onSave }) {
     }
   }
 
-  const renderAvatarStack = (membersCount) => {
-    const count = Math.min(membersCount || 1, 4)
-    const avatars = []
-    const prefixes = ['JD', 'AB', 'SK', 'ML']
-    for (let i = 0; i < count; i++) {
-      avatars.push(
-        <span key={i} className="project-avatar-bubble">
-          {prefixes[i % prefixes.length]}
-        </span>,
-      )
-    }
-    if (membersCount > 4) {
-      avatars.push(
-        <span key="more" className="project-avatar-bubble more">
-          +{membersCount - 4}
-        </span>,
-      )
-    }
-    return (
-      <div className="project-avatar-stack" title={`${membersCount} team members`}>
-        {avatars}
-      </div>
-    )
-  }
+  const memberCount = Number(project.members) || 0
 
   return (
     <section className="project-page">
@@ -170,53 +149,53 @@ export function ProjectDetailPage({ project, onBack, onSave }) {
           <h1>{project.name}</h1>
           <span>{project.description}</span>
         </div>
-        <div className="project-page-header-actions">
-          <CustomDropdown
-            value={project.status}
-            onChange={handleStatusChange}
-            ariaLabel="Change project status"
-            options={['Planning', 'Active', 'On hold', 'Completed'].map((val) => ({
-              value: val,
-              label: val,
-            }))}
-          />
-          <div className="project-page-links">
-            <button className="project-edit-button" onClick={openEditor}>
-              <Pencil size={15} />
-              Edit
-            </button>
-            <button className="secondary-button" onClick={handleDelete}>
-              <Trash2 size={15} />
-              Delete
-            </button>
-            {project.githubUrl && (
-              <a href={project.githubUrl} target="_blank" rel="noreferrer">
-                <GitBranch size={15} />
-                GitHub
-              </a>
-            )}
-            {project.liveUrl && (
-              <a
-                className="live-link"
-                href={project.liveUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <ExternalLink size={15} />
-                Live site
-              </a>
-            )}
-          </div>
+      </div>
+      <div className="page-inline-actions">
+        <CustomDropdown
+          value={project.status}
+          onChange={handleStatusChange}
+          ariaLabel="Change project status"
+          options={['Planning', 'Active', 'On hold', 'Completed'].map((val) => ({
+            value: val,
+            label: val,
+          }))}
+        />
+        <div className="project-page-links">
+          <button className="project-edit-button" onClick={openEditor}>
+            <Pencil size={15} />
+            Edit
+          </button>
+          <button className="secondary-button" onClick={handleDelete}>
+            <Trash2 size={15} />
+            Delete
+          </button>
+          {project.githubUrl && (
+            <a href={project.githubUrl} target="_blank" rel="noreferrer">
+              <GitBranch size={15} />
+              GitHub
+            </a>
+          )}
+          {project.liveUrl && (
+            <a
+              className="live-link"
+              href={project.liveUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ExternalLink size={15} />
+              Live site
+            </a>
+          )}
         </div>
       </div>
 
       {error && (
-        <div className="todo-api-error" role="alert" style={{ marginTop: 14 }}>
+        <div className="project-page-error" role="alert">
           {error}
         </div>
       )}
 
-      <div className="project-page-grid" style={{ marginTop: 20 }}>
+      <div className="project-page-grid">
         <article className="project-overview-card">
           <div className="project-overview-heading">
             <div>
@@ -237,8 +216,7 @@ export function ProjectDetailPage({ project, onBack, onSave }) {
           </div>
 
           <div
-            className="project-progress-actions"
-            style={{ marginTop: 14, justifyContent: 'flex-start' }}
+            className="project-progress-actions project-progress-actions-detail"
           >
             <button
               type="button"
@@ -275,8 +253,8 @@ export function ProjectDetailPage({ project, onBack, onSave }) {
           <div className="project-page-details">
             <div>
               <Users size={17} />
-              <span>Team ({project.members})</span>
-              {renderAvatarStack(project.members)}
+              <span>Team</span>
+              <strong>{memberCount} {memberCount === 1 ? 'member' : 'members'}</strong>
             </div>
             <div>
               <CalendarClock size={17} />

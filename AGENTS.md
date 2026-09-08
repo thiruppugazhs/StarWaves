@@ -28,6 +28,20 @@ Instructions and guidelines for AI Coding Agents working in the **Starwaves** co
    - Tier 3 (targeted): Use `Grep` with `include` filters (`*.py`, `*.jsx`, `*.css`) and `Read` on specific paths from Tier 1. **Prohibited:** `Glob **/*` without `include`, full tree scans, or reading every file to orient. Prefer semantic `Grep` over enumeration.
    - `CHANGELOG.md` holds history — never read it for orientation; `context.md` history belongs there.
 
+6. **No Sub-Agents — Direct Execution Only**:
+   - **Prohibited:** Delegating work to sub-agents via the `Task` tool (or any `explore`/`general`/custom sub-agent), spawning background agents, or wrapping work in delegated sessions. All reasoning, searching, reading, editing, verification, and commits must be performed **directly by the primary agent** in the current session.
+   - **Why:** Sub-agents break the tiered context protocol, duplicate reads, hide file-level decisions, and bypass `context.md` as the single living snapshot. Direct execution keeps the audit trail in one session and one commit history.
+   - **How to work instead:** Use `Grep` (with `include`), `Read` on the 1–2 files located via `PROJECT_MAP.md`, and `Bash`/`Edit`/`Write` directly. Break large work into a local `TodoWrite` list — never into sub-agent dispatches.
+   - **Exception:** Only when the user explicitly writes "use sub-agents" or "delegate to sub-agents" may delegation be used, and the reason must be noted in the commit/ADR.
+
+7. **Architecture Decision Records (ADRs) — Required**:
+   - Every non-trivial architectural decision **must** be recorded as an ADR file under `docs/adr/`. If you skip it, the task is incomplete.
+   - **When to create an ADR:** new patterns, layering changes, DB schema choices, auth/cache strategies, frontend architecture (state, styling, routing), infra/deployment changes, dependency additions, or any alternative that was considered and rejected. Trivial bug fixes and copy changes do not need ADRs.
+   - **Location & naming:** `docs/adr/NNNN-kebab-case-title.md` (zero-padded 4 digits, sequential). Never reuse numbers. Start from `0001`.
+   - **Template:** Use `docs/adr/_template.md` (Status, Context, Decision, Consequences, Alternatives). Keep it to ~300–500 words; link code/files, not prose walls.
+   - **Lifecycle:** `Proposed → Accepted → Superseded/Deprecated`. Update `Status` in-place when superseded and cross-link the replacement ADR. Add a one-line summary to `docs/adr/README.md` index.
+   - **Commit rule:** ADR file(s) must be committed in the **same commit** as the code they justify (or immediately before, if the decision precedons code). Never leave an architectural change without its ADR.
+
 2. **Ask When in Doubt**:
    - Never guess user intent, business logic, API schemas, or ambiguous design
      decisions.
@@ -42,14 +56,26 @@ Instructions and guidelines for AI Coding Agents working in the **Starwaves** co
      guidance.
 
 4. **Respect System Architecture**:
-   - **Frontend (`/website`)**: React 19 + Vite + Vanilla CSS (Monochrome
-     Design System) + Monaco Editor.
+   - **Frontend (`/website`)**: React 19 + Vite + Vanilla CSS (Design
+     Tokens & Presets: Mono, Duo, Spectrum) + Monaco Editor.
    - **Backend (`/server`)**: FastAPI (Python) + Supabase (PostgreSQL) / Async
      SQLAlchemy 2.0.
    - **Desktop Shell** (`/website/src-tauri`): Tauri v2 scaffold.
    - **WhatsApp Worker** (`/services/whatsapp-worker`): Go (WhatsMeow) bridge.
    - Never introduce a new framework, ORM, CSS preprocessor, or bundler
      without explicit user approval.
+
+8. **No Demo / Mock / Placeholder Values in UI — Real Data Only**:
+   - **PROHIBITED in UI:** hardcoded demo arrays/objects (`const data = [{ name: "Demo Project" }]`), `lorem ipsum`, fake stats/counters, placeholder images/text left in shipped components, or `TODO: replace with real data` shipped to main.
+   - Every UI component must be wired to **real data**: API client (`lib/*Api.js` via `apiRequest`), props from a data hook, or an explicit `EmptyState`/`LoadingState` for zero-data. If the API has no data, show the empty state — never invent data to fill the screen.
+   - Mock/demo data is allowed **only** inside `tests/`, `__mocks__/`, Storybook, or isolated dev fixtures that are never imported by production pages/components. Any fixture file must be named `*.mock.*`, `*.fixture.*`, or live under `tests/`.
+   - Validation: `Grep` for `demo|mockData|placeholder|fakeData|lorem` in `website/src/pages` and `website/src/components` must return zero hits in production code before commit.
+
+9. **No Easy Fixes / Temp Fixes / Shortcuts — Fix the Root Cause**:
+   - **PROHIBITED:** `// temp fix`, `// quick fix`, `// hack`, `// workaround`, `// FIXME later`, `setTimeout` hacks to paper over race conditions, suppressing errors (`try { } catch {}` with empty catch, `// @ts-ignore`, `eslint-disable` without justification), commenting out failing code/tests to make CI pass, hardcoding values to bypass validation, or adding `!important` / inline styles to override layout bugs.
+   - Every fix must address the **root cause** at the correct layer (Routes → Services → Repositories → Core per §5.2; or tokens → base → components → pages per §4.6.1). If the proper fix is larger, split it correctly, add an ADR if architectural (§1.7), and fix it — do not ship a shortcut.
+   - If a temporary mitigation is unavoidable (e.g. upstream outage), it must be: (a) behind an explicit flag/env, (b) tracked with a TODO that links to an issue, and (c) approved by the user — never silent.
+   - Review checklist before commit: `Grep` for `temp fix|easy fix|quick fix|hack|workaround|TODO.*temp` must be clean; failing tests must be fixed, not skipped or commented out.
 
 ---
 
@@ -358,9 +384,12 @@ website/src/
 
 1. **One File per Backend Feature**: Each API client module maps to one backend
    route group. Name it `<feature>Api.js`.
-2. **All HTTP goes through `request.js`**: Use `apiRequest()` for every call.
+2. **All HTTP goes through `request.js`**: Use `apiRequest()` for every JSON API call.
    Never use raw `fetch()` directly in API clients — `apiRequest` handles auth
-   tokens, deduplication, caching, retries, and timeouts.
+   tokens, deduplication, caching, retries, and timeouts. Exceptions require inline
+   justification: binary `MediaSource` streaming (`eveSpeechStream.js`) and
+   OAuth popup flows (`googleContacts.js` `googleMail.js`) that need `window.open`/
+   non-JSON handling.
 3. **Named Exports**: Export individual functions, not a default object.
    ```javascript
    // ✅ Good
@@ -376,19 +405,29 @@ website/src/
 
 ### 4.6 CSS & Design System
 
-#### 4.6.1 Strict Color Palette (Monochrome Only)
+#### 4.6.1 Color System — Multi-Color Semantic Tokens & Module Accents (ADR 0019)
 
-**ONLY Black & White** are allowed across the entire UI.
+The design system uses a **vibrant multi-color architecture** with domain-specific accent coding. Pure monochrome presets are retired:
 
-| Role | Allowed Values |
-|------|---------------|
-| Pure/Dark Black | `#000000`, `#09090b`, `#121212`, `#18181b` |
-| Pure/Off White | `#ffffff`, `#fafafa`, `#f4f4f5` |
-| Grayscale Accents / Borders | `#27272a`, `#3f3f46`, `#71717a`, `#e4e4e7` |
+1. **Semantic Role Tokens**:
+   - `--color-primary`: Electric Indigo (`#4f46e5` light / `#6366f1` dark)
+   - `--color-accent`: Sky Blue (`#0284c7` light / `#38bdf8` dark)
+   - `--color-success`: Emerald Green (`#059669` light / `#10b981` dark)
+   - `--color-warning`: Amber (`#d97706` light / `#f59e0b` dark)
+   - `--color-danger`: Crimson Rose (`#e11d48` light / `#f43f5e` dark)
+   - `--color-purple`: Royal Purple (`#9333ea` light / `#a855f7` dark)
 
-**PROHIBITED**: Red, blue, green, yellow, purple, gradient fills, or rainbow
-themes are strictly forbidden. State indicators (status badges, active states)
-must use high-contrast black/white or grays.
+2. **Domain & Module Accent Identities**:
+   - **Work Group**: `--module-work` (Electric Indigo) with specialized feature accents (`--module-workspace` Amber, `--module-todo` Cyan, `--module-projects` Cobalt, `--module-documents` Sky Blue).
+   - **Studio Group**: `--module-studio` (Vivid Violet).
+   - **Eve AI Group**: `--module-eve` (Luminous Iris/Pink).
+   - **Growth Group**: `--module-growth` (Energetic Emerald).
+   - **Communication Group**: App-specific signatures (`--module-whatsapp` Brand Green, `--module-mail` Rose Red, `--module-calendar` Sky Blue, `--module-calls` Purple, `--module-chats` Indigo).
+   - **Account Group**: `--module-account` (Slate Indigo).
+
+3. **Preset Palettes**:
+   - **Spectrum (`spectrum`)**: Multi-Color Spectrum where every semantic role owns a distinct hue (`light`, `dark`, `prism`, `neonGrid`, `botanical`).
+   - **Duotone (`duo`)**: High-contrast two-color themes pairing a neutral canvas with one high-energy signature accent (`abyss`, `ember`, `coral`, `azure`, etc.).
 
 #### 4.6.2 CSS Architecture
 
@@ -417,15 +456,34 @@ must use high-contrast black/white or grays.
    .card { border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
    ```
 
-5. **Class Naming**: Use `kebab-case`, scoped to the feature/component
+5. **Single-Source Color Palette (ADR 0022)**: Every color must come from the
+   palette in `styles/tokens.css` (`:root`), consumed via `var(--…)`; dark-mode
+   values live in `styles/themes/dark.css`. Never write bare hex/`rgb()`/`hsl()`
+   color literals in component/page CSS, inline styles, or JS/JSX color data —
+   add a named token instead (`--on-fill`, `--chart-*`, `--menu-*`, …).
+   Translucent tints use `color-mix(in srgb, var(--…) N%, transparent)`, never a
+   hand-mixed `rgba()` of a palette hue.
+   ```css
+   /* ❌ Bad */
+   .badge { background: #f43f5e; box-shadow: 0 0 16px rgba(244,63,94,0.4); }
+
+   /* ✅ Good */
+   .badge { background: var(--module-eve); box-shadow: 0 0 16px color-mix(in srgb, var(--module-eve) 40%, transparent); }
+   ```
+   Only exceptions: per-theme presets under `styles/themes/`, intentionally
+   pinned scoped defaults (`.cinema`), `var(--x, fallback)` resilience
+   fallbacks, the neutral shadow/backdrop `rgba(0,0,0/255,255,255,…)` elevation
+   system, and functional color-input defaults in theme-customizer UI.
+
+6. **Class Naming**: Use `kebab-case`, scoped to the feature/component
    (e.g. `.studio-prompt-attachment-chip`, `.ws-overview-grid`). Never use
    generic class names that could collide (`.container`, `.wrapper`, `.card`
    without a prefix).
 
-6. **Dark Mode**: Use CSS custom properties defined per theme. Dark overrides
+7. **Dark Mode**: Use CSS custom properties defined per theme. Dark overrides
    live in `styles/themes/dark.css`. Never branch in JS to apply dark styles.
 
-#### 4.6.3 Full-Page Layout — Never Cut Off Content
+#### 4.6.2 Full-Page Layout — Never Cut Off Content
 
 - Every page must render as a **complete, full-height layout** where all content
   is fully visible and accessible — no clipped, truncated, or cut-off sections.
@@ -439,7 +497,7 @@ must use high-contrast black/white or grays.
 - Before declaring a UI task complete, visually confirm that the entire page
   renders without truncation.
 
-#### 4.6.4 Responsive Design
+#### 4.6.3 Responsive Design
 
 - Use the breakpoints and patterns established in `responsive.css`.
 - Mobile-first approach: base styles target mobile, `@media` queries add
@@ -767,10 +825,12 @@ Never declare success without running build/lint/test tools to verify correctnes
 
 ### Before Writing Code
 
-- [ ] Read `context.md` for current state
+- [ ] Follow tiered loading: `PROJECT_MAP.md` to locate 1–2 files → `context.md` if cross-cutting → `Grep` (with `include`) + `Read` targeted (no `Glob **/*`, no full-tree scans)
+- [ ] Read `context.md` for current state (never use sub-agents — execute directly in the primary session)
 - [ ] Check `components/ui/` for existing primitives
 - [ ] Check existing hooks, API clients, and services for reusable logic
 - [ ] Confirm the feature doesn't already exist elsewhere
+- [ ] If architectural, prepare ADR via `docs/adr/_template.md` (`NNNN-kebab-case`)
 
 ### Before Committing
 
@@ -779,10 +839,15 @@ Never declare success without running build/lint/test tools to verify correctnes
 - [ ] `python -m pytest tests -q` passes in `/server`
 - [ ] No dead code, unused imports, or commented-out blocks
 - [ ] No hardcoded magic values or inline styles
+- [ ] No bare color literals — `Grep` for `:\s*#[0-9a-fA-F]` in touched CSS and `'#` in touched JSX is clean outside the §4.6.2-item-5 exceptions (tokens/themes/cinema/fallbacks/shadows)
+- [ ] No demo/mock/placeholder values in UI — `Grep` for `demo|mockData|placeholder|fakeData|lorem` in `website/src/pages` + `components` is clean (§1.8)
+- [ ] No temp/easy fixes, hacks, or workarounds — `Grep` for `temp fix|easy fix|quick fix|hack|workaround` is clean; failing tests fixed not skipped (§1.9)
 - [ ] File sizes are under 400 lines (500 hard limit)
-- [ ] `context.md` updated if implementation changed
+- [ ] `context.md` updated if implementation changed (single `Last updated` one-liner; old detail → `CHANGELOG.md`; keep <15k)
+- [ ] ADR added/updated in `docs/adr/` if architectural (and listed in `docs/adr/README.md`)
+- [ ] No sub-agent delegation used (or explicitly justified)
 - [ ] No secrets, `.env`, or build artifacts staged
-- [ ] Commit message is clear and imperative
+- [ ] Commit message is clear and imperative (ADR and code in same commit)
 
 ### When Adding a New Feature
 
@@ -793,7 +858,7 @@ Never declare success without running build/lint/test tools to verify correctnes
 - [ ] Frontend uses existing UI primitives
 - [ ] API client uses `apiRequest()` from `request.js`
 - [ ] CSS uses design tokens, not raw values
-- [ ] Colors are monochrome only (black/white/gray)
 - [ ] Tests added for new backend logic
 - [ ] `context.md` updated with new routes/pages/features
+- [ ] ADR created if architecture/pattern/schema/auth/cache decision (commit with code)
 

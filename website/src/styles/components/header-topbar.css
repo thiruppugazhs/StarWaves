@@ -1,0 +1,310 @@
+/* Header Topbar — split from header.css (Wave F) */
+/* Header & Topbar Component Styles */
+
+.app-shell {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.app-main-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.topbar {
+  flex: 0 0 auto;
+  z-index: 30;
+  height: var(--header-height);
+  min-height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 0 var(--content-gutter);
+  background: var(--bg-overlay);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07), var(--shadow-inset);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.topbar-page-title {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.header-actions,
+.profile-button,
+.search {
+  display: flex;
+  align-items: center;
+}
+
+.header-menu-btn {
+  /* Hidden on desktop — the sidebar owns its own collapse toggle and the
+     topbar shows the page title only. Shown on mobile (see below) where it
+     is the sole opener for the navigation drawer. */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.header-menu-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--border-light, var(--border-color));
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .topbar {
+    justify-content: space-between;
+  }
+
+  .topbar-page-title {
+    max-width: 38vw;
+  }
+
+  .header-menu-btn {
+    display: inline-flex !important;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.starwaves-logo-icon {
+  display: block;
+  flex: 0 0 auto;
+  border-radius: var(--radius-sm);
+  border: none !important;
+  box-shadow: none !important;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+}
+
+.header-actions {
+  gap: var(--space-2xs);
+  min-width: 0;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+/* ── Eve Assistant Button ── */
+.eve-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  height: 36px;
+  padding: 0 var(--space-xs);
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.eve-button:hover,
+.eve-button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile & Tablet Web Responsiveness */
+@media (max-width: 900px) {
+  .topbar {
+    padding: 0 14px;
+    height: 62px;
+    gap: 10px;
+  }
+
+  .notification-backdrop {
+    top: 62px;
+  }
+
+  .notification-panel {
+    top: 62px;
+    width: 100%;
+    border-left: 0;
+  }
+
+  .search-container {
+    flex-basis: 180px;
+    max-width: 180px;
+  }
+
+  .search {
+    transition: border-color var(--transition-normal), background var(--transition-normal), box-shadow var(--transition-normal);
+  }
+
+  .search kbd {
+    display: none;
+  }
+
+  .search-results {
+    position: fixed;
+    top: 66px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .eve-button { width: 36px; justify-content: center; padding: 0; }
+  .eve-button span { display: none; }
+
+  .topbar {
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-left: max(10px, env(safe-area-inset-left));
+  }
+
+  .brand {
+    font-size: 15px;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .brand span {
+    display: none;
+  }
+
+  .header-actions {
+    flex: 0 1 auto;
+    gap: 6px;
+  }
+
+  .search-container {
+    position: static;
+    flex: 0 0 38px;
+    max-width: 38px;
+  }
+
+  .search {
+    width: 38px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .search .search-placeholder,
+  .search kbd {
+    display: none;
+  }
+
+  .search input {
+    width: 0;
+    min-width: 0;
+    opacity: 0;
+  }
+
+  .search:focus-within,
+  .search.open {
+    position: fixed;
+    z-index: 46;
+    top: 66px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    justify-content: flex-start;
+    padding: 0 10px;
+  }
+
+  .search:focus-within input,
+  .search.open input {
+    width: 100%;
+    opacity: 1;
+  }
+
+  .search:focus-within .search-placeholder,
+  .search.open .search-placeholder {
+    display: block;
+  }
+
+  .profile-name {
+    display: none;
+  }
+
+  .profile-button {
+    padding-right: 4px;
+  }
+
+  .profile-button > svg {
+    display: none;
+  }
+}
+.notification-target-highlight {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 3px;
+  animation: notification-target-pulse 1.6s ease-out;
+}
+
+@keyframes notification-target-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  25% { box-shadow: 0 0 0 5px var(--bg-hover); }
+}
+

@@ -12,10 +12,10 @@ from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
 
-from app.db.base import Base
-
-
 from sqlalchemy import create_engine, text
+
+class Base(DeclarativeBase):
+    pass
 
 
 def get_async_db_url() -> str:
@@ -80,12 +80,28 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db() -> None:
-    """Initialize database tables."""
-    import app.models  # noqa: F401
-    try:
-        Base.metadata.create_all(bind=sync_engine)
-    except Exception as e:
-        logger.warning("sync_engine create_all note: %s", e)
+    """Initialize database tables.
+
+    e2-micro note: _ensure_* ALTERs run off the event loop via to_thread to avoid
+    blocking lifespan; create_all is already async via run_sync.
+    """
+    # pgvector must exist before create_all: eve_memories.embedding is VECTOR(1536)
+    # on postgres. The old ordering created the extension AFTER create_all in
+    # _ensure_eve_memory_embedding, so a fresh volume failed with
+    # `type "vector" does not exist` and left the DB with no tables (caught in
+    # lifespan). Create it first, best-effort on both sync+async handles.
+    if not is_sqlite:
+        try:
+            with sync_engine.connect() as conn:
+                conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+                conn.commit()
+        except Exception:
+            pass
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        except Exception:
+            pass
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     # Run sync ALTERs off the loop so single worker stays responsive

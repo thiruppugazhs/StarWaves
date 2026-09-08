@@ -1,3 +1,4 @@
+import '../../styles/pages/workspace-panels.css'
 import { Terminal as TerminalIcon } from 'lucide-react'
 
 export function WorkspaceTerminal({ isTauri }) {

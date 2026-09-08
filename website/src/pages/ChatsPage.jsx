@@ -1,3 +1,5 @@
+import "../styles/pages/chats-shell.css"
+import "../styles/pages/chats-thread.css"
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import {
   MessageSquare,
@@ -17,7 +19,7 @@ import {
   getGoogleChatSpaces,
   sendGoogleChatMessage,
 } from '../lib/googleChatApi'
-import { FilterPills, LoadingState, PageHeader, SearchBar } from '../components/ui'
+import { FilterPills, LoadingState, SearchBar } from '../components/ui'
 
 export function ChatsPage({ onNavigate: _onNavigate }) {
   const [accounts, setAccounts] = useState([])
@@ -139,41 +141,35 @@ export function ChatsPage({ onNavigate: _onNavigate }) {
 
   return (
     <section className="chats-page">
-      <PageHeader
-        eyebrow="Communication"
-        title="Chats"
-        actions={
-          <>
-            {accounts.length > 0 ? (
-              <div className="account-badge-pill">
-                <span className="dot active"></span>
-                {accounts.length} Google {accounts.length === 1 ? 'Account' : 'Accounts'} Connected
-              </div>
-            ) : !loading ? (
-              <button
-                className="secondary-button icon-button-text"
-                onClick={handleConnectGoogleChat}
-                disabled={connectingChat}
-              >
-                <Settings size={16} className={connectingChat ? 'spin' : ''} />
-                <span>{connectingChat ? 'Connecting…' : 'Connect Google Chat'}</span>
-              </button>
-            ) : null}
-            <button
-              className="icon-button"
-              onClick={() => fetchSpaces(selectedAccountEmail)}
-              disabled={loading}
-              title="Refresh"
-            >
-              <RefreshCw size={16} className={loading ? 'spin' : ''} />
-            </button>
-          </>
-        }
-      />
+      <div className="page-inline-actions">
+        {accounts.length > 0 ? (
+          <div className="account-badge-pill">
+            <span className="dot active"></span>
+            {accounts.length} Google {accounts.length === 1 ? 'Account' : 'Accounts'} Connected
+          </div>
+        ) : !loading ? (
+          <button
+            className="secondary-button icon-button-text"
+            onClick={handleConnectGoogleChat}
+            disabled={connectingChat}
+          >
+            <Settings size={16} className={connectingChat ? 'spin' : ''} />
+            <span>{connectingChat ? 'Connecting…' : 'Connect Google Chat'}</span>
+          </button>
+        ) : null}
+        <button
+          className="icon-button"
+          onClick={() => fetchSpaces(selectedAccountEmail)}
+          disabled={loading}
+          title="Refresh"
+        >
+          <RefreshCw size={16} className={loading ? 'spin' : ''} />
+        </button>
+      </div>
 
       {/* No accounts connected empty state */}
       {!loading && accounts.length === 0 && (
-        <div className="no-active-chat" style={{ height: '60vh' }}>
+        <div className="no-active-chat no-active-chat--large">
           <MessageSquare size={48} />
           <h3>No Google Chat Accounts Connected</h3>
           <p>
@@ -181,8 +177,7 @@ export function ChatsPage({ onNavigate: _onNavigate }) {
             here. No need to go to Settings.
           </p>
           <button
-            className="primary-button"
-            style={{ marginTop: '12px', padding: '10px 20px' }}
+            className="primary-button chat-cta-button"
             onClick={handleConnectGoogleChat}
             disabled={connectingChat}
           >
@@ -193,13 +188,12 @@ export function ChatsPage({ onNavigate: _onNavigate }) {
 
       {/* Error state */}
       {error && accounts.length === 0 && (
-        <div className="no-active-chat" style={{ height: '40vh' }}>
+        <div className="no-active-chat no-active-chat--compact">
           <AlertCircle size={40} />
           <h3>Could Not Load Chats</h3>
           <p>{error}</p>
           <button
-            className="secondary-button"
-            style={{ marginTop: '12px' }}
+            className="secondary-button chat-retry-button"
             onClick={() => fetchSpaces(selectedAccountEmail)}
           >
             <RefreshCw size={15} /> Retry
@@ -276,6 +270,8 @@ export function ChatsPage({ onNavigate: _onNavigate }) {
                     key={space.id}
                     className={`chat-item ${space.id === activeSpaceId ? 'active' : ''}`}
                     onClick={() => setActiveSpaceId(space.id)}
+                    aria-current={space.id === activeSpaceId ? 'true' : undefined}
+                    aria-label={`Open ${space.name}`}
                   >
                     <div className="chat-item-avatar">
                       {space.type === 'space' ? (
@@ -349,7 +345,7 @@ export function ChatsPage({ onNavigate: _onNavigate }) {
                 {/* Messages */}
                 <div className="chat-messages-container">
                   {(activeSpace.messages || []).length === 0 ? (
-                    <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: '40px 20px', fontSize: '14px' }}>
+                    <div className="chat-empty-messages">
                       No messages yet. Say something!
                     </div>
                   ) : (
@@ -402,15 +398,7 @@ export function ChatsPage({ onNavigate: _onNavigate }) {
                 </div>
 
                 {sendError && (
-                  <p
-                    role="alert"
-                    style={{
-                      color: '#ffffff',
-                      fontSize: '12px',
-                      padding: '6px 24px',
-                      background: '#27272a',
-                    }}
-                  >
+                  <p role="alert" className="chat-send-error">
                     {sendError}
                   </p>
                 )}

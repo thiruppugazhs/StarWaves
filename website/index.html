@@ -2,15 +2,29 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/starwaves-logo.png" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0d080a" />
+    <!-- Pre-paint theme: Crimson Noir dark is the default (ADR 0028). Sets
+         dark-theme before first paint so fresh visitors never flash light. -->
+    <script>
+      try {
+        var storedTheme = localStorage.getItem('starwaves.theme')
+        if (storedTheme === 'dark' || !storedTheme) document.documentElement.classList.add('dark-theme')
+      } catch (e) {
+        document.documentElement.classList.add('dark-theme')
+      }
+    </script>
     <meta name="description" content="StarWaves is a productivity workspace for developers that unifies task management, calendar scheduling, competitive coding tracking, hackathon management, job application pipelines, and project documentation into one focused interface." />
     <meta name="application-name" content="StarWaves" />
+    <!-- Live2D Cubism 4 runtime core (Redistributable Code, Live2D Inc.).
+         Required by pixi-live2d-display/cubism4; loads before the app so
+         window.Live2DCubismCore exists when a Live2D model mounts. -->
+    <script src="/live2d/live2dcubismcore.min.js"></script>
     <title>StarWaves — Developer Productivity Workspace for Tasks, Calendar, Coding & Careers</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

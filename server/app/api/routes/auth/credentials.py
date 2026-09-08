@@ -1,4 +1,4 @@
-"""Email/password credential authentication: signup, login, and OTP verification."""
+"""Email/password credential authentication: signup and login."""
 
 import logging
 import uuid
@@ -9,15 +9,8 @@ from pydantic import BaseModel, EmailStr
 
 from app.api.routes.auth._shared import _send_welcome_email_best_effort
 from app.core.auth import create_session_token
-from app.core.config import settings
-from app.repositories.password import verify_password
-from app.repositories.users import (
-    create_email_otp,
-    create_user_with_password,
-    get_user_by_email,
-    verify_email_otp,
-)
-from app.services.email import send_otp_email
+from app.repositories.password import hash_password, needs_rehash, verify_password
+from app.repositories.users import create_user_with_password, get_user_by_email
 
 router = APIRouter(prefix="/auth")
 logger = logging.getLogger(__name__)
@@ -34,19 +27,13 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class VerifyOtpRequest(BaseModel):
-    email: EmailStr
-    otp: str
-
-
-class ResendOtpRequest(BaseModel):
-    email: EmailStr
-
-
 @router.post("/signup")
 def signup(
     payload: SignupRequest,
+    request: Request,
     database: SqlClient = Depends(get_firestore),
+    x_device_id: str | None = Header(default=None, alias="X-Device-Id"),
+    x_device_name: str | None = Header(default=None, alias="X-Device-Name"),
 ):
     try:
         user_record = create_user_with_password(
@@ -66,27 +53,34 @@ def signup(
             detail=str(exc),
         ) from None
 
-    # Generate 6-digit verification OTP
-    otp_code = create_email_otp(database, user_record["email"])
-    logger.info("Verification OTP for signup %s: %s", user_record["email"], otp_code)
+    _send_welcome_email_best_effort(
+        to_email=user_record["email"],
+        user_name=user_record["display_name"],
+    )
 
-    try:
-        send_otp_email(
-            to_email=user_record["email"],
-            user_name=user_record["display_name"],
-            otp_code=otp_code,
-        )
-    except Exception as exc:
-        logger.warning("Could not send signup verification email to %s: %s", user_record["email"], exc)
-
-    res = {
-        "status": "otp_required",
-        "email": user_record["email"],
-        "message": "A 6-digit verification code has been sent to your email.",
+    device_id = (x_device_id or uuid.uuid4().hex)[:64]
+    ua = request.headers.get("user-agent")
+    ip = request.client.host if request.client else None
+    token = create_session_token(
+        {
+            "uid": user_record["uid"],
+            "email": user_record["email"],
+            "name": user_record["display_name"],
+        },
+        device_id=device_id,
+        device_name=x_device_name,
+        user_agent=ua,
+        ip_address=ip,
+    )
+    return {
+        "token": token,
+        "user": {
+            "uid": user_record["uid"],
+            "email": user_record["email"],
+            "displayName": user_record["display_name"],
+            "emailVerified": bool(user_record.get("email_verified", False)),
+        },
     }
-    if not settings.smtp_host or settings.app_env != "production":
-        res["dev_otp"] = otp_code
-    return res
 
 
 @router.post("/login")
@@ -129,28 +123,20 @@ def login(
             detail="The email or password is incorrect.",
         ) from None
 
-    # Check if user needs email OTP verification
-    is_verified = bool(user_record.get("email_verified") or user_record.get("google_auth"))
-    if not is_verified:
-        otp_code = create_email_otp(database, clean_email)
-        logger.info("Verification OTP for unverified login %s: %s", clean_email, otp_code)
-        try:
-            send_otp_email(
-                to_email=user_record["email"],
-                user_name=user_record.get("display_name") or clean_email.split("@")[0],
-                otp_code=otp_code,
-            )
-        except Exception as exc:
-            logger.warning("Could not send login verification email to %s: %s", clean_email, exc)
-
-        res = {
-            "status": "otp_required",
-            "email": user_record["email"],
-            "message": "Please verify your email address. A 6-digit verification code has been sent to your email.",
-        }
-        if not settings.smtp_host or settings.app_env != "production":
-            res["dev_otp"] = otp_code
-        return res
+    # Transparent rehash: upgrade legacy 100k hashes to 600k on successful login
+    try:
+        if needs_rehash(user_record.get("password_salt", "")):
+            new_hash, new_salt = hash_password(payload.password)
+            from app.db import SqlClient as _SC  # local to avoid cycle
+            try:
+                database.collection("users").document(user_record["uid"]).update({
+                    "password_hash": new_hash,
+                    "password_salt": new_salt,
+                })
+            except Exception:
+                pass
+    except Exception:
+        pass
 
     try:
         device_id = (x_device_id or uuid.uuid4().hex)[:64]
@@ -174,15 +160,23 @@ def login(
         ) from exc
 
     return {
-        "status": "authenticated",
         "token": token,
         "user": {
             "uid": user_record["uid"],
             "email": user_record["email"],
             "displayName": user_record.get("display_name") or user_record["email"].split("@")[0],
-            "emailVerified": True,
+            "emailVerified": bool(user_record.get("email_verified", False)),
         },
     }
+
+
+class VerifyOtpRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+
+class ResendOtpRequest(BaseModel):
+    email: EmailStr
 
 
 @router.post("/verify-otp")
@@ -193,6 +187,7 @@ def verify_otp(
     x_device_id: str | None = Header(default=None, alias="X-Device-Id"),
     x_device_name: str | None = Header(default=None, alias="X-Device-Name"),
 ):
+    from app.repositories.users import verify_email_otp
     clean_email = payload.email.lower().strip()
     is_valid, err_msg = verify_email_otp(database, clean_email, payload.otp)
     if not is_valid:
@@ -246,6 +241,9 @@ def resend_otp(
     payload: ResendOtpRequest,
     database: SqlClient = Depends(get_firestore),
 ):
+    from app.core.config import settings
+    from app.repositories.users import create_email_otp
+    from app.services.email import send_otp_email
     clean_email = payload.email.lower().strip()
     user_record = get_user_by_email(database, clean_email)
     if not user_record:
@@ -272,3 +270,4 @@ def resend_otp(
     if not settings.smtp_host or settings.app_env != "production":
         res["dev_otp"] = otp_code
     return res
+

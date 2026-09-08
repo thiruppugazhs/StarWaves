@@ -1,0 +1,126 @@
+/* Contacts Shell — split from contacts.css (Wave E) */
+/* ── Contacts Page (Strict Monochrome) ── */
+.contacts-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-bottom: 2rem;
+}
+
+.contacts-page > .empty-state {
+  flex: 1 1 auto;
+  min-height: 360px;
+}
+
+.contacts-header,
+.contacts-page .page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.contacts-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.contacts-header-kicker {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.contacts-header h1,
+.contacts-page .page-heading h1 {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.03em;
+  line-height: var(--leading-tight);
+}
+
+.contacts-header p,
+.contacts-page .page-heading-description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--leading-normal);
+}
+
+.contacts-header-actions,
+.contacts-page .page-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex-wrap: wrap;
+}
+
+.contacts-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-2xs) 0;
+}
+
+.contacts-search-box {
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+
+.contacts-search-box.search-bar {
+  min-height: 38px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md, 10px);
+}
+
+.contacts-filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 2px 0;
+}
+
+.contacts-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.contacts-filter-pill:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-heavy);
+}
+
+.contacts-filter-pill.active {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border-color: var(--color-primary);
+}
+

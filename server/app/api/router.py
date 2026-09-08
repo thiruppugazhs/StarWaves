@@ -12,6 +12,7 @@ from app.api.routes import (
     documents,
     email,
     eve,
+    eve_avatar,
     eve_memory_settings,
     eve_schedules,
     eve_speech,
@@ -29,10 +30,12 @@ from app.api.routes import (
     todos,
     ui_preferences,
     unified_models,
+    updates,
     usage,
     whatsapp,
     workspace,
     workspace_files,
+    modeling,
 )
 
 api_router = APIRouter()
@@ -53,6 +56,7 @@ api_router.include_router(eve_stream.router, tags=["Eve AI assistant"])
 api_router.include_router(eve_schedules.router, tags=["Eve automated schedules"])
 api_router.include_router(eve_memory_settings.router, tags=["Eve memory settings"])
 api_router.include_router(eve_speech.router, tags=["Eve speech settings"])
+api_router.include_router(eve_avatar.router, tags=["Eve avatar"])
 api_router.include_router(gmail.router, tags=["Gmail integration"])
 api_router.include_router(
     competitive_coding_profile.router,
@@ -78,6 +82,8 @@ api_router.include_router(unified_models.router, tags=["Unified model discovery"
 api_router.include_router(studio.router, tags=["Studio builder"])
 api_router.include_router(workspace.router, tags=["workspace data"])
 api_router.include_router(workspace_files.router, tags=["workspace files"])
+api_router.include_router(modeling.router, tags=["3D modeling"])
 api_router.include_router(ui_preferences.router, tags=["UI preferences"])
 api_router.include_router(usage.router, tags=["usage"])
+api_router.include_router(updates.router, prefix="/updates", tags=["updates"])
 

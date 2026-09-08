@@ -62,7 +62,7 @@ export function parseIcsContent(icsData, calendarName = 'Imported Calendar', cal
         id: '',
         calendarId,
         calendarName,
-        calendarColor: '#71717a',
+        calendarColor: 'var(--text-muted)',
         title: '(Untitled event)',
         description: '',
         location: '',
@@ -118,7 +118,7 @@ export function parseIcsContent(icsData, calendarName = 'Imported Calendar', cal
     calendar: {
       id: calendarId,
       name: calendarName,
-      color: '#71717a',
+      color: 'var(--text-muted)',
       eventCount: events.length,
     },
     events,

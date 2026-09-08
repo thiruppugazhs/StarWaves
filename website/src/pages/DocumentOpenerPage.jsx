@@ -1,3 +1,4 @@
+import "../styles/pages/documents.css"
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft, ExternalLink, FileText, RefreshCw } from 'lucide-react'
 import { loadGoogleWorkspaceEditor } from '../lib/googleDriveApi'

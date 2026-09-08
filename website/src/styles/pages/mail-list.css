@@ -1,0 +1,166 @@
+/* Mail List — split from mails.css (Wave E) */
+.mail-list {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.mail-pagination {
+  align-items: center;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.mail-pagination button {
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  padding: 7px;
+  cursor: pointer;
+}
+
+.mail-pagination button:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.mail-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.mail-page-indicator {
+  appearance: textfield;
+  -moz-appearance: textfield;
+  width: 58px;
+  height: 34px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--text-primary);
+  padding: 0 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.mail-page-indicator::-webkit-inner-spin-button,
+.mail-page-indicator::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.mail-row {
+  position: relative;
+  align-items: center;
+  background: var(--bg-card);
+  border: 0;
+  border-bottom: 1px solid var(--border-color);
+  color: inherit;
+  display: grid;
+  font-size: 13px;
+  gap: 12px;
+  grid-template-columns: 24px 165px minmax(0, 1fr) 75px;
+  padding: 13px 18px;
+  text-align: left;
+  width: 100%;
+}
+
+.mail-row-main {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none !important;
+  color: inherit;
+  display: grid;
+  gap: 12px;
+  grid-column: 2 / -1;
+  grid-template-columns: 165px minmax(0, 1fr) 75px;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mail-row-main:focus-visible {
+  outline-offset: -2px;
+}
+
+.mail-row:hover {
+  background: var(--bg-hover-subtle);
+  box-shadow: inset 3px 0 var(--color-primary);
+}
+
+.mail-row.unread {
+  box-shadow: inset 3px 0 var(--module-mail);
+}
+
+.mail-row.unread:hover {
+  box-shadow: inset 3px 0 var(--module-mail);
+}
+
+.mail-row:not(.unread) {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.mail-row strong,
+.mail-row b,
+.mail-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mail-row:not(.unread) strong,
+.mail-row:not(.unread) b {
+  font-weight: 500;
+}
+
+.mail-row-main > span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mail-row time {
+  color: var(--text-muted);
+  font-size: 11px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.mail-star {
+  background: transparent;
+  border: 0;
+  box-shadow: none !important;
+  border-radius: 4px;
+  display: grid;
+  padding: 4px;
+  place-items: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.mail-star:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.mail-row .starred,
+.mail-reader .starred {
+  color: var(--text-primary);
+  fill: var(--text-primary);
+}
+

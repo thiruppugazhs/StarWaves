@@ -21,6 +21,21 @@
   padding-top: 18px;
 }
 
+.hackathons-page .contest-site-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.hackathons-page .contest-site-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--palette-ember), transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
 .hackathon-list > .empty-state,
 .hackathon-empty-state {
   grid-column: 1 / -1;
@@ -31,7 +46,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 22px;
+  margin-top: 0;
   padding: 10px;
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -405,6 +420,15 @@
   gap: 20px;
 }
 
+.hackathon-detail-header h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.03em;
+}
+
 .hackathon-organizer-subhead {
   color: var(--text-secondary);
   font-size: 13px;
@@ -466,4 +490,3 @@
 .hackathon-url-display a:hover {
   opacity: 0.85;
 }
-

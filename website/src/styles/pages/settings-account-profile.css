@@ -1,0 +1,328 @@
+/* Settings Account Profile — split from settings.css (Wave F) */
+/* Profile Card */
+.profile-card {
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 14px);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 22px;
+}
+
+.profile-card-avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.profile-card-header h3 {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+}
+
+.profile-card-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.profile-card-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+  margin-left: auto;
+}
+
+.profile-card-actions .profile-card-btn {
+  min-height: 32px;
+  padding: 6px var(--space-xs);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.profile-verification-actions {
+  display: flex;
+  gap: var(--space-2xs);
+  flex-wrap: wrap;
+  margin-top: var(--space-xs);
+}
+
+.profile-verified-badge {
+  font-size: var(--text-sm);
+  padding: var(--space-3xs) var(--space-xs);
+  cursor: default;
+  opacity: 0.85;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+.profile-verify-btn {
+  font-size: var(--text-sm);
+  padding: var(--space-3xs) var(--space-xs);
+}
+
+.profile-feedback-spaced {
+  margin-top: var(--space-2xs);
+}
+
+.profile-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--border-color);
+}
+
+.profile-detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+}
+
+.profile-detail + .profile-detail {
+  border-left: 1px solid var(--border-color);
+}
+
+.profile-detail strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.profile-detail span {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Combined Accounts & SMTP Access Sharing */
+.combined-accounts-section {
+  padding: 22px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.combined-accounts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.combined-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.combined-smtp-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs, 4px);
+}
+
+.combined-description {
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.combine-account-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.combine-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  transition: border-color var(--transition-fast, 140ms ease);
+}
+
+.combine-input-group:focus-within {
+  border-color: var(--border-heavy, var(--text-primary));
+}
+
+.combine-input-group svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.combine-input-group input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.combine-input-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.combine-input-group input:focus {
+  outline: none;
+}
+
+.combine-submit-btn {
+  white-space: nowrap;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.combine-submit-btn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.combine-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.combine-feedback {
+  margin: 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  line-height: 1.4;
+}
+
+.combine-feedback.success {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.combine-feedback.error {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-heavy);
+}
+
+.combined-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.combined-list h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.combined-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+}
+
+.combined-item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.combined-item-info svg {
+  color: var(--text-primary);
+}
+
+.combined-item-info strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.combined-item-info small {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.unlink-account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.unlink-account-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.pending-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-xs, 4px);
+  font-weight: 600;
+}
+

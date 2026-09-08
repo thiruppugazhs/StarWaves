@@ -20,9 +20,28 @@ from app.core.cors import ALLOWED_ORIGIN_REGEX, is_allowed_origin as _is_allowed
 from app.core.rate_limit import RateLimitMiddleware
 from app.core.worker import server_worker
 
+from fastapi.staticfiles import StaticFiles
+
 from app.db.session import init_db
 
 logger = logging.getLogger(__name__)
+
+
+def _is_studio_preview_path(path: str) -> bool:
+    """Return whether a request serves a signed Studio preview document."""
+    preview_prefix = f"{settings.api_v1_prefix.rstrip('/')}/studio/preview/"
+    return path.startswith(preview_prefix)
+
+
+def _studio_preview_frame_ancestors() -> str:
+    """Build the narrow frame policy required by the cross-origin preview iframe."""
+    origins = {"'self'", "http://localhost:5173", "http://127.0.0.1:5173"}
+    origins.update(
+        origin.rstrip("/")
+        for origin in [settings.frontend_url, *settings.cors_origins]
+        if origin.startswith(("http://", "https://"))
+    )
+    return " ".join(sorted(origins))
 
 
 @asynccontextmanager
@@ -44,7 +63,7 @@ async def lifespan(app: FastAPI):
         logger.warning("Could not auto-init database tables: %s", err)
     # Unified serverless detection: VERCEL (Vercel), AWS_LAMBDA_FUNCTION_NAME (Lambda), or explicit IS_SERVERLESS
     is_serverless = bool(
-        os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or os.getenv("IS_SERVERLESS") == "true"
+        os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or (os.getenv("IS_SERVERLESS", "").lower() == "true")
     )
     if not is_serverless:
         try:
@@ -79,7 +98,7 @@ def create_app() -> FastAPI:
         allow_origin_regex=ALLOWED_ORIGIN_REGEX,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With"],
+        allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With", "X-Device-Id", "X-Device-Name"],
         expose_headers=["Content-Length"],
         max_age=86400,
     )
@@ -88,15 +107,21 @@ def create_app() -> FastAPI:
     async def security_headers_middleware(request: Request, call_next):
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "SAMEORIGIN"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(self), camera=(self)"
         if request.url.scheme == "https":
             response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
-        response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; "
-            "style-src 'self' 'unsafe-inline'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'"
-        )
+        if _is_studio_preview_path(request.url.path):
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; "
+                f"frame-ancestors {_studio_preview_frame_ancestors()}; object-src 'none'; base-uri 'self'"
+            )
+        else:
+            response.headers["X-Frame-Options"] = "SAMEORIGIN"
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; "
+                "style-src 'self' 'unsafe-inline'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'"
+            )
         return response
 
     @application.exception_handler(FastAPIHTTPException)
@@ -148,6 +173,30 @@ def create_app() -> FastAPI:
     application.include_router(calls_ws_router)
     application.include_router(whatsapp_ws_router)
     application.include_router(twilio_relay_router)
+
+    # Root /health alias for load balancers and direct probe requests
+    @application.get("/health", include_in_schema=False)
+    async def root_health_check(request: Request):
+        from app.services.health import collect_health
+        payload = await collect_health(app=request.app, detailed=False)
+        return JSONResponse(content=payload)
+
+    # Backend-hosted updater static alias: /updates -> server/static/updates
+    # Serves APKs/EXEs/.sigs + OTA bundles; /api/v1/updates/latest.json is the Tauri entrypoint
+    try:
+        from pathlib import Path
+
+        updates_dir = Path(__file__).resolve().parents[1] / "static" / "updates"
+        # ENV override
+        import os as _os
+
+        _env_dir = _os.getenv("UPDATES_DIR") or _os.getenv("STATIC_UPDATES_DIR") or getattr(settings, "updates_dir", None)
+        if _env_dir:
+            updates_dir = Path(_env_dir)
+        updates_dir.mkdir(parents=True, exist_ok=True)
+        application.mount("/updates", StaticFiles(directory=str(updates_dir)), name="updates-static")
+    except Exception as exc:  # pragma: no cover
+        logger.warning("Could not mount /updates static dir: %s", exc)
 
     return application
 

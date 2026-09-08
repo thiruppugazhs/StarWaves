@@ -33,7 +33,7 @@ def extract_usage_from_response(raw: Any, fallback_text: str | None = None) -> t
             else:
                 p = getattr(usage, "prompt_tokens", None) or getattr(usage, "input_tokens", None) or 0
                 c = getattr(usage, "completion_tokens", None) or getattr(usage, "output_tokens", None) or 0
-                t = getattr(usage, "total_tokens", None) or getattr(usage, "total_tokens", None) or (p + c)
+                t = getattr(usage, "total_tokens", None) or getattr(usage, "totalTokens", None) or (p + c)
                 # Some SDKs use input_tokens/output_tokens
                 if not p and hasattr(usage, "input_tokens"):
                     p = usage.input_tokens
@@ -51,6 +51,13 @@ def extract_usage_from_response(raw: Any, fallback_text: str | None = None) -> t
             u = raw.get("usage") or raw.get("usageMetadata")
             if u:
                 return extract_usage_from_response(u, fallback_text)
+            # Direct dict containing token counts (e.g. {"prompt_tokens":100,...})
+            if any(k in raw for k in ("prompt_tokens", "input_tokens", "inputTokens", "completion_tokens", "output_tokens", "outputTokens", "total_tokens", "totalTokens")):
+                p = raw.get("prompt_tokens") or raw.get("input_tokens") or raw.get("inputTokens") or 0
+                c = raw.get("completion_tokens") or raw.get("output_tokens") or raw.get("outputTokens") or 0
+                t = raw.get("total_tokens") or raw.get("totalTokens") or (p + c)
+                if t or p or c:
+                    return int(p or 0), int(c or 0), int(t or (p + c))
     except Exception:
         pass
     est = _estimate_tokens(fallback_text)
@@ -72,5 +79,13 @@ def log_usage(
 
         with Session(sync_engine) as session:
             usage_repo.create_usage(session, user_id, provider, model, kind, prompt, completion, total)
+        # Invalidate per-user usage caches so next summary/logs GET reflects fresh tokens
+        try:
+            from app.core.cache import cache_invalidate_prefix
+
+            cache_invalidate_prefix(f"usage:summary:{user_id}")
+            cache_invalidate_prefix(f"usage:logs:{user_id}")
+        except Exception:
+            pass
     except Exception:
         pass

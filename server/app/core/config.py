@@ -19,7 +19,7 @@ class Settings:
     api_v1_prefix: str = os.getenv("API_V1_PREFIX", "/api/v1")
     cors_origins_raw: str = os.getenv(
         "CORS_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173,https://starwaves.app,https://starwaves.vercel.app",
+        "https://starwaves.susindran.in,http://localhost:5173,http://127.0.0.1:5173",
     )
     firebase_project_id: str | None = os.getenv("FIREBASE_PROJECT_ID")
     firebase_private_key: str | None = os.getenv("FIREBASE_PRIVATE_KEY")
@@ -77,13 +77,15 @@ class Settings:
         "AUTH_GOOGLE_CALLBACK_URL",
         "http://127.0.0.1:8000/api/v1/auth/google/callback",
     )
+    native_app_scheme_android: str = os.getenv("NATIVE_APP_SCHEME_ANDROID", "com.starwaves.app")
+    native_app_scheme_tauri: str = os.getenv("NATIVE_APP_SCHEME_TAURI", "app.starwaves.workspace")
     auth_secret_key: str = os.getenv("AUTH_SECRET_KEY") or (
         "starwaves-super-secret-auth-key-change-in-prod" if app_env != "production" else ""
     )
-    default_ai_provider: str = os.getenv("DEFAULT_AI_PROVIDER", "gemini")
+    default_ai_provider: str = os.getenv("DEFAULT_AI_PROVIDER", "openrouter")
     openai_api_key: str | None = os.getenv("OPENAI_API_KEY")
     openai_url: str | None = os.getenv("OPENAI_URL") or None
-    openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
+    openai_model: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
     anthropic_api_key: str | None = os.getenv("ANTHROPIC_API_KEY")
     anthropic_url: str | None = os.getenv("ANTHROPIC_URL") or None
     anthropic_model: str = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
@@ -92,7 +94,7 @@ class Settings:
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     groq_api_key: str | None = os.getenv("GROQ_API_KEY")
     groq_url: str | None = os.getenv("GROQ_URL") or None
-    groq_model: str = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
+    groq_model: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
     groq_voice_model: str = os.getenv("GROQ_VOICE_MODEL", "llama-3.1-8b-instant")
     groq_stt_model: str = os.getenv("GROQ_STT_MODEL", "whisper-large-v3-turbo")
     deepgram_api_key: str | None = os.getenv("DEEPGRAM_API_KEY")
@@ -100,7 +102,7 @@ class Settings:
     deepgram_stt_model: str = os.getenv("DEEPGRAM_STT_MODEL", "nova-3")
     openrouter_api_key: str | None = os.getenv("OPENROUTER_API_KEY")
     openrouter_url: str | None = os.getenv("OPENROUTER_URL") or None
-    openrouter_model: str = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o")
+    openrouter_model: str = os.getenv("OPENROUTER_MODEL", "openrouter/free")
     ollama_url: str | None = os.getenv("OLLAMA_URL") or None
     ollama_model: str = os.getenv("OLLAMA_MODEL", "llama3.1")
     ollama_api_key: str | None = os.getenv("OLLAMA_API_KEY")
@@ -113,9 +115,6 @@ class Settings:
         "https://texttospeech.googleapis.com/v1",
     )
     google_cloud_tts_voice: str = os.getenv("GOOGLE_CLOUD_TTS_VOICE", "en-US-Standard-C")
-    elevenlabs_api_key: str | None = os.getenv("ELEVENLABS_API_KEY")
-    elevenlabs_model_id: str = os.getenv("ELEVENLABS_MODEL_ID", "eleven_turbo_v2_5")
-    elevenlabs_voice_id: str = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
     openrouter_tts_model: str = os.getenv("OPENROUTER_TTS_MODEL", "fish-audio/s2.1-pro-free:free")
     openrouter_tts_voice: str = os.getenv("OPENROUTER_TTS_VOICE", "alloy")
     openrouter_tts_url: str | None = os.getenv("OPENROUTER_TTS_URL") or None
@@ -131,7 +130,7 @@ class Settings:
     smtp_port: int = int(os.getenv("SMTP_PORT", "587"))
     smtp_user: str | None = os.getenv("SMTP_USER")
     smtp_password: str | None = os.getenv("SMTP_PASSWORD")
-    smtp_from_email: str = os.getenv("SMTP_FROM_EMAIL", "noreply@starwaves.app")
+    smtp_from_email: str = os.getenv("SMTP_FROM_EMAIL", "noreply@starwaves.susindran.in")
     smtp_use_tls: bool = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
     smtp_use_ssl: bool = os.getenv("SMTP_USE_SSL", "false").lower() == "true"
     cron_secret: str | None = os.getenv("CRON_SECRET") or (
@@ -142,6 +141,7 @@ class Settings:
         os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or os.getenv("IS_SERVERLESS", "false").lower() == "true"
     )
     workspace_storage_path: str = os.getenv("WORKSPACE_STORAGE_PATH", "workspaces")
+    modeling_asset_max_bytes: int = int(os.getenv("MODELING_ASSET_MAX_BYTES", str(100 * 1024 * 1024)))
     redis_url: str | None = os.getenv("REDIS_URL") or None
     studio_preview_domain: str = os.getenv(
         "STUDIO_PREVIEW_DOMAIN",
@@ -152,12 +152,15 @@ class Settings:
         "WHATSAPP_GATEWAY_URL",
         "http://whatsapp-worker:3001" if os.path.exists("/.dockerenv") else "http://127.0.0.1:3001",
     )
-    whatsapp_eve_tag: str = os.getenv("WHATSAPP_EVE_TAG", "@assistant")
-    whatsapp_owner_name: str = os.getenv("WHATSAPP_OWNER_NAME", "User")
-    whatsapp_owner_aliases_raw: str = os.getenv("WHATSAPP_OWNER_ALIASES", "@me,@user")
+    whatsapp_eve_tag: str = os.getenv("WHATSAPP_EVE_TAG", "@eve")
+    whatsapp_owner_name: str = os.getenv("WHATSAPP_OWNER_NAME", "Susindran")
+    whatsapp_owner_aliases_raw: str = os.getenv("WHATSAPP_OWNER_ALIASES", "@susindran,@susin,@susindran_d")
     whatsapp_my_number: str = os.getenv("WHATSAPP_MY_NUMBER", "")
     whatsapp_my_jid: str = os.getenv("WHATSAPP_MY_JID", "")
     whatsapp_worker_secret: str | None = os.getenv("WHATSAPP_WORKER_SECRET")
+    updates_dir: str | None = os.getenv("UPDATES_DIR") or os.getenv("STATIC_UPDATES_DIR")
+    updater_secret: str | None = os.getenv("UPDATER_SECRET") or os.getenv("OTA_SECRET")
+    tauri_signing_public_key: str | None = os.getenv("TAURI_SIGNING_PUBLIC_KEY")
 
     # Twilio PSTN provider (dual call option: in-app WebRTC vs PSTN)
     twilio_account_sid: str | None = os.getenv("TWILIO_ACCOUNT_SID")

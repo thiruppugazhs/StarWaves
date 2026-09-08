@@ -12,7 +12,6 @@ import {
 import {
   buildSearchIndex,
   filterSearchItems,
-  SEARCH_CATEGORIES,
 } from '../../config/searchIndex'
 
 const RECENT_SEARCHES_KEY = 'starwaves.recent_searches'
@@ -24,6 +23,7 @@ export function AdvancedSearchModal({
   onNavigate,
   onCreate,
   callCenter,
+  toggleTheme,
   setDarkTheme,
   setEveOpen,
   setNotificationsOpen,
@@ -33,7 +33,6 @@ export function AdvancedSearchModal({
   initialQuery = '',
 }) {
   const [query, setQuery] = useState(initialQuery)
-  const [selectedCategory, setSelectedCategory] = useState('all')
   const [activeIndex, setActiveIndex] = useState(0)
   const [recentSearches, setRecentSearches] = useState(() => {
     try {
@@ -51,7 +50,6 @@ export function AdvancedSearchModal({
   useEffect(() => {
     if (isOpen) {
       setQuery(initialQuery)
-      setSelectedCategory('all')
       setActiveIndex(0)
       window.requestAnimationFrame(() => {
         inputRef.current?.focus()
@@ -65,10 +63,10 @@ export function AdvancedSearchModal({
     return buildSearchIndex(workspaceData)
   }, [workspaceData])
 
-  // Filter items based on current query and category
+  // Filter items based on current query
   const filteredItems = useMemo(() => {
-    return filterSearchItems(fullIndex, query, selectedCategory)
-  }, [fullIndex, query, selectedCategory])
+    return filterSearchItems(fullIndex, query, 'all')
+  }, [fullIndex, query])
 
   // Group filtered items for presentation
   const groupedResults = useMemo(() => {
@@ -202,7 +200,9 @@ export function AdvancedSearchModal({
           }
           break
         case 'toggle-theme':
-          if (setDarkTheme) {
+          if (toggleTheme) {
+            toggleTheme()
+          } else if (setDarkTheme) {
             setDarkTheme((current) => !current)
           }
           break
@@ -340,33 +340,48 @@ export function AdvancedSearchModal({
           </button>
         </div>
 
-        {/* Category Pills Filter */}
-        <div className="search-palette-categories">
-          {SEARCH_CATEGORIES.map((cat) => {
-            const count =
-              cat.id === 'all'
-                ? fullIndex.length
-                : fullIndex.filter((item) => item.category === cat.id).length
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                className={`search-palette-pill ${selectedCategory === cat.id ? 'active' : ''}`}
-                onClick={() => {
-                  setSelectedCategory(cat.id)
-                  setActiveIndex(0)
-                  inputRef.current?.focus()
-                }}
-              >
-                <span>{cat.label}</span>
-                <span className="search-palette-pill-count">{count}</span>
-              </button>
-            )
-          })}
-        </div>
-
         {/* Results List */}
         <div className="search-palette-body" ref={listRef}>
+          {/* Recent Pages (only when query is empty — hidden while searching) */}
+          {!query && recentSearches.length > 0 && (
+            <div className="search-palette-recents">
+              <div className="search-palette-recents-header">
+                <span>
+                  <Clock size={13} />
+                  Recent Pages
+                </span>
+                <button
+                  type="button"
+                  className="search-palette-recents-clear"
+                  onClick={clearRecentSearches}
+                >
+                  <Trash2 size={12} />
+                  Clear
+                </button>
+              </div>
+              <div className="search-palette-recents-chips">
+                {recentSearches.map((rec) => (
+                  <button
+                    key={rec.id}
+                    type="button"
+                    className="search-palette-recent-chip"
+                    onClick={() => {
+                      const found = fullIndex.find((i) => i.id === rec.id)
+                      if (found) {
+                        handleSelectItem(found)
+                      } else {
+                        setQuery(rec.title)
+                      }
+                    }}
+                  >
+                    <span>{rec.title}</span>
+                    <ArrowRight size={11} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {flatItems.length === 0 ? (
             <div className="search-palette-empty">
               <Search size={28} className="empty-icon" />
@@ -421,46 +436,6 @@ export function AdvancedSearchModal({
                 </div>
               </div>
             ))
-          )}
-
-          {/* Recent Searches (when query is empty and recents exist) */}
-          {!query && recentSearches.length > 0 && selectedCategory === 'all' && (
-            <div className="search-palette-recents">
-              <div className="search-palette-recents-header">
-                <span>
-                  <Clock size={13} />
-                  Recent Searches
-                </span>
-                <button
-                  type="button"
-                  className="search-palette-recents-clear"
-                  onClick={clearRecentSearches}
-                >
-                  <Trash2 size={12} />
-                  Clear
-                </button>
-              </div>
-              <div className="search-palette-recents-chips">
-                {recentSearches.map((rec) => (
-                  <button
-                    key={rec.id}
-                    type="button"
-                    className="search-palette-recent-chip"
-                    onClick={() => {
-                      const found = fullIndex.find((i) => i.id === rec.id)
-                      if (found) {
-                        handleSelectItem(found)
-                      } else {
-                        setQuery(rec.title)
-                      }
-                    }}
-                  >
-                    <span>{rec.title}</span>
-                    <ArrowRight size={11} />
-                  </button>
-                ))}
-              </div>
-            </div>
           )}
         </div>
 

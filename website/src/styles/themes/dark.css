@@ -1,43 +1,105 @@
 html.dark-theme {
-  /* Colors - Dark Theme Overrides */
-  --bg-primary: #080808;
-  --bg-secondary: #121212;
-  --bg-tertiary: #1a1a1a;
-  --bg-card: #141414;
-  --bg-card-hover: #1f1f1f;
-  --bg-hover: #222222;
-  --bg-hover-subtle: #191919;
-  --bg-overlay: rgba(18, 18, 18, 0.92);
+  /* Colors - Dark Theme Overrides (Crimson Noir default, ADR 0023) */
+  --bg-primary: #0d080a;
+  --bg-secondary: #1a0f13;
+  --bg-tertiary: #24121a;
+  --bg-card: #2e1823;
+  --bg-card-hover: #3a1f2c;
+  --bg-hover: #3a1f2c;
+  --bg-hover-subtle: #24121a;
+  --bg-overlay: rgba(26, 15, 19, 0.92);
   --bg-backdrop: rgba(0, 0, 0, 0.55);
 
-  --text-primary: #e4e4e7;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --text-disabled: #52525b;
-  --text-inverse: #09090b;
+  --text-primary: #f8f9fa;
+  --text-secondary: #b6a9b0;
+  --text-muted: #7a6a73;
+  --text-disabled: #5c4a54;
+  --text-inverse: #0d080a;
 
-  --color-primary: #f4f4f5;
-  --color-primary-hover: #e4e4e7;
-  --color-primary-light: #222222;
+  --color-primary: #a83b59;
+  --color-primary-hover: #c75a73;
+  --color-primary-light: rgba(168, 59, 89, 0.16);
   --color-foam: #ffffff;
 
-  --border-color: #27272a;
-  --border-light: #1e1e1e;
-  --border-heavy: #3f3f46;
-  --border-focus: #71717a;
+  --border-color: #542033;
+  --border-light: #2e1823;
+  --border-heavy: #7a2e45;
+  --border-focus: #c75a73;
 
-  --scrollbar-track: #141414;
-  --scrollbar-thumb: #52525b;
-  --scrollbar-thumb-hover: #a1a1aa;
+  --scrollbar-track: #1a0f13;
+  --scrollbar-thumb: #542033;
+  --scrollbar-thumb-hover: #a83b59;
 
-  --color-accent: #f4f4f5;
-  --color-accent-light: #27272a;
-  --color-success: #f4f4f5;
-  --color-success-light: #27272a;
-  --color-warning: #a1a1aa;
-  --color-warning-light: #27272a;
-  --color-danger: #f4f4f5;
-  --color-danger-light: #27272a;
-  --color-purple: #a1a1aa;
-  --color-purple-light: #27272a;
+  --color-accent: #c75a73;
+  --color-accent-light: rgba(199, 90, 115, 0.16);
+  --color-success: #22c55e;
+  --color-success-light: rgba(34, 197, 94, 0.16);
+  --color-warning: #f59e0b;
+  --color-warning-light: rgba(245, 158, 11, 0.16);
+  --color-danger: #f43f5e;
+  --color-danger-light: rgba(244, 63, 94, 0.16);
+  --color-purple: #a855f7;
+  --color-purple-light: rgba(168, 85, 247, 0.16);
+
+  /* Domain & Module Accent Color Identity (Dark Glow) */
+  --module-work: #6366f1;
+  --module-work-light: rgba(99, 102, 241, 0.16);
+  --module-workspace: #fbbf24;
+  --module-workspace-light: rgba(251, 191, 36, 0.16);
+  --module-todo: #22d3ee;
+  --module-todo-light: rgba(34, 211, 238, 0.16);
+  --module-projects: #3b82f6;
+  --module-projects-light: rgba(59, 130, 246, 0.16);
+  --module-documents: #38bdf8;
+  --module-documents-light: rgba(56, 189, 248, 0.16);
+  --module-studio: #a855f7;
+  --module-studio-light: rgba(168, 85, 247, 0.16);
+  --module-eve: #f43f5e;
+  --module-eve-light: rgba(244, 63, 94, 0.16);
+  --module-growth: #10b981;
+  --module-growth-light: rgba(16, 185, 129, 0.16);
+  --module-comm: #38bdf8;
+  --module-comm-light: rgba(56, 189, 248, 0.16);
+  --module-whatsapp: #22c55e;
+  --module-whatsapp-light: rgba(34, 197, 94, 0.16);
+  --module-mail: #fb7185;
+  --module-mail-light: rgba(251, 113, 133, 0.16);
+  --module-calendar: #38bdf8;
+  --module-calendar-light: rgba(56, 189, 248, 0.16);
+  --module-calls: #c084fc;
+  --module-calls-light: rgba(192, 132, 252, 0.16);
+  --module-chats: #818cf8;
+  --module-chats-light: rgba(129, 140, 248, 0.16);
+  --module-account: #94a3b8;
+  --module-account-light: rgba(148, 163, 184, 0.16);
+
+  /* Palette overrides — single source lives in styles/tokens.css */
+  --nav-bg: rgba(13, 8, 10, 0.92);
+
+  --heat-1: #1e3a5f;
+  --heat-2: #3b82f6;
+  --heat-3: #3b82f6;
+  --heat-4: #60a5fa;
+  --heat-empty: #1e1e1e;
+  --heat-empty-border: #2a2a2a;
+
+  --tooltip-bg: #14090d;
+  --tooltip-border: #3a1f2c;
+
+  /* Glassmorphism — dark overrides */
+  --glass-bg: rgba(26, 15, 19, 0.52);
+  --glass-bg-card: rgba(46, 18, 28, 0.6);
+  --glass-bg-overlay: rgba(13, 8, 10, 0.72);
+  --glass-bg-sidebar: rgba(16, 9, 12, 0.65);
+  --glass-bg-topbar: rgba(13, 8, 10, 0.72);
+  --glass-bg-dropdown: rgba(30, 17, 23, 0.82);
+  --glass-bg-input: rgba(0, 0, 0, 0.35);
+  --glass-bg-input-focus: rgba(0, 0, 0, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-border-card: rgba(255, 255, 255, 0.07);
+  --glass-border-input: rgba(255, 255, 255, 0.12);
+  --glass-border-subtle: rgba(255, 255, 255, 0.04);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --glass-shadow-lifted: 0 20px 60px rgba(0, 0, 0, 0.75), 0 6px 16px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --glass-shadow-modal: 0 32px 80px rgba(0, 0, 0, 0.85), 0 8px 24px rgba(0, 0, 0, 0.60), inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }

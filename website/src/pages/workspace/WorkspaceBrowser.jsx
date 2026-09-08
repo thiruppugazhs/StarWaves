@@ -1,3 +1,4 @@
+import '../../styles/pages/workspace-panels.css'
 import { useEffect, useState } from 'react'
 import { ArrowUpRight, Globe, RefreshCw, X } from 'lucide-react'
 

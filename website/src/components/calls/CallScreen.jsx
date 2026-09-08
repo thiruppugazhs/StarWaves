@@ -1,3 +1,5 @@
+import '../../styles/pages/calls-page.css'
+import '../../styles/pages/eve-call-ui.css'
 import { useEffect, useRef, useState } from 'react'
 import {
   Bot,

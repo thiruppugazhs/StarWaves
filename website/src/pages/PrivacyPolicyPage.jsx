@@ -37,7 +37,7 @@ export function PrivacyPolicyPage({ onNavigate }) {
           <section>
             <h2>1. Overview</h2>
             <p>
-              StarWaves (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your data when you visit <strong>starwaves.app</strong> or use the StarWaves workspace application and integrations.
+              StarWaves (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your data when you visit <strong>starwaves.susindran.in</strong> or use the StarWaves workspace application and integrations.
             </p>
           </section>
 
@@ -101,8 +101,8 @@ export function PrivacyPolicyPage({ onNavigate }) {
               If you have any questions or concerns regarding this Privacy Policy, please contact us at:
             </p>
             <p className="legal-contact">
-              Email: <a href="mailto:support@starwaves.app" className="legal-link">support@starwaves.app</a><br />
-              Domain: starwaves.app
+              Email: <a href="mailto:dev@susindran.in" className="legal-link">dev@susindran.in</a><br />
+              Domain: starwaves.susindran.in
             </p>
           </section>
         </article>

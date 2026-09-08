@@ -1,0 +1,298 @@
+/* Workspace Eve Panel — App Theme Styled */
+
+.workspace-eve-collapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  padding: 6px 4px;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.workspace-eve-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  cursor: pointer;
+  border-radius: var(--radius-xs, 4px);
+  color: var(--text-secondary);
+  transition: background var(--transition-fast, 140ms ease), color var(--transition-fast, 140ms ease);
+}
+
+.workspace-eve-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.workspace-eve-panel {
+  width: 300px;
+  min-width: 240px;
+  max-width: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.workspace-eve-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  height: 35px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+}
+
+.workspace-eve-header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text-secondary);
+}
+
+.workspace-eve-chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-card);
+}
+
+.workspace-eve-chat::-webkit-scrollbar {
+  width: 6px;
+}
+
+.workspace-eve-chat::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 0;
+}
+
+.workspace-eve-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  color: var(--text-muted);
+  font-size: var(--text-xs, 12px);
+  text-align: center;
+  padding: 24px;
+}
+
+.workspace-eve-empty p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.workspace-eve-empty span {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.workspace-eve-message {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: var(--text-xs, 12px);
+  line-height: 1.5;
+  max-width: 90%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.workspace-eve-message.user {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: var(--text-inverse, #ffffff);
+}
+
+.workspace-eve-message.assistant {
+  align-self: flex-start;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.workspace-eve-message.assistant.streaming::after {
+  content: '▍';
+  margin-left: 2px;
+  animation: workspace-eve-caret 1s steps(2) infinite;
+}
+
+@keyframes workspace-eve-caret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-eve-message.assistant.streaming::after {
+    animation: none;
+  }
+}
+
+.workspace-eve-thinking {
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: var(--radius-xs, 4px);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  max-width: 90%;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.workspace-eve-thinking-label {
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.workspace-eve-thinking-text {
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.workspace-eve-message.assistant.streaming:has(.eve-streaming-cursor)::after {
+  content: none;
+  display: none;
+}
+
+.workspace-eve-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 3px 8px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-full, 999px);
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+}
+
+.workspace-eve-error {
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-danger, #e11d48);
+  background: var(--color-danger-light, #fff1f2);
+  border-top: 1px solid var(--color-danger, #e11d48);
+  flex-shrink: 0;
+}
+
+.workspace-eve-input {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  padding: 6px 8px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+}
+
+.workspace-eve-model-row {
+  display: flex;
+  min-width: 0;
+}
+
+.workspace-eve-model-selector {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.workspace-eve-model-selector .model-selector-trigger {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 24px;
+  padding: 3px 5px;
+  border: 0;
+  border-radius: var(--radius-xs, 4px);
+  background: transparent;
+  font-size: var(--text-xs, 12px);
+  font-weight: 650;
+}
+
+.workspace-eve-model-selector .model-selector-label {
+  max-width: 190px;
+}
+
+.workspace-eve-model-selector .model-selector-trigger:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+.workspace-eve-compose-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.workspace-eve-compose-row input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs, 4px);
+  font-size: var(--text-xs, 12px);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast, 140ms ease);
+  font-family: inherit;
+}
+
+.workspace-eve-input input:focus {
+  border-color: var(--color-primary);
+}
+
+.workspace-eve-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: var(--color-primary);
+  color: var(--text-inverse, #ffffff);
+  border-radius: var(--radius-xs, 4px);
+  cursor: pointer;
+  transition: opacity var(--transition-fast, 140ms ease);
+  flex-shrink: 0;
+}
+
+.workspace-eve-send:hover {
+  opacity: 0.9;
+}
+
+.workspace-eve-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

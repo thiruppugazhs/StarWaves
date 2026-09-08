@@ -1,0 +1,72 @@
+/* Mobile bottom tab bar (≤900px) — Home · Search · Eve · Studio · You */
+
+.mobile-tabbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobile-tabbar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .mobile-tabbar button {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    min-height: 52px;
+    padding: 6px 2px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: color var(--transition-fast), background var(--transition-fast);
+  }
+
+  .mobile-tabbar button:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+  }
+
+  .mobile-tabbar button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  .mobile-tabbar button.is-active {
+    color: var(--color-primary);
+  }
+
+  .mobile-tabbar button[data-module="eve"].is-active {
+    color: var(--module-eve);
+  }
+
+  .mobile-tabbar button[data-module="studio"].is-active {
+    color: var(--module-studio);
+  }
+
+  /* Keep scrolled content clear of the fixed bar */
+  .content {
+    padding-bottom: 84px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-tabbar button {
+    transition: none;
+  }
+}

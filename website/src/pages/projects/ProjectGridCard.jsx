@@ -5,30 +5,7 @@ import { getProjectPhase } from '../../utils/projectLifecycle'
 import { getStatusClass } from './constants'
 
 export function ProjectGridCard({ project, onOpenProject, onDelete, onQuickProgress }) {
-  const renderAvatarStack = (membersCount) => {
-    const count = Math.min(membersCount || 1, 3)
-    const avatars = []
-    const prefixes = ['JD', 'AB', 'SK', 'ML']
-    for (let i = 0; i < count; i++) {
-      avatars.push(
-        <span key={i} className="project-avatar-bubble">
-          {prefixes[i % prefixes.length]}
-        </span>,
-      )
-    }
-    if (membersCount > 3) {
-      avatars.push(
-        <span key="more" className="project-avatar-bubble more">
-          +{membersCount - 3}
-        </span>,
-      )
-    }
-    return (
-      <div className="project-avatar-stack" title={`${membersCount} team members`}>
-        {avatars}
-      </div>
-    )
-  }
+  const memberCount = Number(project.members) || 0
 
   return (
     <article className="project-grid-card" data-record-id={project.id}>
@@ -62,12 +39,12 @@ export function ProjectGridCard({ project, onOpenProject, onDelete, onQuickProgr
           </div>
         </div>
 
-        <div className="project-detail-grid" style={{ marginTop: 0 }}>
+        <div className="project-detail-grid project-detail-grid--compact">
           <div className="project-detail-item">
             <Users size={15} />
             <div>
               <span>Team</span>
-              {renderAvatarStack(project.members)}
+              <strong>{memberCount} {memberCount === 1 ? 'member' : 'members'}</strong>
             </div>
           </div>
           <div className="project-detail-item">

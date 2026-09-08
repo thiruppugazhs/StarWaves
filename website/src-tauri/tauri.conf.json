@@ -8,8 +8,16 @@
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
+  "bundle": {
+    "active": true,
+    "category": "DeveloperTool",
+    "targets": ["msi", "nsis"],
+    "icon": ["icons/icon.png", "icons/icon.ico"],
+    "shortDescription": "StarWaves — Developer Productivity Workspace",
+    "longDescription": "Projects, jobs, tasks, documents, workspace IDE, EVE AI, WhatsApp & more.",
+    "createUpdaterArtifacts": "v1Compatible"
+  },
   "app": {
-    "title": "Starwaves",
     "windows": [
       {
         "title": "Starwaves",
@@ -17,6 +25,22 @@
         "height": 800,
         "minWidth": 800,
         "minHeight": 600
+      },
+      {
+        "label": "eve-overlay",
+        "title": "Eve",
+        "url": "/app/avatar-overlay",
+        "width": 320,
+        "height": 480,
+        "minWidth": 200,
+        "minHeight": 300,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "resizable": true,
+        "focus": false
       }
     ],
     "security": {
@@ -24,19 +48,14 @@
     }
   },
   "plugins": {
-    "fs": {
-      "scope": {
-        "allow": ["**"],
-        "deny": []
-      }
+    "deepLink": {
+      "domains": false,
+      "schemes": ["com.starwaves.app", "app.starwaves.workspace"]
     },
-    "shell": {
-      "open": true,
-      "scope": []
-    },
-    "dialog": {
-      "open": true,
-      "save": true
+    "updater": {
+      "pubkey": "",
+      "endpoints": ["https://api.starwaves.susindran.in/api/v1/updates/latest.json"],
+      "windows": { "installMode": "passive" }
     }
   }
 }

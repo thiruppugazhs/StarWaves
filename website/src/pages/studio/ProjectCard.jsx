@@ -24,6 +24,10 @@ export function ProjectCard({ project, onOpen, onDelete }) {
           <span className="studio-file-count">
             <FileCode size={12} /> {project.file_count} files
           </span>
+          <span className={`studio-preview-state ${project.preview_status}`}>
+            {project.preview_status === 'ready' ? 'Preview ready' : 'No preview yet'}
+          </span>
+          {project.last_activity && <span className="studio-file-count">{project.last_activity.label}</span>}
           {project.git_initialized && (
             <span className="studio-git-tag" title="Git initialized">
               <GitBranch size={12} /> git

@@ -16,29 +16,61 @@
   --text-disabled: #a1a1aa;
   --text-inverse: #f4f4f5;
 
-  --color-primary: #18181b;
-  --color-primary-hover: #09090b;
-  --color-primary-light: #e4e4e7;
+  --color-primary: #a83b59;
+  --color-primary-hover: #8c2f4b;
+  --color-primary-light: #fbe8ed;
   --color-foam: #ffffff;
 
-  --border-color: #e4e4e7;
-  --border-light: #ececec;
-  --border-heavy: #a1a1aa;
-  --border-focus: #71717a;
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+  --border-heavy: #94a3b8;
+  --border-focus: #a83b59;
 
-  --scrollbar-track: #e4e4e7;
-  --scrollbar-thumb: #a1a1aa;
-  --scrollbar-thumb-hover: #18181b;
+  --scrollbar-track: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #a83b59;
 
-  /* Accents & Status Colors (Monochrome) */
-  --color-accent: #18181b;
-  --color-accent-light: #e4e4e7;
-  --color-success: #18181b;
-  --color-success-light: #e4e4e7;
-  --color-warning: #71717a;
-  --color-warning-light: #e4e4e7;
-  --color-danger: #18181b;
-  --color-danger-light: #e4e4e7;
-  --color-purple: #71717a;
-  --color-purple-light: #e4e4e7;
+  /* Accents & Status Colors (Multi-Color Semantic System) */
+  --color-accent: #0284c7;
+  --color-accent-light: #e0f2fe;
+  --color-success: #059669;
+  --color-success-light: #ecfdf5;
+  --color-warning: #d97706;
+  --color-warning-light: #fffbeb;
+  --color-danger: #e11d48;
+  --color-danger-light: #fff1f2;
+  --color-purple: #9333ea;
+  --color-purple-light: #faf5ff;
+
+  /* Domain & Module Accent Color Identity */
+  --module-work: #4f46e5;
+  --module-work-light: #eef2ff;
+  --module-workspace: #d97706;
+  --module-workspace-light: #fef3c7;
+  --module-todo: #0891b2;
+  --module-todo-light: #ecfeff;
+  --module-projects: #2563eb;
+  --module-projects-light: #eff6ff;
+  --module-documents: #0284c7;
+  --module-documents-light: #f0f9ff;
+  --module-studio: #7c3aed;
+  --module-studio-light: #f5f3ff;
+  --module-eve: #db2777;
+  --module-eve-light: #fdf2f8;
+  --module-growth: #059669;
+  --module-growth-light: #ecfdf5;
+  --module-comm: #2563eb;
+  --module-comm-light: #eff6ff;
+  --module-whatsapp: #16a34a;
+  --module-whatsapp-light: #dcfce7;
+  --module-mail: #e11d48;
+  --module-mail-light: #ffe4e6;
+  --module-calendar: #0284c7;
+  --module-calendar-light: #e0f2fe;
+  --module-calls: #9333ea;
+  --module-calls-light: #f3e8ff;
+  --module-chats: #4f46e5;
+  --module-chats-light: #eef2ff;
+  --module-account: #475569;
+  --module-account-light: #f1f5f9;
 }

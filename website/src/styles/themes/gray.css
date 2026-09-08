@@ -1,0 +1,29 @@
+/* Neutral Gray - Balanced true-neutral gray theme with pure grayscale surfaces */
+html.gray-theme {
+  --bg-primary: #e7e7e9;
+  --bg-secondary: #dcdce0;
+  --bg-tertiary: #cfcfd6;
+  --bg-card: #efeff1;
+  --bg-card-hover: #e2e2e6;
+  --bg-hover: #cfcfd6;
+  --bg-overlay: #efeff1;
+  --text-primary: #26262b;
+  --text-secondary: #55555e;
+  --text-muted: #7a7a85;
+  --text-inverse: #efeff1;
+  --color-primary: #2e2e34;
+  --color-primary-hover: #1a1a1f;
+  --color-primary-light: #d8d8de;
+  --color-accent: #55555e;
+  --border-color: #cfcfd6;
+  --border-light: #d8d8de;
+  --border-heavy: #9d9da8;
+  --border-focus: #55555e;
+  --scrollbar-track: #dcdce0;
+  --scrollbar-thumb: #9d9da8;
+  --scrollbar-thumb-hover: #2e2e34;
+  --color-success: #2e2e34;
+  --color-warning: #7a7a85;
+  --color-danger: #2e2e34;
+  --color-purple: #7a7a85;
+}

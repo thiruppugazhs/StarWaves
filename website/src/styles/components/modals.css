@@ -69,6 +69,72 @@
   margin-top: var(--space-md);
 }
 
+.modal form,
+.modal-form,
+.project-edit-form {
+  display: grid;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.modal form label,
+.modal-form label,
+.project-edit-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.modal form input,
+.modal form select,
+.modal form textarea,
+.project-edit-form input,
+.project-edit-form select,
+.project-edit-form textarea {
+  width: 100%;
+  padding: 9px 12px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  outline: 0;
+  font: inherit;
+  font-weight: 500;
+  font-size: 13px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.modal form input:focus,
+.modal form select:focus,
+.modal form textarea:focus,
+.project-edit-form input:focus,
+.project-edit-form select:focus,
+.project-edit-form textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+.modal form textarea,
+.project-edit-form textarea {
+  resize: vertical;
+}
+
+.modal-form-row,
+.project-edit-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2xs);
+}
+
+@media (max-width: 480px) {
+  .modal-form-row,
+  .project-edit-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .profile-edit-modal {
   max-width: 420px;
 }

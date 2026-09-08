@@ -1,0 +1,213 @@
+/* Settings Shell — split from settings.css (Wave F) */
+/* Settings Page Styles */
+
+.setting-page {
+  display: grid;
+  gap: var(--section-gap);
+  padding-bottom: var(--space-xl);
+}
+
+
+.settings-source-summary {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+}
+
+.settings-source-summary strong {
+  font-size: 14px;
+}
+
+.settings-source-summary span {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.setting-section {
+  scroll-margin-top: 60px;
+}
+
+.setting-section {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  gap: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--border-color);
+}
+
+.setting-page .page-heading {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.setting-section:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+@media (max-width: 860px) {
+  .setting-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.section-heading h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+}
+
+.section-heading p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Card Shells */
+.workspace-settings-card,
+.coding-settings-card {
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.hackathon-source-settings {
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl, 14px);
+  box-shadow: var(--shadow-sm);
+}
+
+.setting-content-stack,
+.apps-settings-stack {
+  display: grid;
+  gap: 20px;
+}
+
+/* Header inside Card */
+.workspace-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--border-color);
+  border-top-left-radius: calc(var(--radius-xl, 14px) - 1px);
+  border-top-right-radius: calc(var(--radius-xl, 14px) - 1px);
+}
+
+.workspace-settings-header > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.coding-settings-header,
+.hackathon-source-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--border-color);
+  border-top-left-radius: calc(var(--radius-xl, 14px) - 1px);
+  border-top-right-radius: calc(var(--radius-xl, 14px) - 1px);
+}
+
+.workspace-google-mark,
+.hackathon-source-heading > span,
+.coding-settings-header > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border-radius: 11px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.workspace-google-mark svg,
+.hackathon-source-heading > span svg,
+.coding-settings-header > span svg,
+.google-calendar-avatar svg {
+  display: block;
+  margin: auto;
+}
+
+.workspace-settings-header h3,
+.coding-settings-header h3,
+.hackathon-source-heading h3 {
+  margin: 0 0 3px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.workspace-settings-header p,
+.coding-settings-header p,
+.hackathon-source-heading p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Header Connect / Action Buttons */
+.workspace-settings-header button,
+.coding-settings-footer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.workspace-settings-header button:hover,
+.coding-settings-footer button:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.workspace-settings-header button.workspace-connected {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.workspace-settings-header button.workspace-connected:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.workspace-connection-error {
+  margin: 0;
+  padding: 12px 22px;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+

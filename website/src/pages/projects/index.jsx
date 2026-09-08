@@ -1,8 +1,10 @@
 /** Projects page — single responsibility: orchestrate project list, filters and dialogs. */
+import '../../styles/pages/projects-list.css'
+import '../../styles/pages/project-cards.css'
 import { useState } from 'react'
-import { FolderKanban, LayoutGrid, List, Search, SlidersHorizontal } from 'lucide-react'
+import { LayoutGrid, List, Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { createProject, deleteProject, updateProject } from '../../lib/workspaceApi'
-import { ConfirmDialog, CustomDropdown, EmptyState, FilterBar, FilterPills, PageHeader, SearchBar } from '../../components/ui'
+import { ConfirmDialog, CustomDropdown, EmptyState, FilterBar, SearchBar } from '../../components/ui'
 import { usePersistentState } from '../../hooks/usePersistentState'
 import { emptyProject } from './constants'
 import { useProjectFilters } from './useProjectFilters'
@@ -92,39 +94,7 @@ export function ProjectsPage({ projects, setProjects, onOpenProject, canLoadMore
 
   return (
     <section className="projects-page">
-      <PageHeader
-        eyebrow="Work & build"
-        title="Projects"
-        description="Turn ideas into momentum with a clear view of what is moving."
-        actions={
-          <>
-            <div className="project-summary">
-              <FolderKanban size={16} />
-              <span>
-                {filteredProjects.length} of {projects.length} projects
-              </span>
-            </div>
-            <button className="primary-button" onClick={() => setFormOpen(true)}>
-              <Search size={16} style={{ display: 'none' }} />
-              Add project
-            </button>
-          </>
-        }
-      />
-
       <ProjectMetrics projects={projects} statusCounts={statusCounts} statusFilter={statusFilter} setStatusFilter={setStatusFilter} />
-
-      <FilterPills
-        className="project-status-chips"
-        ariaLabel="Status filter options"
-        items={['All', 'Active', 'Planning', 'On hold', 'Completed'].map((status) => ({
-          id: status,
-          label: status === 'All' ? 'All projects' : status,
-          count: statusCounts[status] || 0,
-        }))}
-        activeId={statusFilter}
-        onChange={setStatusFilter}
-      />
 
       <FilterBar
         className="project-toolbar"
@@ -154,42 +124,47 @@ export function ProjectsPage({ projects, setProjects, onOpenProject, canLoadMore
           </>
         }
         actions={
-          <div className="project-view-toggle" aria-label="View layout switcher">
-            <button type="button" className={`project-view-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')} title="Grid view" aria-label="Switch to grid view">
-              <LayoutGrid size={15} />
+          <>
+            <div className="project-view-toggle" aria-label="View layout switcher">
+              <button type="button" className={`project-view-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')} title="Grid view" aria-label="Switch to grid view">
+                <LayoutGrid size={15} />
+              </button>
+              <button type="button" className={`project-view-btn ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')} title="List view" aria-label="Switch to list view">
+                <List size={15} />
+              </button>
+            </div>
+            <button className="primary-button" type="button" onClick={() => setFormOpen(true)}>
+              <Plus size={15} /> Add project
             </button>
-            <button type="button" className={`project-view-btn ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')} title="List view" aria-label="Switch to list view">
-              <List size={15} />
-            </button>
-          </div>
+          </>
         }
         isFiltered={Boolean(hasFilters)}
         onReset={resetFilters}
       />
 
-      {viewMode === 'grid' ? (
-        <div className="projects-grid-layout" aria-label="Projects grid">
-          {filteredProjects.map((project) => (
-            <ProjectGridCard key={project.id} project={project} onOpenProject={onOpenProject} onDelete={handleDelete} onQuickProgress={handleQuickProgress} />
-          ))}
-        </div>
+      {filteredProjects.length > 0 ? (
+        viewMode === 'grid' ? (
+          <div className="projects-grid-layout" aria-label="Projects grid">
+            {filteredProjects.map((project) => (
+              <ProjectGridCard key={project.id} project={project} onOpenProject={onOpenProject} onDelete={handleDelete} onQuickProgress={handleQuickProgress} />
+            ))}
+          </div>
+        ) : (
+          <div className="project-list" aria-label="Projects list">
+            {filteredProjects.map((project) => (
+              <ProjectListCard
+                key={project.id}
+                project={project}
+                isOpen={openProjects.has(project.id)}
+                onToggle={toggleProject}
+                onOpenProject={onOpenProject}
+                onDelete={handleDelete}
+                onQuickProgress={handleQuickProgress}
+              />
+            ))}
+          </div>
+        )
       ) : (
-        <div className="project-list" aria-label="Projects list">
-          {filteredProjects.map((project) => (
-            <ProjectListCard
-              key={project.id}
-              project={project}
-              isOpen={openProjects.has(project.id)}
-              onToggle={toggleProject}
-              onOpenProject={onOpenProject}
-              onDelete={handleDelete}
-              onQuickProgress={handleQuickProgress}
-            />
-          ))}
-        </div>
-      )}
-
-      {!filteredProjects.length && (
         <EmptyState
           icon={Search}
           title="No projects match these filters"

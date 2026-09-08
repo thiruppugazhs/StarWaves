@@ -1,3 +1,5 @@
+import '../../styles/pages/calls-page.css'
+import '../../styles/pages/calls-overlay.css'
 import { Phone, PhoneOff, Video } from 'lucide-react'
 import {
   participantInitials,

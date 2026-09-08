@@ -1,0 +1,284 @@
+/* Workspace Editor/Center — App Theme Styled with VS Code UX */
+
+/* Center Panel (Editor + Terminal) */
+.workspace-center {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-card);
+  padding: 0;
+  gap: 0;
+}
+
+/* Editor shell */
+.workspace-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Empty state (no files open) */
+.workspace-editor-empty,
+.workspace-editor-empty-v2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: var(--text-muted);
+  font-size: var(--text-base, 13px);
+  padding: var(--space-xl, 32px);
+  background: var(--bg-card);
+}
+
+.workspace-editor-empty-v2 {
+  flex-direction: column;
+  gap: var(--space-xs, 12px);
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.workspace-empty-illustration {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.workspace-editor-empty-v2 h3 {
+  margin: 0;
+  font-size: var(--text-lg, 16px);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.workspace-editor-empty-v2 p {
+  margin: 0;
+  font-size: var(--text-xs, 12px);
+  line-height: var(--leading-normal, 1.5);
+  color: var(--text-secondary);
+  max-width: 380px;
+}
+
+.workspace-editor-empty-v2 p kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  padding: 1px 5px;
+  border: 1px solid var(--border-color);
+  border-bottom-width: 2px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xs, 4px);
+  font-family: 'Consolas', 'Monaco', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+.workspace-empty-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.workspace-empty-hint {
+  font-size: var(--text-xs, 12px);
+  color: var(--text-muted);
+}
+
+/* ── Tabs — VS Code style with App Theme ── */
+.workspace-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  overflow-x: auto;
+  flex-shrink: 0;
+  border-radius: 0;
+  height: 35px;
+}
+
+.workspace-tabs::-webkit-scrollbar {
+  height: 2px;
+}
+
+.workspace-tabs::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+}
+
+.workspace-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 35px;
+  border: none;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  font-size: var(--text-xs, 12px);
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: background var(--transition-fast, 140ms ease), color var(--transition-fast, 140ms ease);
+  position: relative;
+  border-radius: 0;
+}
+
+.workspace-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.workspace-tab.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 600;
+  border-top: 2px solid var(--color-primary);
+}
+
+.workspace-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--bg-card);
+}
+
+.workspace-tab-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.workspace-tab-icon {
+  opacity: 0.7;
+}
+
+.workspace-tab-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.workspace-tab-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-xs, 4px);
+  cursor: pointer;
+  transition: background var(--transition-fast, 140ms ease);
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.workspace-tab:hover .workspace-tab-close,
+.workspace-tab.active .workspace-tab-close {
+  opacity: 1;
+}
+
+.workspace-tab-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Breadcrumb */
+.workspace-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  font-size: var(--text-xs, 12px);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.workspace-breadcrumb-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.breadcrumb-segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.breadcrumb-sep {
+  color: var(--text-muted);
+  opacity: 0.6;
+  font-size: 11px;
+}
+
+.breadcrumb-active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.breadcrumb-dirty {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-warning, #d97706);
+  font-weight: 500;
+}
+
+.breadcrumb-run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-inverse, #ffffff);
+  background: var(--color-primary);
+  border: none;
+  padding: 1px 8px;
+  border-radius: var(--radius-xs, 4px);
+  cursor: pointer;
+  transition: opacity var(--transition-fast, 140ms ease);
+  height: 18px;
+}
+
+.breadcrumb-run-btn:hover {
+  opacity: 0.88;
+}
+
+/* Monaco container */
+.workspace-editor-monaco {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg-card);
+}

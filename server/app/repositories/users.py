@@ -153,7 +153,6 @@ def create_user_with_password(
         "display_name": display_name,
         "password_hash": pwd_hash,
         "password_salt": pwd_salt,
-        "email_verified": False,
         "created_at": SERVER_TIMESTAMP,
         "updated_at": SERVER_TIMESTAMP,
     }

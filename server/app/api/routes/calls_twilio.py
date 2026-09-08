@@ -7,7 +7,7 @@ from fastapi.responses import PlainTextResponse
 
 from app.core.auth import get_current_user
 from app.core.config import settings
-from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
+from app.db import SERVER_TIMESTAMP, SqlClient, get_firestore
 from app.repositories.calls import CallRepository
 from app.repositories.users import get_user_by_id
 from app.schemas.call import CallResponse, CallUser, EveTwilioCallRequest, TwilioCallCreate
@@ -88,8 +88,7 @@ async def trigger_eve_twilio_call(payload: EveTwilioCallRequest, database: SqlCl
     prompt = payload.prompt or "Hello, this is Eve from StarWaves. How can I help you today?"
     # Update call with say payload so twiml can render it
     try:
-        # Use messages array to carry prompt
-        repo._document(call["id"]).update({"messages": ArrayUnion([{"id": "eve-prompt", "from_uid": "eve-bot", "type": "say", "payload": prompt[:500], "created_at": call["created_at"]}])})
+        repo.append_message(call["id"], {"id": "eve-prompt", "from_uid": "eve-bot", "type": "say", "payload": prompt[:500], "created_at": call["created_at"]})
         call["messages"] = [{"id": "eve-prompt", "from_uid": "eve-bot", "type": "say", "payload": prompt[:500], "created_at": call["created_at"]}]
     except Exception:
         pass

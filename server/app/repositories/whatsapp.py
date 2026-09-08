@@ -103,7 +103,7 @@ def get_whatsapp_settings(database: SqlClient, user_id: str) -> WhatsAppSettings
         eve_tag=data.get("eve_tag") or app_settings.whatsapp_eve_tag,
         owner_name=data.get("owner_name") or app_settings.whatsapp_owner_name,
         owner_aliases=data.get("owner_aliases") or app_settings.whatsapp_owner_aliases,
-        keywords=data.get("keywords") if "keywords" in data else ["@assistant", "assistant", "urgent", "help", "summary", "schedule"],
+        keywords=data.get("keywords") if "keywords" in data else ["@eve", "eve", "@susindran", "@susin", "urgent", "help", "summary", "schedule"],
         my_number=data.get("my_number") or app_settings.whatsapp_my_number,
         my_jid=data.get("my_jid") or app_settings.whatsapp_my_jid,
     )

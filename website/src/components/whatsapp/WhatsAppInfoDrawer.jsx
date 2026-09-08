@@ -1,3 +1,4 @@
+import '../../styles/pages/whatsapp-drawer.css'
 import { useState, useMemo } from 'react'
 import { X, Bot, Image as ImageIcon, FileText, Sparkles, Star, Users, User, ShieldCheck, Download } from 'lucide-react'
 
@@ -37,8 +38,8 @@ export function WhatsAppInfoDrawer({
   return (
     <div className="whatsapp-info-drawer">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>
+      <div className="whatsapp-drawer-header">
+        <h3 className="whatsapp-drawer-title">
           {chat.is_group ? 'Group Info' : 'Contact Info'}
         </h3>
         <button
@@ -46,21 +47,22 @@ export function WhatsAppInfoDrawer({
           className="whatsapp-icon-btn"
           onClick={onClose}
           title="Close details"
+          aria-label="Close details"
         >
           <X size={16} />
         </button>
       </div>
 
       {/* Profile Card */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '8px' }}>
-        <div className={`whatsapp-avatar ${isEve ? 'is-eve' : chat.is_group ? 'is-group' : ''}`} style={{ width: 72, height: 72, fontSize: '1.75rem' }}>
+      <div className="whatsapp-drawer-profile">
+        <div className={`whatsapp-avatar whatsapp-avatar--lg ${isEve ? 'is-eve' : chat.is_group ? 'is-group' : ''}`}>
           {isEve ? (
             <Bot size={36} />
           ) : chat.avatar_url ? (
             <img
               src={chat.avatar_url}
               alt={chat.name}
-              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+              className="whatsapp-avatar-img whatsapp-avatar-img--cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none'
               }}
@@ -71,9 +73,9 @@ export function WhatsAppInfoDrawer({
             <User size={32} />
           )}
         </div>
-        <div>
-          <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{chat.name || 'Conversation'}</div>
-          <div style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', marginTop: 2 }}>
+        <div className="whatsapp-drawer-profile-meta">
+          <div className="whatsapp-drawer-name">{chat.name || 'Conversation'}</div>
+          <div className="whatsapp-drawer-subtitle">
             {chat.phone_number || (isEve ? 'Eve Assistant • AI Workspace Agent' : chat.is_group ? `${chat.participants?.length || 0} participants` : 'WhatsApp Contact')}
           </div>
         </div>
@@ -83,43 +85,39 @@ export function WhatsAppInfoDrawer({
       {chat.description && (
         <div className="whatsapp-drawer-section">
           <h4>About / Description</h4>
-          <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.45, background: 'var(--bg-primary)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+          <div className="whatsapp-drawer-description">
             {chat.description}
           </div>
         </div>
       )}
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginTop: '4px' }}>
+      <div className="whatsapp-drawer-tabs">
         <button
           type="button"
-          className={`filter-pill ${activeTab === 'overview' ? 'active' : ''}`}
+          className={`filter-pill whatsapp-drawer-tab ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
-          style={{ flex: 1, padding: '4px 8px', fontSize: '0.75rem' }}
         >
           Overview
         </button>
         <button
           type="button"
-          className={`filter-pill ${activeTab === 'media' ? 'active' : ''}`}
+          className={`filter-pill whatsapp-drawer-tab ${activeTab === 'media' ? 'active' : ''}`}
           onClick={() => setActiveTab('media')}
-          style={{ flex: 1, padding: '4px 8px', fontSize: '0.75rem' }}
         >
           Media ({photosAndVideos.length})
         </button>
         <button
           type="button"
-          className={`filter-pill ${activeTab === 'docs' ? 'active' : ''}`}
+          className={`filter-pill whatsapp-drawer-tab ${activeTab === 'docs' ? 'active' : ''}`}
           onClick={() => setActiveTab('docs')}
-          style={{ flex: 1, padding: '4px 8px', fontSize: '0.75rem' }}
         >
           Docs ({documentFiles.length})
         </button>
         <button
           type="button"
-          className={`filter-pill ${activeTab === 'starred' ? 'active' : ''}`}
+          className={`filter-pill whatsapp-drawer-tab ${activeTab === 'starred' ? 'active' : ''}`}
           onClick={() => setActiveTab('starred')}
-          style={{ flex: 1, padding: '4px 8px', fontSize: '0.75rem' }}
         >
           Starred ({starredMessages.length})
         </button>
@@ -131,34 +129,24 @@ export function WhatsAppInfoDrawer({
           {!isEve && (
             <div className="whatsapp-drawer-section">
               <h4>Eve AI Assistant</h4>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 12px',
-                  background: 'var(--bg-primary)',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="whatsapp-drawer-card">
+                <div className="whatsapp-drawer-card-row">
                   <Bot size={16} />
-                  <span style={{ fontSize: '0.875rem' }}>Auto-Responder</span>
+                  <span className="whatsapp-drawer-card-label">Auto-Responder</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={Boolean(chat.eve_auto_reply)}
                   onChange={(e) => onToggleEveAutoReply?.(chat.id, e.target.checked)}
-                  style={{ cursor: 'pointer' }}
+                  className="whatsapp-drawer-checkbox"
+                  aria-label="Toggle Eve auto-responder"
                 />
               </div>
 
               <button
                 type="button"
-                className="secondary-button"
+                className="secondary-button whatsapp-drawer-full-btn"
                 onClick={() => onSummarizeChat?.(chat.id)}
-                style={{ width: '100%', minHeight: '36px', marginTop: '6px' }}
               >
                 <Sparkles size={14} />
                 Generate Summary & Action Items
@@ -170,7 +158,7 @@ export function WhatsAppInfoDrawer({
           {chat.is_group && Array.isArray(chat.participants) && chat.participants.length > 0 && (
             <div className="whatsapp-drawer-section">
               <h4>{chat.participants.length} Participants</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '240px', overflowY: 'auto' }}>
+              <div className="whatsapp-drawer-scroll-list">
                 {chat.participants
                   .map((p) => {
                     if (!p) return null
@@ -184,22 +172,13 @@ export function WhatsAppInfoDrawer({
                   .map(({ raw, displayName }, idx) => (
                     <div
                       key={raw || idx}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '8px 10px',
-                        background: 'var(--bg-primary)',
-                        borderRadius: '6px',
-                        border: '1px solid var(--border-color)',
-                        fontSize: '0.8125rem',
-                      }}
+                      className="whatsapp-drawer-participant"
                     >
-                      <div className="whatsapp-avatar" style={{ width: 28, height: 28, fontSize: '0.75rem' }}>
+                      <div className="whatsapp-avatar whatsapp-avatar--sm">
                         <User size={14} />
                       </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div className="whatsapp-drawer-participant-meta">
+                        <div className="whatsapp-drawer-participant-name">
                           {displayName}
                         </div>
                       </div>
@@ -212,20 +191,8 @@ export function WhatsAppInfoDrawer({
           {/* Privacy & Security */}
           <div className="whatsapp-drawer-section">
             <h4>Security & Encryption</h4>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '10px 12px',
-                background: 'var(--bg-primary)',
-                borderRadius: '8px',
-                border: '1px solid var(--border-color)',
-                fontSize: '0.8125rem',
-                color: 'var(--text-secondary)',
-              }}
-            >
-              <ShieldCheck size={18} style={{ color: 'var(--text-primary)', flexShrink: 0 }} />
+            <div className="whatsapp-drawer-security">
+              <ShieldCheck size={18} className="whatsapp-drawer-security-icon" />
               <span>Messages and calls are end-to-end encrypted with WhatsMeow gateway.</span>
             </div>
           </div>
@@ -237,31 +204,28 @@ export function WhatsAppInfoDrawer({
         <div className="whatsapp-drawer-section">
           <h4>Shared Media ({photosAndVideos.length})</h4>
           {photosAndVideos.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
-              <ImageIcon size={24} style={{ margin: '0 auto 8px auto', display: 'block', opacity: 0.5 }} />
+            <div className="whatsapp-drawer-empty">
+              <ImageIcon size={24} className="whatsapp-drawer-empty-icon" />
               No photos or videos shared yet
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', maxHeight: '320px', overflowY: 'auto' }}>
+            <div className="whatsapp-drawer-media-grid">
               {photosAndVideos.map((m) => {
                 const src = m.media.url || m.media.thumbnail_base64
                 return (
                   <div
                     key={m.id}
-                    style={{
-                      aspectRatio: '1',
-                      borderRadius: '6px',
-                      overflow: 'hidden',
-                      background: '#000',
-                      cursor: 'pointer',
-                      border: '1px solid var(--border-color)',
-                    }}
+                    className="whatsapp-drawer-media-item"
                     onClick={() => setSelectedLightbox(m.media)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedLightbox(m.media) } }}
+                    aria-label={`Open ${m.media.filename || 'media'}`}
                   >
                     <img
                       src={src}
                       alt={m.media.filename || 'media'}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      className="whatsapp-drawer-media-img"
                     />
                   </div>
                 )
@@ -276,29 +240,20 @@ export function WhatsAppInfoDrawer({
         <div className="whatsapp-drawer-section">
           <h4>Shared Documents ({documentFiles.length})</h4>
           {documentFiles.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
-              <FileText size={24} style={{ margin: '0 auto 8px auto', display: 'block', opacity: 0.5 }} />
+            <div className="whatsapp-drawer-empty">
+              <FileText size={24} className="whatsapp-drawer-empty-icon" />
               No documents shared yet
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '320px', overflowY: 'auto' }}>
+            <div className="whatsapp-drawer-scroll-list">
               {documentFiles.map((m) => (
                 <div
                   key={m.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '8px 10px',
-                    background: 'var(--bg-primary)',
-                    borderRadius: '6px',
-                    border: '1px solid var(--border-color)',
-                    fontSize: '0.8125rem',
-                  }}
+                  className="whatsapp-drawer-doc"
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                  <div className="whatsapp-drawer-doc-main">
                     <FileText size={16} />
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span className="whatsapp-drawer-doc-name">
                       {m.media.filename || 'Document'}
                     </span>
                   </div>
@@ -309,6 +264,7 @@ export function WhatsAppInfoDrawer({
                       target="_blank"
                       rel="noreferrer"
                       className="whatsapp-icon-btn small"
+                      aria-label={`Download ${m.media.filename || 'document'}`}
                     >
                       <Download size={14} />
                     </a>
@@ -325,28 +281,22 @@ export function WhatsAppInfoDrawer({
         <div className="whatsapp-drawer-section">
           <h4>Starred Messages ({starredMessages.length})</h4>
           {starredMessages.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
-              <Star size={24} style={{ margin: '0 auto 8px auto', display: 'block', opacity: 0.5 }} />
+            <div className="whatsapp-drawer-empty">
+              <Star size={24} className="whatsapp-drawer-empty-icon" />
               No starred messages in this chat
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '320px', overflowY: 'auto' }}>
+            <div className="whatsapp-drawer-scroll-list">
               {starredMessages.map((m) => (
                 <div
                   key={m.id}
-                  style={{
-                    padding: '8px 10px',
-                    background: 'var(--bg-primary)',
-                    borderRadius: '6px',
-                    border: '1px solid var(--border-color)',
-                    fontSize: '0.8125rem',
-                  }}
+                  className="whatsapp-drawer-starred"
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.75rem', marginBottom: 4 }}>
+                  <div className="whatsapp-drawer-starred-meta">
                     <span>{m.is_from_me ? 'You' : m.sender_name || 'Contact'}</span>
                     <span>{new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
-                  <div style={{ color: 'var(--text-primary)', wordBreak: 'break-word' }}>
+                  <div className="whatsapp-drawer-starred-content">
                     {m.content}
                   </div>
                 </div>

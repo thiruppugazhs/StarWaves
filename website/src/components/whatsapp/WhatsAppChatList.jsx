@@ -1,3 +1,4 @@
+import '../../styles/pages/whatsapp-shell.css'
 import { useMemo, useState, useRef, useEffect } from 'react'
 import { Bot, Pin, User, Users, QrCode, Archive, BellOff, CheckCheck, Trash2 } from 'lucide-react'
 import { SearchBar } from '../ui'
@@ -134,7 +135,7 @@ export function WhatsAppChatList({
     <div className="whatsapp-sidebar">
       {/* Sidebar Header */}
       <div className="whatsapp-sidebar-header">
-        <div style={{ width: 36 }} />
+        <div className="whatsapp-sidebar-spacer" aria-hidden="true" />
 
         <h2 className="whatsapp-sidebar-centered-title">Chats</h2>
 
@@ -144,6 +145,7 @@ export function WhatsAppChatList({
             className="whatsapp-icon-btn"
             onClick={onOpenQrModal}
             title={isConnected ? 'Device settings & QR' : 'Link WhatsApp'}
+            aria-label={isConnected ? 'Device settings & QR' : 'Link WhatsApp'}
           >
             <QrCode size={18} />
           </button>
@@ -196,7 +198,7 @@ export function WhatsAppChatList({
             className={`whatsapp-filter-pill ${activeFilter === 'archived' ? 'active' : ''}`}
             onClick={() => setActiveFilter('archived')}
           >
-            <Archive size={12} style={{ display: 'inline', marginRight: 3 }} />
+            <Archive size={12} className="whatsapp-filter-archived-icon" />
             Archived
           </button>
         )}
@@ -205,7 +207,7 @@ export function WhatsAppChatList({
       {/* Chat List */}
       <div className="whatsapp-chat-list">
         {filteredChats.length === 0 ? (
-          <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+          <div className="whatsapp-chat-list-empty">
             {searchQuery
               ? 'No matching conversations'
               : activeFilter !== 'all'
@@ -224,6 +226,8 @@ export function WhatsAppChatList({
                 className={`whatsapp-chat-item ${isActive ? 'active' : ''}`}
                 onClick={() => onSelectChat(chat.id)}
                 onContextMenu={(e) => handleContextMenu(e, chat)}
+                aria-current={isActive ? 'true' : undefined}
+                aria-label={`Open chat with ${chat.name || 'conversation'}`}
               >
                 <div className={`whatsapp-avatar ${isEve ? 'is-eve' : chat.is_group ? 'is-group' : ''}`}>
                   {isEve ? (
@@ -260,11 +264,11 @@ export function WhatsAppChatList({
                   )}
                 </div>
 
-                <div className="whatsapp-chat-info">
+                  <div className="whatsapp-chat-info">
                   <div className="whatsapp-chat-top">
                     <span className="whatsapp-chat-name" title={chat.name}>
-                      {chat.pinned && <Pin size={12} style={{ display: 'inline', marginRight: 4 }} />}
-                      {chat.is_muted && <BellOff size={12} style={{ display: 'inline', marginRight: 4, opacity: 0.6 }} />}
+                      {chat.pinned && <Pin size={12} className="whatsapp-chat-pin" />}
+                      {chat.is_muted && <BellOff size={12} className="whatsapp-chat-muted" />}
                       {(() => {
                         const cleanName = String(chat.name || '').replace(/@s\.whatsapp\.net|@g\.us|@lid/g, '').trim()
                         const isNumericName = /^\+?\d{6,}$/.test(cleanName)
@@ -285,9 +289,9 @@ export function WhatsAppChatList({
                       {chat.last_message ? (
                         <>
                           {chat.last_message.is_from_me ? (
-                            <span style={{ fontWeight: 600 }}>You: </span>
+                            <span className="whatsapp-chat-preview-strong">You: </span>
                           ) : chat.is_group && formatSenderName(chat.last_message.sender_name) ? (
-                            <span style={{ fontWeight: 600 }}>{formatSenderName(chat.last_message.sender_name)}: </span>
+                            <span className="whatsapp-chat-preview-strong">{formatSenderName(chat.last_message.sender_name)}: </span>
                           ) : null}
                           {chat.last_message.content || (chat.last_message.media ? `[${chat.last_message.media.type}]` : '')}
                         </>

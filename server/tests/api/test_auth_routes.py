@@ -164,7 +164,7 @@ class TestForgotPasswordFlow:
             "/api/v1/auth/forgot-password", json={"email": SIGNUP_PAYLOAD["email"]}
         )
         assert res.status_code == 200
-        otp = state_serializer().loads(captured["token"], max_age=3600)["otp"]
+        otp = captured["otp"]
 
         verified = auth_client.post(
             "/api/v1/auth/verify-reset-code",
@@ -190,6 +190,7 @@ class TestForgotPasswordFlow:
 
         def fake_send(to_email, token, otp_code):
             captured["token"] = token
+            captured["otp"] = otp_code
             return True
 
         monkeypatch.setattr("app.api.routes.auth.password.send_password_reset_email", fake_send)
@@ -206,12 +207,16 @@ class TestForgotPasswordFlow:
             },
         )
         # Unless the generated OTP really is 000000, mismatch must be rejected
-        real_otp = state_serializer().loads(captured["token"], max_age=3600)["otp"]
+        # After fix OTP is not in token — compare against captured otp if available
+        real_otp = captured.get("otp") or "unknown"
+        # If fake_send didn't capture otp, treat as mismatch
         if real_otp != "000000":
             assert wrong.status_code == 400
 
     def test_reset_password_short_password_400(self, auth_client):
-        token = state_serializer().dumps({"uid": "u", "action": "reset_password_verified"})
+        import secrets
+        jti = secrets.token_urlsafe(16)
+        token = state_serializer().dumps({"uid": "u", "action": "reset_password_verified", "jti": jti})
         res = auth_client.post(
             "/api/v1/auth/reset-password", json={"token": token, "password": "short"}
         )
@@ -224,7 +229,9 @@ class TestForgotPasswordFlow:
         assert res.status_code == 400
 
     def test_reset_password_wrong_action_payload_400(self, auth_client):
-        token = state_serializer().dumps({"uid": "u", "action": "something_else"})
+        import secrets
+        jti = secrets.token_urlsafe(16)
+        token = state_serializer().dumps({"uid": "u", "action": "something_else", "jti": jti})
         res = auth_client.post(
             "/api/v1/auth/reset-password", json={"token": token, "password": "longenough1"}
         )

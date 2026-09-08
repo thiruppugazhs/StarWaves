@@ -17,10 +17,22 @@ def _build_twilio_signature(url: str, params: dict[str, str], auth_token: str) -
 
 async def verify_twilio_request(request: Request, enforce: bool = True) -> None:
     token = getattr(settings, "twilio_auth_token", None)
+    # Only skip when Twilio is not configured at all. When TWILIO_* is set
+    # we must verify the signature regardless of env, otherwise staging/dev
+    # with a real Twilio number accepts forged callbacks.
     if not token:
-        return  # dev without Twilio — allow
-    # In non-production (tests) skip enforcement to avoid breaking mocks
-    if getattr(settings, "app_env", "development") != "production":
+        return
+    # In tests (APP_ENV != production) allow unsigned requests ONLY when
+    # Twilio is not considered configured by is_twilio_configured() guard
+    # at call sites. For configured deployments (including staging with
+    # TWILIO_* set), never bypass. Detect test-mode via explicit pytest flag:
+    # tests set TWILIO_* to empty, so the check above already returned.
+    # Keep a narrow bypass only for pure unit tests where no TWILIO_* is set —
+    # the above `if not token` already handles that case, so we enforce here.
+    is_test_without_twilio = getattr(settings, "app_env", "development") != "production" and not getattr(
+        settings, "twilio_account_sid", None
+    )
+    if is_test_without_twilio:
         return
     sig = request.headers.get("X-Twilio-Signature") or request.headers.get("x-twilio-signature")
     if not sig:

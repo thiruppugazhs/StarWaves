@@ -35,6 +35,8 @@ def _to_response(project: dict) -> StudioProjectResponse:
         github_repo_url=project.get("github_repo_url"),
         published_template_id=project.get("published_template_id"),
         file_count=project.get("file_count", 0),
+        preview_status=project.get("preview_status", "unavailable"),
+        last_activity=project.get("last_activity"),
         created_at=project["created_at"],
         updated_at=project["updated_at"],
     )

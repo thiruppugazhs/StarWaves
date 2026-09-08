@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Bell,
@@ -9,8 +9,6 @@ import {
   ChevronDown,
   FolderKanban,
   LogOut,
-  Menu,
-  Moon,
   Phone,
   PhoneIncoming,
   PhoneMissed,
@@ -18,7 +16,6 @@ import {
   Search,
   Settings,
   Trophy,
-  Sun,
   Trash2,
   UserRound,
   X,
@@ -27,13 +24,16 @@ import { clearAuthSession } from '../lib/authApi'
 import { deleteNotification, markAllNotificationsRead } from '../lib/workspaceApi'
 import { CALENDAR_REMINDER_PREFIX } from '../utils/calendarReminders'
 import { getNotificationPermission, requestNotificationPermission } from '../utils/browserNotifications'
-import { StarWavesLogo } from './StarWavesLogo'
-import { EveAssistantModal } from './EveAssistantModal'
-import { AdvancedSearchModal } from './search/AdvancedSearchModal'
+import { navigationItems } from '../config/navigation'
+// Interaction-only modals — fetched on first open so the search index,
+// Eve modal, and Markdown renderer stay out of the initial shell.
+const EveAssistantModal = lazy(() => import('./EveAssistantModal').then((m) => ({ default: m.EveAssistantModal })))
+const AdvancedSearchModal = lazy(() => import('./search/AdvancedSearchModal').then((m) => ({ default: m.AdvancedSearchModal })))
+
+import { applyThemeVariables, THEME_PRESETS } from '../themes/presets'
 
 export function Header({
-  onMenuOpen,
-  navigationExpanded,
+  activePage,
   onNavigate,
   onCreate,
   callCenter,
@@ -62,10 +62,7 @@ export function Header({
     }
   }
   const [eveOpen, setEveOpen] = useState(false)
-  const assistantName = user?.assistantName || (typeof localStorage !== 'undefined' ? localStorage.getItem('starwaves_assistant_name') : null) || 'Eve'
-  const [darkTheme, setDarkTheme] = useState(
-    () => localStorage.getItem('starwaves.theme') === 'dark',
-  )
+  const [editorContext, setEditorContext] = useState(null)
   const [permissionStatus, setPermissionStatus] = useState(() => getNotificationPermission())
 
   const handleToggleNotifications = () => {
@@ -87,9 +84,11 @@ export function Header({
       setPermissionStatus(getNotificationPermission())
     }
   }
-  const unreadCount = notifications.filter(
+
+  const unreadCount = (notifications || []).filter(
     (notification) => notification.unread,
   ).length
+
   const notificationIcons = {
     calendar: CalendarDays,
     contest: Trophy,
@@ -100,9 +99,10 @@ export function Header({
     call_missed: PhoneMissed,
     call_declined: PhoneOff,
   }
+
   const notificationDestinations = {
     calendar: 'calendar',
-    contest: 'competitive-coding',
+    contest: 'compete',
     project: 'projects',
     job: 'jobs',
     hackathon: 'hackathons',
@@ -113,10 +113,32 @@ export function Header({
     call_declined: 'calls',
   }
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark-theme', darkTheme)
-    localStorage.setItem('starwaves.theme', darkTheme ? 'dark' : 'light')
-  }, [darkTheme])
+  const handleToggleTheme = () => {
+    const isCurrentlyDark = document.documentElement.classList.contains('dark-theme')
+    const nextMode = isCurrentlyDark ? 'light' : 'dark'
+    const nextPreset = nextMode
+    const presetData = THEME_PRESETS[nextPreset]
+    if (!presetData) return
+
+    let currentConfig = {}
+    try {
+      const saved = localStorage.getItem('starwaves.custom_theme')
+      if (saved) currentConfig = JSON.parse(saved) || {}
+    } catch {}
+
+    const nextState = {
+      ...currentConfig,
+      preset: nextPreset,
+      mode: nextMode,
+      colors: presetData.colors,
+    }
+
+    applyThemeVariables(nextState)
+    try {
+      localStorage.setItem('starwaves.custom_theme', JSON.stringify(nextState))
+    } catch {}
+    window.dispatchEvent(new CustomEvent('starwaves:theme-change', { detail: nextState }))
+  }
 
   useEffect(() => {
     const handleShortcut = (event) => {
@@ -127,9 +149,20 @@ export function Header({
       if (event.key === 'Escape') setNotificationsOpen(false)
     }
 
+    // Mobile tab bar search entry point (decoupled via event).
+    const handleOpenSearchEvent = () => setSearchOpen(true)
+
     document.addEventListener('keydown', handleShortcut)
+    window.addEventListener('starwaves:open-search', handleOpenSearchEvent)
+    const handleOpenEve = () => setEveOpen(true)
+    const handleEditorContext = (event) => setEditorContext(event.detail || null)
+    window.addEventListener('starwaves:open-eve', handleOpenEve)
+    window.addEventListener('starwaves:avatar-editor-context', handleEditorContext)
     return () => {
       document.removeEventListener('keydown', handleShortcut)
+      window.removeEventListener('starwaves:open-search', handleOpenSearchEvent)
+      window.removeEventListener('starwaves:open-eve', handleOpenEve)
+      window.removeEventListener('starwaves:avatar-editor-context', handleEditorContext)
     }
   }, [setNotificationsOpen])
 
@@ -190,24 +223,18 @@ export function Header({
     )
   }
 
+  const currentNav = navigationItems.find((item) => item.id === activePage) || {
+    label: activePage ? activePage.charAt(0).toUpperCase() + activePage.slice(1) : 'Dashboard',
+  }
+
   return (
     <>
       <header className="topbar">
-      <div className="brand">
-        <button
-          className="icon-button menu-button"
-          onClick={onMenuOpen}
-          aria-label={navigationExpanded ? 'Collapse navigation' : 'Expand navigation'}
-          aria-expanded={navigationExpanded}
-          title={navigationExpanded ? 'Collapse navigation' : 'Expand navigation'}
-        >
-          <Menu size={20} />
-        </button>
-        <StarWavesLogo size={30} />
-        <span>StarWaves</span>
-      </div>
+        <div className="topbar-left">
+          <span className="topbar-page-title" aria-current="page">{currentNav.label}</span>
+        </div>
 
-      <div className="header-actions">
+        <div className="header-actions">
         <div className="search-container">
           <button
             type="button"
@@ -224,20 +251,10 @@ export function Header({
           className="eve-button"
           type="button"
           onClick={() => setEveOpen(true)}
-          aria-label={`Open ${assistantName} AI assistant`}
+          aria-label="Open Eve AI assistant"
         >
           <Bot size={17} />
-          <span>{assistantName}</span>
-        </button>
-        <button
-          className="icon-button theme-toggle"
-          type="button"
-          onClick={() => setDarkTheme((current) => !current)}
-          aria-label={darkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
-          aria-pressed={darkTheme}
-          title={darkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
-        >
-          {darkTheme ? <Sun size={18} /> : <Moon size={18} />}
+          <span>Eve</span>
         </button>
         <button
           className="icon-button notification-button"
@@ -260,8 +277,7 @@ export function Header({
               <img
                 src={user.photoURL}
                 alt={user.fullName}
-                className="avatar"
-                style={{ width: 30, height: 30, borderRadius: 8, objectFit: 'cover' }}
+                className="avatar avatar-sm"
                 loading="eager"
                 decoding="async"
                 referrerPolicy="no-referrer"
@@ -272,7 +288,7 @@ export function Header({
                 }}
               />
             ) : null}
-            <span className="avatar" style={user.photoURL ? { display: 'none' } : {}}>
+            <span className={`avatar ${user.photoURL ? 'avatar-fallback' : ''}`}>
               {user.initials}
             </span>
             <span className="profile-name">{user.firstName}</span>
@@ -411,26 +427,35 @@ export function Header({
         </div>,
         document.body,
       )}
-      <EveAssistantModal
-        isOpen={eveOpen}
-        onClose={() => setEveOpen(false)}
-        onNavigate={onNavigate}
-        onWorkspaceChanged={onWorkspaceChanged}
-      />
-      <AdvancedSearchModal
-        isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        onNavigate={onNavigate}
-        onCreate={onCreate}
-        callCenter={callCenter}
-        darkTheme={darkTheme}
-        setDarkTheme={setDarkTheme}
-        setEveOpen={setEveOpen}
-        setNotificationsOpen={setNotificationsOpen}
-        onEveNewChat={onEveNewChat}
-        onSignOut={handleSignOut}
-        workspaceData={workspaceData}
-      />
+      {eveOpen && (
+        <Suspense fallback={null}>
+          <EveAssistantModal
+            isOpen={eveOpen}
+            onClose={() => setEveOpen(false)}
+            onNavigate={onNavigate}
+            onWorkspaceChanged={onWorkspaceChanged}
+            editorContext={editorContext}
+          />
+        </Suspense>
+      )}
+      {searchOpen && (
+        <Suspense fallback={null}>
+          <AdvancedSearchModal
+            isOpen={searchOpen}
+            onClose={() => setSearchOpen(false)}
+            onNavigate={onNavigate}
+            onCreate={onCreate}
+            callCenter={callCenter}
+            toggleTheme={handleToggleTheme}
+            setDarkTheme={handleToggleTheme}
+            setEveOpen={setEveOpen}
+            setNotificationsOpen={setNotificationsOpen}
+            onEveNewChat={onEveNewChat}
+            onSignOut={handleSignOut}
+            workspaceData={workspaceData}
+          />
+        </Suspense>
+      )}
     </>
   )
 }

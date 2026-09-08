@@ -1,3 +1,6 @@
+import "../styles/pages/themes-shell.css"
+import "../styles/pages/themes-controls.css"
+import "../styles/pages/themes-customizer.css"
 import { useRef, useState } from 'react'
 import {
   Check,
@@ -16,7 +19,7 @@ import {
   Layers,
   Zap,
 } from 'lucide-react'
-import { PageHeader, SectionHeading } from '../components/ui'
+import { SectionHeading } from '../components/ui'
 import {
   useThemeCustomizer,
   PALETTE_GROUPS,
@@ -73,69 +76,65 @@ export function ThemesPage() {
 
   return (
     <section className="themes-page">
-      <PageHeader
-        eyebrow="Account"
-        title="UI & UX Customization Studio"
-        actions={
-          <div className="themes-header-actions">
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={resetToDefault}
-              title="Reset UI/UX settings to system defaults"
-            >
-              <RotateCcw size={15} />
-              Reset Defaults
-            </button>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={exportTheme}
-              title="Export full UI/UX configuration JSON"
-            >
-              <Download size={15} />
-              Export JSON
-            </button>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={triggerImport}
-              title="Import full UI/UX configuration JSON"
-            >
-              <Upload size={15} />
-              Import JSON
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-              accept=".json"
-              style={{ display: 'none' }}
-            />
-            <button
-              type="button"
-              className="primary-button theme-save-btn"
-              onClick={saveCustomTheme}
-            >
-              {isSaved ? (
-                <>
-                  <Check size={16} /> Saved!
-                </>
-              ) : (
-                <>
-                  <Sparkles size={16} /> Save Studio Preset
-                </>
-              )}
-            </button>
-          </div>
-        }
-      />
+      <div className="page-inline-actions">
+        <div className="themes-header-actions">
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={resetToDefault}
+            title="Reset UI/UX settings to system defaults"
+          >
+            <RotateCcw size={15} />
+            Reset Defaults
+          </button>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={exportTheme}
+            title="Export full UI/UX configuration JSON"
+          >
+            <Download size={15} />
+            Export JSON
+          </button>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={triggerImport}
+            title="Import full UI/UX configuration JSON"
+          >
+            <Upload size={15} />
+            Import JSON
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept=".json"
+            style={{ display: 'none' }}
+          />
+          <button
+            type="button"
+            className="primary-button theme-save-btn"
+            onClick={saveCustomTheme}
+          >
+            {isSaved ? (
+              <>
+                <Check size={16} /> Saved!
+              </>
+            ) : (
+              <>
+                <Sparkles size={16} /> Save Studio Preset
+              </>
+            )}
+          </button>
+        </div>
+      </div>
 
       {/* 1. Presets */}
       <div className="themes-section">
         <SectionHeading
           title="1. Theme Presets"
-          description="Curated presets grouped by palette — 10 Monochrome and 12 vibrant Two-Color duotone themes, each strictly two-color (neutral canvas + one accent hue)."
+          description="Curated color presets — vibrant multi-color Spectrum themes with distinct semantic roles, and high-contrast energetic Duotones."
         />
         {PALETTE_GROUPS.map((group) => {
           const presets = getPresetsByPalette(group.id)
@@ -154,6 +153,13 @@ export function ThemesPage() {
                   const cardBg = preset.colors['--bg-card'] || '#1e1e1e'
                   const primaryColor = preset.colors['--color-primary'] || '#ffffff'
                   const textColor = preset.colors['--text-primary'] || '#ffffff'
+                  const roleTokens = [
+                    '--color-primary',
+                    '--color-accent',
+                    '--color-success',
+                    '--color-warning',
+                    '--color-danger',
+                  ]
 
                   return (
                     <button
@@ -177,6 +183,19 @@ export function ThemesPage() {
                           <span className="preset-mini-text" style={{ color: textColor }}>
                             {preset.name}
                           </span>
+                        </div>
+                        <div className="preset-mini-swatches">
+                          {roleTokens.map((tokenKey) => {
+                            const c = preset.colors[tokenKey]
+                            return c ? (
+                              <span
+                                key={tokenKey}
+                                className="preset-mini-swatch"
+                                style={{ backgroundColor: c }}
+                                title={tokenKey}
+                              />
+                            ) : null
+                          })}
                         </div>
                       </div>
                       <div className="preset-info">

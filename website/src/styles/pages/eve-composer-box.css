@@ -1,0 +1,335 @@
+/* Eve Composer Box — split from eve.css (Wave D) */
+/* ── Modern Composer Box ── */
+.eve-page-composer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.eve-composer-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--bg-card, var(--bg-secondary));
+  padding: 12px 14px 10px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.eve-composer-card.dragging {
+  border-color: var(--text-primary);
+  border-style: dashed;
+  background: var(--bg-hover);
+}
+
+.eve-composer-card:focus-within {
+  border-color: var(--border-heavy, var(--text-primary));
+}
+
+/* Composer Attachment Chips */
+.eve-composer-attachments-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.eve-composer-attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.55rem 0.25rem 0.4rem;
+  border-radius: var(--radius-xs, 6px);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  max-width: 220px;
+}
+
+.eve-attachment-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+}
+
+.eve-attachment-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.eve-attachment-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.eve-attachment-name {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.eve-attachment-size {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.eve-attachment-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 2px;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.eve-attachment-remove-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.eve-composer-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  box-shadow: none !important;
+  padding: 0;
+  min-height: 88px;
+  max-height: 220px;
+}
+
+.eve-composer-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+.eve-composer-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.eve-composer-bottom-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.eve-bottom-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.eve-bottom-pill-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-heavy);
+  background: var(--bg-hover);
+}
+
+.eve-model-selector-container {
+  position: relative;
+}
+
+.eve-model-tag-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.eve-model-tag-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-heavy);
+}
+
+.eve-model-chevron {
+  color: var(--text-muted);
+  transition: transform var(--transition-fast);
+}
+
+.eve-model-chevron.open {
+  transform: rotate(180deg);
+}
+
+.eve-model-menu-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--bg-card, var(--bg-secondary));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-lg, 0 10px 25px rgba(0, 0, 0, 0.4));
+  z-index: 30;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.eve-model-menu-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 0.25rem 0.5rem 0.15rem;
+}
+
+.eve-model-menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.eve-model-menu-group-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 0.2rem 0.5rem 0;
+}
+
+.eve-model-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-xs, 4px);
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.eve-model-menu-item:hover {
+  background: var(--bg-hover);
+}
+
+.eve-model-menu-item.active {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  font-weight: 600;
+}
+
+.eve-composer-bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.eve-bottom-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.eve-bottom-icon-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.eve-bottom-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.eve-bottom-icon-btn.recording {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  animation: eve-pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes eve-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.eve-bottom-send-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.eve-bottom-send-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  opacity: 0.95;
+}
+
+.eve-bottom-send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+

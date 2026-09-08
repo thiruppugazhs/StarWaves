@@ -129,17 +129,31 @@ class TestAiModelsSettings(unittest.TestCase):
 
     def test_eve_chat_returns_detailed_502_error_on_ai_failure(self):
         self._mock_settings_snapshot()
-        from unittest.mock import patch
+        from unittest.mock import MagicMock, patch
         from app.services.ai_models import AIServiceError
+        from app.services.ai_models.contracts import AiConfig
 
-        with patch("app.services.eve.chat.run_tool_loop", side_effect=AIServiceError("API key expired or quota reached")):
-            with patch("app.services.eve.chat.any_provider_available", return_value=True):
-                payload = {"messages": [{"role": "user", "content": "Hello Eve"}]}
-                response = client.post("/api/v1/eve/chat", json=payload)
-                self.assertEqual(response.status_code, 502)
-                data = response.json()
-                self.assertIn("Eve AI service error", data["detail"])
-                self.assertIn("API key expired or quota reached", data["detail"])
+        # Patch resolve_chat_context to inject a working provider client regardless
+        # of env keys (universal openai default now requires real key). The test
+        # verifies that AIServiceError from the tool loop maps to 502, not the
+        # config resolution itself.
+        fake_config = AiConfig(provider="openai", model="gpt-4o-mini", client_options={"api_key": "sk-test"})
+        fake_context = MagicMock()
+        fake_context.config = fake_config
+        fake_context.client = MagicMock()
+        fake_context.instructions = "test"
+        fake_context.conversation = []
+        fake_context.run_tool = MagicMock()
+
+        with patch("app.services.eve.chat.resolve_chat_context", return_value=fake_context):
+            with patch("app.services.eve.chat.run_tool_loop", side_effect=AIServiceError("API key expired or quota reached")):
+                with patch("app.services.eve.chat.any_provider_available", return_value=True):
+                    payload = {"messages": [{"role": "user", "content": "Hello Eve"}]}
+                    response = client.post("/api/v1/eve/chat", json=payload)
+                    self.assertEqual(response.status_code, 502)
+                    data = response.json()
+                    self.assertIn("Eve AI service error", data["detail"])
+                    self.assertIn("API key expired or quota reached", data["detail"])
 
 
 if __name__ == "__main__":

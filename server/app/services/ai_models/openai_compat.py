@@ -12,9 +12,51 @@ from app.services.ai_models.contracts import (
     ProviderResponse,
     StreamChunk,
     ToolCall,
+    classify_provider_error,
 )
 
 logger = logging.getLogger(__name__)
+
+# Conservative max output tokens to avoid OpenRouter 402 credit checks
+# (free tier can only afford ~3810 total tokens; request + prompt must fit).
+# OpenRouter is most constrained, so use 1024 there, 4096 elsewhere.
+DEFAULT_MAX_TOKENS = 4096
+OPENROUTER_MAX_TOKENS = 1024
+
+_PROVIDER_MAX_TOKENS: dict[str, int] = {
+    "openrouter": OPENROUTER_MAX_TOKENS,
+    "groq": 4096,
+    "ollama": 8192,
+    "opencode": 4096,
+    "openai": 4096,
+}
+
+
+def _provider_label(client: Any) -> str:
+    try:
+        raw = getattr(client, "_base_url", None) or getattr(client, "base_url", None) or ""
+        label = str(raw)
+    except Exception:
+        label = ""
+    low = label.lower()
+    if "openrouter" in low:
+        return "openrouter"
+    if "groq" in low:
+        return "groq"
+    if "opencode" in low:
+        return "opencode"
+    if "ollama" in low or "11434" in low:
+        return "ollama"
+    if "openai" in low:
+        return "openai"
+    return "provider"
+
+
+def _max_tokens_for(client: Any) -> int:
+    try:
+        return _PROVIDER_MAX_TOKENS.get(_provider_label(client), DEFAULT_MAX_TOKENS)
+    except Exception:
+        return DEFAULT_MAX_TOKENS
 
 
 def _parse_arguments(raw: Any) -> dict[str, Any]:
@@ -26,6 +68,33 @@ def _parse_arguments(raw: Any) -> dict[str, Any]:
         return {}
 
 
+def _convert_tool(tool: dict[str, Any]) -> dict[str, Any]:
+    """Convert Eve's flat Responses tool shape to Chat Completions nested shape.
+
+    Eve tools are authored in the flat Responses form
+    ``{type, name, description, parameters, strict}`` so the OpenAI Responses
+    adapter can pass them through. The Chat Completions surface (used by
+    OpenRouter/Ollama/Groq/OpenCode) requires the nested
+    ``{type, function: {name, description, parameters, strict}}`` shape.
+    Pass-through already-nested tools and empty placeholders unchanged so
+    unit tests that use ``[{}]`` as a dummy still pass.
+    """
+    if not isinstance(tool, dict) or not tool:
+        return tool
+    if "function" in tool and isinstance(tool["function"], dict):
+        return tool
+    if "name" not in tool:
+        return tool
+    function: dict[str, Any] = {
+        "name": tool["name"],
+        "description": tool.get("description", ""),
+        "parameters": tool.get("parameters", {"type": "object", "properties": {}}),
+    }
+    if "strict" in tool:
+        function["strict"] = tool["strict"]
+    return {"type": "function", "function": function}
+
+
 class OpenAiCompatibleClient(ProviderClient):
     """Provider adapter for OpenAI-compatible /chat/completions APIs.
 
@@ -35,8 +104,21 @@ class OpenAiCompatibleClient(ProviderClient):
     """
 
     def build_client(self, client_options: dict[str, Any]) -> OpenAI:
+        # Inject OpenRouter Referer/Title if not already present (client_options may carry default_headers)
         try:
-            return OpenAI(**client_options)
+            options = dict(client_options)
+            # Ensure OpenRouter default_headers are propagated even when built via get_provider_client
+            # (config._client_options already sets them, but direct AiConfig may bypass)
+            if options.get("base_url") and "openrouter.ai" in options["base_url"]:
+                hdrs = options.get("default_headers") or {}
+                if "HTTP-Referer" not in hdrs and "Referer" not in hdrs:
+                    from app.core.config import settings as _settings
+
+                    hdrs["HTTP-Referer"] = _settings.frontend_url
+                if "X-Title" not in hdrs:
+                    hdrs["X-Title"] = "Starwaves"
+                options["default_headers"] = hdrs
+            return OpenAI(**options)
         except Exception as error:
             logger.error(f"[OpenAI-Compatible Provider] Failed to initialize client: {type(error).__name__}: {error}", exc_info=True)
             raise AIServiceError(f"Provider client initialization failed: {type(error).__name__}: {error}") from error
@@ -54,18 +136,39 @@ class OpenAiCompatibleClient(ProviderClient):
         conversation: Any,
         tools: list[dict[str, Any]],
     ) -> ProviderResponse:
+        converted = [_convert_tool(tool) for tool in tools] if tools else None
+        max_tokens = _max_tokens_for(self.client)
+        response = None
         try:
             response = self.client.chat.completions.create(
                 model=model,
                 messages=[{"role": "system", "content": instructions}, *conversation],
-                tools=tools or None,
+                tools=converted,
+                max_tokens=max_tokens,
             )
         except OpenAIError as error:
             logger.error(f"[OpenAI-Compatible Provider] API call failed for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Provider API error ({type(error).__name__}): {error}") from error
+            prov = _provider_label(self.client)
+            classified = classify_provider_error(error, prov, model)
+            # Quota 402 often due to max_tokens too high on free tier — retry once with halved tokens
+            if classified.kind == "quota" and max_tokens > 512:
+                try:
+                    retry_tokens = max(512, max_tokens // 2)
+                    logger.warning(f"[OpenAI-Compatible Provider] Retrying {model} with max_tokens={retry_tokens} after quota error")
+                    response = self.client.chat.completions.create(
+                        model=model,
+                        messages=[{"role": "system", "content": instructions}, *conversation],
+                        tools=converted,
+                        max_tokens=retry_tokens,
+                    )
+                except Exception as retry_error:
+                    logger.error(f"[OpenAI-Compatible Provider] Retry failed for model '{model}': {type(retry_error).__name__}: {retry_error}", exc_info=True)
+                    raise classified from error
+            else:
+                raise classified from error
         except Exception as error:
             logger.error(f"[OpenAI-Compatible Provider] Unexpected failure calling model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Provider client error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "provider", model) from error
 
         choice = response.choices[0] if response.choices else None
         message = choice.message if choice else None
@@ -87,19 +190,40 @@ class OpenAiCompatibleClient(ProviderClient):
         conversation: Any,
         tools: list[dict[str, Any]],
     ) -> Iterator[StreamChunk]:
+        converted = [_convert_tool(tool) for tool in tools] if tools else None
+        max_tokens = _max_tokens_for(self.client)
+        stream = None
         try:
             stream = self.client.chat.completions.create(
                 model=model,
                 messages=[{"role": "system", "content": instructions}, *conversation],
-                tools=tools or None,
+                tools=converted,
+                max_tokens=max_tokens,
                 stream=True,
             )
         except OpenAIError as error:
             logger.error(f"[OpenAI-Compatible Provider] Streaming call failed for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Provider API error ({type(error).__name__}): {error}") from error
+            prov = _provider_label(self.client)
+            classified = classify_provider_error(error, prov, model)
+            if classified.kind == "quota" and max_tokens > 512:
+                try:
+                    retry_tokens = max(512, max_tokens // 2)
+                    logger.warning(f"[OpenAI-Compatible Provider] Retrying stream {model} with max_tokens={retry_tokens} after quota error")
+                    stream = self.client.chat.completions.create(
+                        model=model,
+                        messages=[{"role": "system", "content": instructions}, *conversation],
+                        tools=converted,
+                        max_tokens=retry_tokens,
+                        stream=True,
+                    )
+                except Exception as retry_error:
+                    logger.error(f"[OpenAI-Compatible Provider] Stream retry failed for model '{model}': {type(retry_error).__name__}: {retry_error}", exc_info=True)
+                    raise classified from error
+            else:
+                raise classified from error
         except Exception as error:
             logger.error(f"[OpenAI-Compatible Provider] Unexpected streaming failure for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Provider client error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, "provider", model) from error
 
         content_slots: list[dict[str, Any]] = []
         text_parts: list[str] = []
@@ -163,7 +287,7 @@ class OpenAiCompatibleClient(ProviderClient):
             raise
         except Exception as error:
             logger.error(f"[OpenAI-Compatible Provider] Streaming iteration failed for model '{model}': {type(error).__name__}: {error}", exc_info=True)
-            raise AIServiceError(f"Provider client error ({type(error).__name__}): {error}") from error
+            raise classify_provider_error(error, _provider_label(self.client), model) from error
 
         # Synthesize a raw response shaped like the non-streaming one so
         # continuation() can read choices[0].message unchanged.

@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Header } from '../components/Header'
 import { Sidebar } from '../components/Sidebar'
+import { MobileTabBar } from '../components/MobileTabBar'
 import { NetworkStatus } from '../components/NetworkStatus'
 import '../App.css'
-
-const MOBILE_NAV_BREAKPOINT = 900
 
 export function AppLayout({
   activePage,
@@ -40,53 +39,47 @@ export function AppLayout({
     localStorage.setItem('starwaves.sidebar-expanded', String(sidebarExpanded))
   }, [sidebarExpanded])
 
-  const toggleNavigation = () => {
-    if (window.innerWidth <= MOBILE_NAV_BREAKPOINT) {
-      setSidebarOpen(true)
-      return
-    }
-    setSidebarExpanded((expanded) => !expanded)
-  }
-
   return (
     <div className={`app-shell ${isSidebarExpanded ? 'sidebar-expanded' : ''}`}>
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <NetworkStatus />
-      <Header
-        onMenuOpen={toggleNavigation}
-        navigationExpanded={isSidebarExpanded}
+      <Sidebar
+        activePage={activePage}
+        isExpanded={isSidebarExpanded}
+        isOpen={sidebarOpen}
         onNavigate={onNavigate}
-        onCreate={onCreate}
-        callCenter={callCenter}
-        notifications={notifications}
-        setNotifications={setNotifications}
-        notificationsOpen={notificationsOpen}
-        setNotificationsOpen={setNotificationsOpen}
-        user={user}
-        notificationsCanLoadMore={notificationsCanLoadMore}
-        notificationsLoading={notificationsLoading}
-        onLoadMoreNotifications={onLoadMoreNotifications}
+        onClose={() => setSidebarOpen(false)}
+        onToggleExpand={() => setSidebarExpanded((expanded) => !expanded)}
         onWorkspaceChanged={onWorkspaceChanged}
-        onEveNewChat={onEveNewChat}
-        onSignOut={onSignOut}
-        workspaceData={workspaceData}
       />
-      <div className="app-body">
-        <Sidebar
+      <div className="app-main-wrapper">
+        <Header
           activePage={activePage}
-          isExpanded={isSidebarExpanded}
-          isOpen={sidebarOpen}
           onNavigate={onNavigate}
-          onClose={() => setSidebarOpen(false)}
+          onCreate={onCreate}
+          callCenter={callCenter}
+          notifications={notifications}
+          setNotifications={setNotifications}
+          notificationsOpen={notificationsOpen}
+          setNotificationsOpen={setNotificationsOpen}
+          user={user}
+          notificationsCanLoadMore={notificationsCanLoadMore}
+          notificationsLoading={notificationsLoading}
+          onLoadMoreNotifications={onLoadMoreNotifications}
+          onWorkspaceChanged={onWorkspaceChanged}
+          onEveNewChat={onEveNewChat}
+          onSignOut={onSignOut}
+          workspaceData={workspaceData}
         />
         <main
           ref={contentRef}
           id="main-content"
-          className={`app-main content ${activePage === 'calendar' ? 'calendar-content' : ''} ${activePage === 'whatsapp' ? 'whatsapp-fullscreen-content' : ''}`}
+          className={`app-main content ${activePage === 'calendar' ? 'calendar-content' : ''} ${activePage === 'whatsapp' ? 'whatsapp-fullscreen-content' : ''} ${activePage === 'workspace' ? 'workspace-fullscreen-content' : ''} ${activePage === 'avatar' ? 'avatar-fullscreen-content' : ''}`}
           tabIndex={-1}
         >
           {children}
         </main>
+        <MobileTabBar activePage={activePage} onNavigate={onNavigate} />
       </div>
     </div>
   )

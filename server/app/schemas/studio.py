@@ -66,6 +66,16 @@ class StudioTemplateSummary(BaseModel):
     stack: str = ""
     kind: str = "curated"
     source_project_id: str | None = None
+    category: str = "web"
+    tags: list[str] = Field(default_factory=list)
+    featured: bool = False
+    sort_order: int = 0
+
+
+class StudioActivitySummary(BaseModel):
+    type: str
+    label: str
+    occurred_at: str
 
 
 class StudioTemplateListResponse(BaseModel):
@@ -88,6 +98,8 @@ class StudioProjectResponse(BaseModel):
     github_repo_url: str | None = None
     published_template_id: str | None = None
     file_count: int = 0
+    preview_status: str = "unavailable"
+    last_activity: StudioActivitySummary | None = None
     created_at: str
     updated_at: str
 

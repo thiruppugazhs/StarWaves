@@ -1,0 +1,242 @@
+/* Settings AI — split from settings.css (Wave F) */
+/* AI Models Settings */
+.ai-models-fields {
+  display: grid;
+  gap: 0;
+}
+
+.ai-models-fields label,
+.ai-models-env-row {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+@media (max-width: 640px) {
+  .ai-models-fields label,
+  .ai-models-env-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.ai-models-fields label > span,
+.ai-models-env-row > span {
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-models-fields strong,
+.ai-models-env-row strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ai-models-fields small,
+.ai-models-env-row small {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.ai-models-fields .custom-dropdown {
+  width: 100%;
+}
+
+.ai-models-fields .custom-dropdown-trigger {
+  min-height: 40px;
+  padding: 9px 12px;
+  font-size: 13px;
+}
+
+.ai-models-env-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.ai-models-env-pill svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.ai-models-key-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.ai-models-key-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-card);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ai-models-key-input-container:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.ai-models-key-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.ai-models-key-input-container input {
+  width: 100%;
+  padding: 9px 38px 9px 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.ai-models-key-input-container input::placeholder {
+  color: var(--text-muted, #71717a);
+}
+
+.ai-models-key-toggle {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.ai-models-key-toggle:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.ai-models-key-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.ai-models-key-status svg {
+  color: var(--text-primary);
+}
+
+/* Eve Voice Settings */
+.eve-voice-footer .eve-voice-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.eve-voice-footer .eve-voice-primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.eve-voice-footer .eve-voice-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.eve-voice-footer .eve-voice-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.eve-voice-footer .eve-voice-reset:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover, var(--text-muted));
+}
+
+.eve-voice-capabilities {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 22px;
+}
+
+.eve-voice-capabilities > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted, #71717a);
+}
+
+.eve-voice-capabilities > span.supported {
+  color: var(--text-primary, #09090b);
+}
+
+.coding-settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 16px 22px;
+  background: var(--bg-card, #ffffff);
+  border-top: 1px solid var(--border-color);
+  border-bottom-left-radius: calc(var(--radius-xl, 14px) - 1px);
+  border-bottom-right-radius: calc(var(--radius-xl, 14px) - 1px);
+}
+
+.coding-settings-footer p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+

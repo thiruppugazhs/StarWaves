@@ -1,0 +1,301 @@
+/* Workspace Overview Grid — App Theme Styled */
+/* ──── Overview: Workspaces grid ──── */
+
+.ws-overview {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-lg) var(--content-gutter) var(--space-3xl);
+  background: var(--bg-primary);
+}
+
+.ws-overview-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin: 0 auto var(--space-lg);
+  max-width: var(--layout-max-width, 1240px);
+}
+
+.ws-overview-search {
+  width: min(100%, 280px);
+}
+
+.ws-overview-header h2 {
+  margin: 0 0 6px;
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.ws-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: var(--card-gap, 16px);
+  max-width: var(--layout-max-width, 1240px);
+  margin: 0 auto;
+}
+
+/* Card shell */
+.ws-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition:
+    border-color var(--transition-fast, 140ms ease),
+    box-shadow var(--transition-fast, 140ms ease),
+    transform var(--transition-fast, 140ms ease);
+}
+
+.ws-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--module-workspace, var(--color-primary)), transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.ws-card:hover,
+.ws-card:focus-within {
+  border-color: var(--border-heavy, var(--border-color));
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.ws-card.active {
+  border-color: var(--module-workspace, var(--color-primary));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--module-workspace, var(--color-primary)) 20%, transparent);
+}
+
+/* Open button */
+.ws-card-open {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'avatar name'
+    'avatar meta';
+  align-items: center;
+  column-gap: 14px;
+  row-gap: 6px;
+  width: 100%;
+  padding: 18px 20px;
+  background: none;
+  border: 0;
+  border-radius: inherit;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.ws-card-open:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.ws-card-avatar {
+  grid-area: avatar;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-primary);
+  color: var(--text-inverse, #ffffff);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.ws-card-name {
+  grid-area: name;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding-right: 56px;
+}
+
+.ws-card-meta {
+  grid-area: meta;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  font-size: var(--text-xs, 12px);
+  color: var(--text-muted);
+}
+
+.ws-card-count,
+.ws-card-updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.ws-card-updated {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Row actions — revealed on hover */
+.ws-card-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity var(--transition-fast, 140ms ease);
+}
+
+.ws-card:hover .ws-card-actions,
+.ws-card:focus-within .ws-card-actions {
+  opacity: 1;
+}
+
+.ws-card-actions button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast, 140ms ease),
+    border-color var(--transition-fast, 140ms ease),
+    color var(--transition-fast, 140ms ease);
+}
+
+.ws-card-actions button:hover,
+.ws-card-actions button:focus-visible {
+  background: var(--bg-hover);
+  border-color: var(--border-heavy, var(--border-color));
+  color: var(--text-primary);
+}
+
+.ws-card-actions button.danger:hover,
+.ws-card-actions button.danger:focus-visible {
+  background: var(--color-danger, #e11d48);
+  border-color: var(--color-danger, #e11d48);
+  color: #ffffff;
+}
+
+.ws-card-actions button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+/* Active flag */
+.ws-card-flag {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full, 999px);
+  background: var(--module-workspace, var(--color-primary));
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Create card */
+.ws-card-create {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 96px;
+  padding: 18px 20px;
+  border-style: dashed;
+  border-color: var(--border-heavy, var(--border-color));
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font: inherit;
+}
+
+.ws-card-create:hover {
+  background: var(--bg-card);
+  border-color: var(--color-primary);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.ws-card-create:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.ws-card-plus {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-heavy, var(--border-color));
+  border-radius: var(--radius-full, 999px);
+  transition: inherit;
+}
+
+.ws-card-create:hover .ws-card-plus {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--text-inverse, #ffffff);
+}
+
+.ws-card-create .ws-card-name {
+  overflow: visible;
+  white-space: normal;
+  font-weight: 600;
+  text-align: center;
+  padding-right: 0;
+}
+
+.ws-card-create .ws-card-meta {
+  justify-content: center;
+  font-size: 11.5px;
+}
+
+@media (max-width: 520px) {
+  .ws-overview {
+    padding: 20px 14px 36px;
+  }
+
+  .ws-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ws-overview-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ws-overview-search {
+    width: 100%;
+  }
+}

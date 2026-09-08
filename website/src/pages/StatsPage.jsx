@@ -1,3 +1,4 @@
+import "../styles/pages/stats.css"
 import {
   ArrowUpRight,
   CircleCheckBig,
@@ -8,7 +9,7 @@ import {
   Rocket,
   Trophy,
 } from 'lucide-react'
-import { MetricCard, PageHeader } from '../components/ui'
+import { MetricCard } from '../components/ui'
 
 
 function stat(value) {
@@ -23,7 +24,10 @@ function ProgressRow({ label, value, total, colorClass = '' }) {
   const percentage = total ? Math.min(100, Math.round((value / total) * 100)) : 0
   return (
     <div className="stats-progress-row">
-      <div><strong>{label}</strong><span>{stat(value)}</span></div>
+      <div className="stats-progress-label-row">
+        <strong>{label}</strong>
+        <span>{stat(value)}</span>
+      </div>
       <div
         className="stats-progress-track"
         role="progressbar"
@@ -66,12 +70,6 @@ export function StatsPage({
 
   return (
     <section className="stats-page">
-      <PageHeader
-        eyebrow="Performance"
-        title="Stats"
-        actions={<span className="stats-updated">Updated from workspace data</span>}
-      />
-
       <div className="stats-metric-grid">
         <MetricCard icon={Trophy} label="Codeforces rating" value={stat(codeforces.rating)} detail={`${stat(codeforces.rank)} · Max ${stat(codeforces.maxRating)}`} />
         <MetricCard icon={Code2} label="CodeChef rating" value={stat(codechef.rating)} detail={`${stat(codechef.stars)} star · Max ${stat(codechef.maxRating)}`} />
@@ -124,10 +122,13 @@ export function StatsPage({
           <header>
             <span><Code2 size={19} /></span>
             <div><p>Competitive coding</p><h2>Codeforces</h2></div>
-            <button onClick={() => onNavigate('competitive-coding')} aria-label="Open competitive coding"><ArrowUpRight size={17} /></button>
+            <button onClick={() => onNavigate('compete')} aria-label="Open competitive coding"><ArrowUpRight size={17} /></button>
           </header>
           <div className="stats-rating-display">
-            <div><strong>{stat(codeforces.rating)}</strong><span>Current rating</span></div>
+            <div className="stats-rating-meta">
+              <strong>{stat(codeforces.rating)}</strong>
+              <span>Current rating</span>
+            </div>
             <em>{codeforces.ratingChange == null ? '—' : `${codeforces.ratingChange > 0 ? '+' : ''}${codeforces.ratingChange}`}</em>
           </div>
           <div className="stats-inline-values">
@@ -141,10 +142,13 @@ export function StatsPage({
           <header>
             <span><Trophy size={19} /></span>
             <div><p>Competitive coding</p><h2>CodeChef</h2></div>
-            <button onClick={() => onNavigate('competitive-coding')} aria-label="Open competitive coding"><ArrowUpRight size={17} /></button>
+            <button onClick={() => onNavigate('compete')} aria-label="Open competitive coding"><ArrowUpRight size={17} /></button>
           </header>
           <div className="stats-rating-display">
-            <div><strong>{stat(codechef.rating)}</strong><span>Current rating</span></div>
+            <div className="stats-rating-meta">
+              <strong>{stat(codechef.rating)}</strong>
+              <span>Current rating</span>
+            </div>
             <em>{codechef.ratingChange == null ? '—' : `${codechef.ratingChange > 0 ? '+' : ''}${codechef.ratingChange}`}</em>
           </div>
           <div className="stats-inline-values stats-four-values">
@@ -160,7 +164,10 @@ export function StatsPage({
             <span><CircleCheckBig size={19} /></span>
             <div><p>Problem solving</p><h2>LeetCode</h2></div>
           </header>
-          <div className="stats-solved-heading"><strong>{stat(leetcode.solved)}</strong><span>of {stat(leetcode.total)} problems solved</span></div>
+          <div className="stats-solved-heading">
+            <strong>{stat(leetcode.solved)}</strong>
+            <span>of {stat(leetcode.total)} problems solved</span>
+          </div>
           <ProgressRow label="Easy" value={leetcode.easy} total={leetcode.solved} colorClass="easy" />
           <ProgressRow label="Medium" value={leetcode.medium} total={leetcode.solved} colorClass="medium" />
           <ProgressRow label="Hard" value={leetcode.hard} total={leetcode.solved} colorClass="hard" />
@@ -179,9 +186,21 @@ export function StatsPage({
           </header>
           <div className="stats-project-rows">
             {projects.map((project) => (
-              <div key={project.id}>
-                <div><strong>{project.name}</strong><span>{project.status} · {project.progress}%</span></div>
-                <div className="stats-progress-track" role="progressbar" aria-label={`${project.name}: ${project.progress}% complete`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={project.progress}><i style={{ width: `${project.progress}%` }} aria-hidden="true" /></div>
+              <div key={project.id} className="stats-project-item">
+                <div className="stats-project-meta">
+                  <strong>{project.name}</strong>
+                  <span>{project.status} · {project.progress}%</span>
+                </div>
+                <div
+                  className="stats-progress-track"
+                  role="progressbar"
+                  aria-label={`${project.name}: ${project.progress}% complete`}
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow={project.progress}
+                >
+                  <i style={{ width: `${project.progress}%` }} aria-hidden="true" />
+                </div>
               </div>
             ))}
           </div>
@@ -195,10 +214,16 @@ export function StatsPage({
           </header>
           <div className="stats-hackathon-list">
             {hackathons.map((hackathon) => (
-              <div key={hackathon.id}>
-                <span className="stats-date-box"><strong>{new Date(hackathon.startsAt).getDate()}</strong><small>{new Date(hackathon.startsAt).toLocaleDateString(undefined, { month: 'short' })}</small></span>
-                <div><strong>{hackathon.title}</strong><span>{hackathon.organizer}</span></div>
-                <em>{hackathon.mode}</em>
+              <div key={hackathon.id} className="stats-hackathon-item">
+                <span className="stats-date-box">
+                  <strong>{new Date(hackathon.startsAt).getDate()}</strong>
+                  <small>{new Date(hackathon.startsAt).toLocaleDateString(undefined, { month: 'short' })}</small>
+                </span>
+                <div className="stats-hackathon-meta">
+                  <strong>{hackathon.title}</strong>
+                  <span>{hackathon.organizer}</span>
+                </div>
+                <em className="stats-hackathon-mode">{hackathon.mode}</em>
               </div>
             ))}
           </div>

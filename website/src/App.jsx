@@ -1,53 +1,41 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { buildAppPages } from './appPages'
 import { AppLayout } from './layouts/AppLayout'
-import { DashboardPage } from './pages/DashboardPage'
-import { DocumentsPage } from './pages/DocumentsPage'
-import { DocumentOpenerPage } from './pages/DocumentOpenerPage'
-import { HackathonsPage } from './pages/HackathonsPage'
-import { HackathonDetailPage } from './pages/HackathonDetailPage'
-import { JobsPage } from './pages/JobsPage'
-import { ProjectsPage } from './pages/ProjectsPage'
-import { ProjectDetailPage } from './pages/ProjectDetailPage'
-import { SettingPage } from './pages/SettingPage'
-import { ThemesPage } from './pages/ThemesPage'
-import { StatsPage } from './pages/StatsPage'
-import { TodoPage } from './pages/TodoPage'
-import { ProfilePage } from './pages/ProfilePage'
 import { IncomingCallOverlay } from './components/calls/IncomingCallOverlay'
-// Heavy pages lazy (Vercel split: monaco, whatsapp 1.3k, WebRTC, Eve)
-const CalendarPage = lazy(() => import('./pages/CalendarPage').then((m) => ({ default: m.CalendarPage })))
-const CompetitiveCodingPage = lazy(() => import('./pages/CompetitiveCodingPage').then((m) => ({ default: m.CompetitiveCodingPage })))
-const EvePage = lazy(() => import('./pages/EvePage').then((m) => ({ default: m.EvePage })))
-const MailsPage = lazy(() => import('./pages/MailsPage').then((m) => ({ default: m.MailsPage })))
-const WhatsAppPage = lazy(() => import('./pages/WhatsAppPage').then((m) => ({ default: m.WhatsAppPage })))
-const ChatsPage = lazy(() => import('./pages/ChatsPage').then((m) => ({ default: m.ChatsPage })))
-const CallsPage = lazy(() => import('./pages/CallsPage').then((m) => ({ default: m.CallsPage })))
-const ContactsPage = lazy(() => import('./pages/ContactsPage').then((m) => ({ default: m.ContactsPage })))
-const WorkspacePage = lazy(() => import('./pages/WorkspacePage').then((m) => ({ default: m.WorkspacePage })))
-const StudioProjectsPage = lazy(() => import('./pages/studio/StudioProjectsPage').then((m) => ({ default: m.StudioProjectsPage })))
-const StudioAppsPage = lazy(() => import('./pages/studio/StudioAppsPage').then((m) => ({ default: m.StudioAppsPage })))
-const StudioBuilderPage = lazy(() => import('./pages/studio/StudioBuilderPage').then((m) => ({ default: m.StudioBuilderPage })))
-const StudioTemplatesPage = lazy(() => import('./pages/studio/StudioTemplatesPage').then((m) => ({ default: m.StudioTemplatesPage })))
-const UsagePage = lazy(() => import('./pages/UsagePage').then((m) => ({ default: m.UsagePage })))
-import { AuthPage } from './pages/AuthPage'
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
-import { OnboardingPage } from './pages/OnboardingPage'
-import { LandingPage } from './pages/LandingPage'
-import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
-import { TermsOfServicePage } from './pages/TermsOfServicePage'
-import { CustomPage } from './pages/CustomPage'
+// App pages live in appPages.jsx (buildAppPages) — heavy pages stay lazy for
+// code-split (fixes 567k index). Only public-shell pages are imported here.
+// Public pages lazy — LandingPage pulls framer-motion; none of these are
+// needed for authenticated /app/* sessions, so keep them out of `index`.
+const AuthPage = lazy(() => import('./pages/AuthPage').then((m) => ({ default: m.AuthPage })))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })))
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage').then((m) => ({ default: m.OnboardingPage })))
+const LandingPage = lazy(() => import('./pages/LandingPage').then((m) => ({ default: m.LandingPage })))
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })))
+const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage').then((m) => ({ default: m.TermsOfServicePage })))
+const CustomPage = lazy(() => import('./pages/CustomPage').then((m) => ({ default: m.CustomPage })))
+// Global companion overlay lazy — pulls EveAvatar + useThemeCustomizer; not
+// needed for first paint, mounts quietly once loaded.
+const EveGlobalCompanionHost = lazy(() => import('./components/eve/avatar/EveGlobalCompanionHost').then((m) => ({ default: m.EveGlobalCompanionHost })))
+const AvatarOverlayManager = lazy(() => import('./components/eve/avatar/AvatarOverlayManager').then((m) => ({ default: m.AvatarOverlayManager })))
+const AvatarOverlayPage = lazy(() => import('./pages/AvatarOverlayPage').then((m) => ({ default: m.AvatarOverlayPage })))
 import { updateNotification } from './lib/workspaceApi'
 import { confirmEmailVerification } from './lib/emailApi'
 import { clearAuthSession, verifyAccountCombine } from './lib/authApi'
 import { CALENDAR_REMINDER_PREFIX } from './utils/calendarReminders'
-import { useAuth, useRouter, useWorkspaceData, useCallCenter } from './hooks'
+import { useAuth } from './hooks/useAuth'
+import { useRouter } from './hooks/useRouter'
+import { useWorkspaceData } from './hooks/useWorkspaceData'
+import { useCallCenter } from './hooks/call/useCallCenter'
 import { useSyncEvents } from './hooks/useSyncEvents'
-import { applyThemeVariables } from './themes'
+import { applyThemeVariables } from './themes/themeApplicator'
 import { NetworkStatus } from './components/NetworkStatus'
 import { WaveLoader } from './components/WaveLoader'
 import { useDialogAccessibility } from './hooks/useDialogAccessibility'
-import { useCustomUI } from './hooks/useCustomUI'
+import { CustomUIProvider } from './hooks/useCustomUI'
 import { EveUiBanner } from './components/ui/EveUiBanner'
+import { UpdateBanner } from './components/ui/UpdateBanner'
+import { useAutoUpdater } from './hooks/useAutoUpdater'
+import { EveAvatarProvider } from './components/eve/avatar/EveAvatarProvider'
 
 const routeTitles = {
   '/': 'StarWaves — Developer productivity workspace',
@@ -64,7 +52,7 @@ function publicRoute(content) {
     <>
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <NetworkStatus />
-      {content}
+      <Suspense fallback={<WaveLoader />}>{content}</Suspense>
     </>
   )
 }
@@ -76,6 +64,18 @@ function App() {
   const activeUser = currentUser || sessionUser
   const callCenter = useCallCenter({ user: activeUser })
   useSyncEvents({ user: activeUser, onInvalidate: () => setWorkspaceRefreshKey((k) => k + 1) })
+  const isNativeApp = (() => {
+    try {
+      if (typeof window !== 'undefined') {
+        if (window.Capacitor?.isNativePlatform?.() && window.Capacitor.isNativePlatform()) return true
+        if (window.__TAURI__) return true
+        if (navigator.userAgent.includes('Capacitor') || navigator.userAgent.includes('Tauri')) return true
+        if (window.location.protocol === 'capacitor:' || window.location.protocol === 'tauri:') return true
+      }
+    } catch {}
+    return false
+  })()
+  const { update: appUpdate, dismiss: dismissAppUpdate } = useAutoUpdater()
 
   const resetToken = (() => {
     const hash = window.location.hash || ''
@@ -107,9 +107,6 @@ function App() {
     selectedHackathonId,
     navigate,
   } = useRouter()
-
-  // Eve UI runtime overrides (global + per-page) — must live after useRouter
-  useCustomUI()
 
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [workspaceRefreshKey, setWorkspaceRefreshKey] = useState(0)
@@ -212,10 +209,15 @@ function App() {
         const parsed = JSON.parse(savedTheme)
         if (parsed && typeof parsed === 'object') {
           applyThemeVariables(parsed)
+          return
         }
       } catch (err) {
         console.error('Could not load custom theme:', err)
       }
+    }
+    const stored = localStorage.getItem('starwaves.theme')
+    if (stored === 'light') {
+      applyThemeVariables({ preset: 'light', mode: 'light' })
     }
   }, [])
 
@@ -227,15 +229,10 @@ function App() {
       !resetToken &&
       (route === '/' || route === '/login' || route === '/signup' || route === '/forgot-password' || route === '/auth')
     ) {
-      if (activeUser.needsOnboarding) {
-        window.history.replaceState({}, '', '/onboarding')
-        setRoute('/onboarding')
-      } else {
-        window.history.replaceState({}, '', '/app/dashboard')
-        setRoute('/app/dashboard')
-        setActivePage('dashboard')
-        setSelectedProjectId(null)
-      }
+      window.history.replaceState({}, '', '/app/dashboard')
+      setRoute('/app/dashboard')
+      setActivePage('dashboard')
+      setSelectedProjectId(null)
     }
   }, [authReady, activeUser, route, setRoute, setActivePage, setSelectedProjectId, resetToken])
 
@@ -258,8 +255,10 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const navigateWorkspace = (page, projectId = null, documentId = null) => {
-    navigate(page, { projectId, documentId })
+  const navigateWorkspace = (page, projectId = null, documentId = null, hackathonId = null) => {
+    const effectiveHackathonId = hackathonId || (page === 'hackathon-detail' ? projectId : null)
+    const effectiveProjectId = page === 'hackathon-detail' ? null : projectId
+    navigate(page, { projectId: effectiveProjectId, documentId, hackathonId: effectiveHackathonId })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -274,7 +273,6 @@ function App() {
       displayName,
       email: user.email,
       providerData: user.providerData,
-      needsOnboarding: false,
     })
     navigateRoute('/app/dashboard')
   }
@@ -355,250 +353,57 @@ function App() {
     }
   }, [])
 
-  const pages = {
-    dashboard: (
-        <DashboardPage
-          tasks={tasks}
-          projects={projects}
-          jobs={jobs}
-          documents={documents}
-          contestSites={contestSites}
-          hackathons={hackathons}
-          notifications={notifications}
-          calendarEventIndex={calendarEventIndex}
-          onNavigate={navigateWorkspace}
-          onCreate={requestCreation}
-          onOpenNotifications={() => setNotificationsOpen(true)}
-        />
-      ),
-    eve: (
-      <EvePage
-        activeSubpage="chat"
-        callCenter={callCenter}
-        onNavigate={navigateWorkspace}
-        onWorkspaceChanged={() => setWorkspaceRefreshKey((current) => current + 1)}
-        chatResetKey={eveChatKey}
-      />
-    ),
-    'eve-chat': (
-      <EvePage
-        activeSubpage="chat"
-        callCenter={callCenter}
-        onNavigate={navigateWorkspace}
-        onWorkspaceChanged={() => setWorkspaceRefreshKey((current) => current + 1)}
-        chatResetKey={eveChatKey}
-      />
-    ),
-    'eve-sessions': (
-      <EvePage
-        activeSubpage="sessions"
-        callCenter={callCenter}
-        onNavigate={navigateWorkspace}
-        onWorkspaceChanged={() => setWorkspaceRefreshKey((current) => current + 1)}
-        chatResetKey={eveChatKey}
-      />
-    ),
-    'eve-memory': (
-      <EvePage
-        activeSubpage="memory"
-        callCenter={callCenter}
-        onNavigate={navigateWorkspace}
-        onWorkspaceChanged={() => setWorkspaceRefreshKey((current) => current + 1)}
-        chatResetKey={eveChatKey}
-      />
-    ),
-    'eve-call': (
-      <EvePage
-        activeSubpage="call"
-        callCenter={callCenter}
-        onNavigate={navigateWorkspace}
-        onWorkspaceChanged={() => setWorkspaceRefreshKey((current) => current + 1)}
-        chatResetKey={eveChatKey}
-      />
-    ),
-    'eve-schedules': (
-      <EvePage
-        activeSubpage="schedules"
-        callCenter={callCenter}
-        onNavigate={navigateWorkspace}
-        onWorkspaceChanged={() => setWorkspaceRefreshKey((current) => current + 1)}
-        chatResetKey={eveChatKey}
-      />
-    ),
-    stats: (
-      <StatsPage
-        codingStats={codingStats}
-        contestSites={contestSites}
-        projects={projects}
-        hackathons={hackathons}
-        onNavigate={navigateWorkspace}
-      />
-    ),
-    todo: <TodoPage tasks={tasks} setTasks={setTasks} createIntent={creationIntent} />,
-    'competitive-coding': <CompetitiveCodingPage contestSites={contestSites} />,
-    hackathons: (
-      <HackathonsPage
-        hackathons={hackathons}
-        setHackathons={setHackathons}
-        canLoadMore={pagination.hackathons.has_more}
-        loadingMore={loadingMore}
-        onLoadMore={() => loadMore('hackathons')}
-        onOpenHackathon={(hackathonId) => navigate('hackathon-detail', { hackathonId })}
-      />
-    ),
-    'hackathon-detail': selectedHackathon ? (
-      <HackathonDetailPage
-        hackathon={selectedHackathon}
-        onBack={() => navigateWorkspace('hackathons')}
-        onSave={(updated) =>
-          setHackathons((current) =>
-            current.map((item) => (item.id === updated.id ? updated : item)),
-          )
-        }
-        onDelete={(deletedId) =>
-          setHackathons((current) =>
-            current.filter((item) => item.id !== deletedId),
-          )
-        }
-      />
-    ) : (
-      <HackathonsPage
-        hackathons={hackathons}
-        setHackathons={setHackathons}
-        canLoadMore={pagination.hackathons.has_more}
-        loadingMore={loadingMore}
-        onLoadMore={() => loadMore('hackathons')}
-        onOpenHackathon={(hackathonId) => navigate('hackathon-detail', { hackathonId })}
-      />
-    ),
-    projects: (
-      <ProjectsPage
-        projects={projects}
-        setProjects={setProjects}
-        onOpenProject={openProject}
-        canLoadMore={pagination.projects.has_more}
-        loadingMore={loadingMore}
-        onLoadMore={() => loadMore('projects')}
-      />
-    ),
-    jobs: (
-      <JobsPage
-        jobs={jobs}
-        setJobs={setJobs}
-        documents={documents}
-        createIntent={creationIntent}
-        canLoadMore={pagination.jobs.has_more}
-        loadingMore={loadingMore}
-        onLoadMore={() => loadMore('jobs')}
-      />
-    ),
-    documents: (
-      <DocumentsPage documents={documents} setDocuments={setDocuments} createIntent={creationIntent} onOpenDocument={(documentId) => navigate('document-opener', { documentId })} />
-    ),
-    workspace: <WorkspacePage />,
-    studio: (
-      <StudioProjectsPage
-        onOpenProject={(project) => navigateWorkspace('studio-detail', project.id)}
-        onNavigate={navigateWorkspace}
-      />
-    ),
-    'studio-detail': selectedProjectId ? (
-      <StudioBuilderPage
-        projectId={selectedProjectId}
-        onBack={() => navigateWorkspace('studio')}
-      />
-    ) : (
-      <StudioProjectsPage
-        onOpenProject={(project) => navigateWorkspace('studio-detail', project.id)}
-        onNavigate={navigateWorkspace}
-      />
-    ),
-    'studio-apps': (
-      <StudioAppsPage
-        onOpenProject={(project) => navigateWorkspace('studio-detail', project.id)}
-        onNavigate={navigateWorkspace}
-      />
-    ),
-    'studio-templates': (
-      <StudioTemplatesPage
-        onOpenProject={(project) => navigateWorkspace('studio-detail', project.id)}
-      />
-    ),
-    'document-opener': (
-      <DocumentOpenerPage
-        document={selectedDocument}
-        onBack={() => navigateWorkspace('documents')}
-      />
-    ),
-    'project-detail': selectedProject ? (
-      <ProjectDetailPage
-        project={selectedProject}
-        onBack={() => navigateWorkspace('projects')}
-        onSave={(updatedProject) =>
-          setProjects((current) =>
-            current.map((project) =>
-              project.id === updatedProject.id ? updatedProject : project,
-            ),
-          )
-        }
-      />
-    ) : (
-      <ProjectsPage
-        projects={projects}
-        setProjects={setProjects}
-        onOpenProject={openProject}
-      />
-    ),
-    calendar: (
-      <CalendarPage
-        eventsByDate={calendarEventIndex}
-        googleCalendarEvents={googleCalendarEvents}
-        importedIcsCalendars={importedIcsCalendars}
-        setImportedIcsCalendars={setImportedIcsCalendars}
-        importedIcsEvents={importedIcsEvents}
-        setImportedIcsEvents={setImportedIcsEvents}
-        onNavigate={navigateWorkspace}
-      />
-    ),
-    mails: <MailsPage onNavigate={navigateWorkspace} />,
-    whatsapp: <WhatsAppPage />,
-    chats: <ChatsPage onNavigate={navigateWorkspace} />,
-    calls: <CallsPage callCenter={callCenter} user={userProfile} />,
-    contacts: <ContactsPage callCenter={callCenter} onNavigate={navigateWorkspace} />,
-    usage: <UsagePage />,
-    profile: (
-      <ProfilePage
-        user={userProfile}
-        onProfileUpdated={(newName) =>
-          setSessionUser((current) => ({
-            ...(current || activeUser),
-            displayName: newName,
-          }))
-        }
-        onSignOut={handleSignOut}
-      />
-    ),
-      themes: <ThemesPage />,
-      setting: (
-        <SettingPage
-          user={userProfile}
-          onNavigate={navigateWorkspace}
-          onGoogleCalendarsChange={setGoogleCalendarEvents}
-          onHackathonsChange={setHackathons}
-          onContestSitesChange={setContestSites}
-          importedIcsCalendars={importedIcsCalendars}
-          setImportedIcsCalendars={setImportedIcsCalendars}
-          importedIcsEvents={importedIcsEvents}
-          setImportedIcsEvents={setImportedIcsEvents}
-          onSignOut={handleSignOut}
-        />
-      ),
-  }
+  const pages = buildAppPages({
+    activeUser,
+    calendarEventIndex,
+    callCenter,
+    codingStats,
+    contestSites,
+    creationIntent,
+    documents,
+    setDocuments,
+    eveChatKey,
+    googleCalendarEvents,
+    hackathons,
+    setHackathons,
+    importedIcsCalendars,
+    setImportedIcsCalendars,
+    importedIcsEvents,
+    setImportedIcsEvents,
+    jobs,
+    setJobs,
+    loadingMore,
+    loadMore,
+    navigate,
+    navigateWorkspace,
+    notifications,
+    setNotificationsOpen,
+    openProject,
+    pagination,
+    projects,
+    setProjects,
+    requestCreation,
+    selectedDocument,
+    selectedHackathon,
+    selectedProject,
+    selectedProjectId,
+    setContestSites,
+    setGoogleCalendarEvents,
+    setSessionUser,
+    setWorkspaceRefreshKey,
+    tasks,
+    setTasks,
+    userProfile,
+    handleSignOut,
+  })
 
   if (route === '/') {
     if (!authReady) return <WaveLoader />
     if (resetToken) {
       return publicRoute(<AuthPage mode="reset" resetToken={resetToken} onNavigate={navigateRoute} onAuthenticate={beginOnboarding} />)
+    }
+    if (isNativeApp && !activeUser) {
+      return publicRoute(<AuthPage mode="login" onNavigate={navigateRoute} onAuthenticate={beginOnboarding} />)
     }
     return publicRoute(<LandingPage user={activeUser} onNavigate={navigateRoute} />)
   }
@@ -638,6 +443,18 @@ function App() {
     }
     return publicRoute(<OnboardingPage user={activeUser} onComplete={completeOnboarding} />)
   }
+  // Tauri overlay window — served to the transparent secondary window.
+  // No auth guard needed: it reads state via BroadcastChannel from the main window.
+  if (route === '/app/avatar-overlay') {
+    return (
+      <EveAvatarProvider>
+        <Suspense fallback={null}>
+          <AvatarOverlayPage />
+        </Suspense>
+      </EveAvatarProvider>
+    )
+  }
+
   if (!authReady) {
     return <WaveLoader />
   }
@@ -646,8 +463,9 @@ function App() {
   }
 
   return (
-    <>
-      <AppLayout
+    <CustomUIProvider>
+      <EveAvatarProvider>
+        <AppLayout
         activePage={
           activePage === 'project-detail'
             ? 'projects'
@@ -657,9 +475,16 @@ function App() {
                 ? 'documents'
                 : activePage === 'studio-detail'
                   ? 'studio'
-                  : activePage.startsWith('custom-')
-                    ? activePage
-                    : activePage
+                  : activePage === 'eve-sessions' ||
+                        activePage === 'eve-memory' ||
+                        activePage === 'eve-call' ||
+                        activePage === 'eve-schedules'
+                      ? 'eve'
+                      : activePage === 'stats' || activePage === 'competitive-coding'
+                        ? 'compete'
+                        : activePage.startsWith('custom-')
+                          ? activePage
+                          : activePage
         }
         onNavigate={navigateWorkspace}
         onCreate={requestCreation}
@@ -685,17 +510,27 @@ function App() {
         }}
       >
         <Suspense fallback={<WaveLoader />}>
-          {activePage.startsWith('custom-')
-            ? (() => {
-                const slug = activePage.slice(7)
-                return <CustomPage slug={slug} />
-              })()
-            : (pages[activePage] ?? pages.dashboard)}
+          <div key={activePage} className="app-page-enter">
+            {activePage.startsWith('custom-')
+              ? (() => {
+                  const slug = activePage.slice(7)
+                  return <CustomPage slug={slug} />
+                })()
+              : (pages[activePage] ?? pages.dashboard)}
+          </div>
+        </Suspense>
+        <IncomingCallOverlay callCenter={callCenter} myUid={userProfile?.uid} />
+        <UpdateBanner update={appUpdate} onDismiss={dismissAppUpdate} />
+        <EveUiBanner />
+        <Suspense fallback={null}>
+          <EveGlobalCompanionHost />
+        </Suspense>
+        <Suspense fallback={null}>
+          <AvatarOverlayManager />
         </Suspense>
       </AppLayout>
-      <IncomingCallOverlay callCenter={callCenter} myUid={userProfile?.uid} />
-      <EveUiBanner />
-    </>
+    </EveAvatarProvider>
+    </CustomUIProvider>
   )
 }
 

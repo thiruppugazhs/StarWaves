@@ -1,0 +1,66 @@
+/* Appearance (Eve UI) settings section — replaces inline styles */
+/* Bodies carry their own spacing: settings-card-body provides none. */
+.appearance-note { margin: var(--space-sm) var(--space-md) var(--space-md); font-size: 13px; color: var(--text-muted); }
+.appearance-note-error { margin: var(--space-sm) var(--space-md) var(--space-md); font-size: 13px; color: var(--color-danger); }
+.appearance-stack { display: grid; gap: 12px; margin: var(--space-sm) var(--space-md) var(--space-md); }
+.appearance-label { font-size: 12px; }
+.appearance-code {
+  margin-top: 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  font-size: 11px;
+  overflow: auto;
+}
+.appearance-code-wrap { white-space: pre-wrap; }
+.appearance-row-head { display: flex; align-items: center; gap: 8px; }
+.appearance-list { display: grid; gap: 6px; margin-top: 6px; }
+.appearance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  background: var(--bg-card);
+}
+.appearance-row-active { background: var(--bg-tertiary); }
+.appearance-row-name { font-size: 12px; font-weight: 600; }
+.appearance-row-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex: 1;
+  margin-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.appearance-row-time { color: var(--text-muted); font-size: 11px; }
+.appearance-pill-btn {
+  font-size: 11px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: var(--bg-card);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.appearance-pill-btn:disabled { opacity: 0.5; cursor: default; }
+.appearance-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.appearance-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: var(--bg-card);
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+}
+.appearance-primary-btn:disabled { opacity: 0.6; cursor: default; }
+.appearance-history { display: grid; gap: 6px; max-height: 280px; overflow: auto; margin: var(--space-sm) var(--space-md) var(--space-md); padding-right: 4px; }

@@ -100,6 +100,7 @@ from app.services.eve.handlers.workspace_files import (
     handle_search_workspace_files,
     handle_write_workspace_file,
 )
+from app.services.eve.handlers.avatar import handle_avatar_editor_action
 
 def _make_list_alias(resource: str):
     def _handler(database: SqlClient, user_id: str, arguments: dict) -> tuple[dict, None, None]:
@@ -190,6 +191,7 @@ _TOOL_HANDLERS: dict[str, Any] = {
     "reset_ui": handle_reset_ui,
     "list_ui_history": handle_list_ui_history,
     "create_custom_page": handle_create_custom_page,
+    "avatar_editor_action": handle_avatar_editor_action,
 }
 
 

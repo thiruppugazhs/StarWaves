@@ -52,10 +52,12 @@ services:
     expose:
       - "8000"
     ports:
-      - "8000:8000"
+      # Host mapping so the Vite dev server can reach the API at 127.0.0.1:8000.
+      # Loopback-bound on purpose; nginx (port 80) is the public entrypoint.
+      - "127.0.0.1:8000:8000"
     volumes:
       - workspace-data:/app/workspaces
-      - ./server/app:/app/app:ro
+      - ./server/static/updates:/app/static/updates
       - ./server/firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - starwaves-network
@@ -65,11 +67,11 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f --max-time 8 http://localhost:8000/api/v1/health || exit 1"]
       interval: 15s
-      timeout: 5s
+      timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
     deploy:
       resources:
         limits:
@@ -125,8 +127,14 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      # Mount single file, not the whole conf.d directory — prevents
+      # `duplicate upstream "server_backend"` when docker-compose.backend.yml
+      # overrides this file via `default.backend.conf:/etc/nginx/conf.d/default.conf`
+      # (directory + file mounts would expose both default.conf and default.backend.conf).
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/certs:/etc/nginx/certs:ro
       - nginx-logs:/var/log/nginx
     depends_on:
       server:

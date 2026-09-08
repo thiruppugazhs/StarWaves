@@ -9,6 +9,7 @@ from cryptography.fernet import Fernet
 from itsdangerous import URLSafeTimedSerializer
 
 from app.core.config import settings
+from app.core.http import create_async_client
 from app.services.oauth._shared import create_oauth_state_serializer
 
 
@@ -45,7 +46,7 @@ def decrypt_google_token(token: str) -> str:
 async def exchange_google_code(code: str, redirect_uri: str | None = None) -> dict:
     require_google_oauth_config()
     redirect_uri = redirect_uri or settings.google_oauth_callback_url
-    async with httpx.AsyncClient(timeout=20) as client:
+    async with create_async_client(timeout=20) as client:
         response = await client.post(
             "https://oauth2.googleapis.com/token",
             data={
@@ -65,7 +66,7 @@ async def exchange_google_code(code: str, redirect_uri: str | None = None) -> di
 
 async def refresh_google_token(refresh_token: str) -> str:
     require_google_oauth_config()
-    async with httpx.AsyncClient(timeout=20) as client:
+    async with create_async_client(timeout=20) as client:
         response = await client.post(
             "https://oauth2.googleapis.com/token",
             data={
@@ -83,7 +84,7 @@ async def refresh_google_token(refresh_token: str) -> str:
 
 
 async def google_profile(access_token: str) -> dict:
-    async with httpx.AsyncClient(timeout=20) as client:
+    async with create_async_client(timeout=20) as client:
         response = await client.get(
             "https://www.googleapis.com/oauth2/v3/userinfo",
             headers={"Authorization": f"Bearer {access_token}"},

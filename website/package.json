@@ -1,7 +1,7 @@
 {
   "name": "starwaves",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,24 +11,56 @@
     "preview": "vite preview",
     "cap:sync": "vite build && cap sync",
     "cap:open": "cap open android",
-    "cap:build": "npm run build && cap copy android && cd android && .\\gradlew assembleDebug"
+    "cap:build": "npm run build && cap copy android && cd android && .\\gradlew assembleDebug",
+    "android:sync": "cap sync android",
+    "android:open": "cap open android",
+    "android:build:debug": "vite build && cap sync android && cd android && gradlew assembleDebug",
+    "android:build:release": "vite build && cap sync android && cd android && gradlew assembleRelease",
+    "android:build:bundle": "vite build && cap sync android && cd android && gradlew bundleRelease",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:debug": "tauri build --debug"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/browser": "^8.0.4",
     "@capacitor/cli": "^8.4.2",
     "@capacitor/core": "^8.4.2",
     "@monaco-editor/react": "^4.7.0",
+    "@pixiv/three-vrm": "^3.5.5",
     "dompurify": "^3.4.14",
     "firebase": "^12.16.0",
     "framer-motion": "^13.1.1",
-    "lucide-react": "^1.26.0",
+    "lucide-react": "^1.40.0",
     "picomatch": "^4.0.5",
+    "pixi-live2d-display": "^0.4.0",
+    "pixi.js": "^7.4.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-grid-layout": "^2.2.3"
+    "react-grid-layout": "^2.2.3",
+    "three": "^0.160.1"
+  },
+  "overrides": {
+    "@pixi/constants": "7.4.3",
+    "@pixi/core": "7.4.3",
+    "@pixi/display": "7.4.3",
+    "@pixi/math": "7.4.3",
+    "@pixi/settings": "7.4.3",
+    "@pixi/sprite": "7.4.3",
+    "@pixi/utils": "7.4.3"
+  },
+  "optionalDependencies": {
+    "@capgo/capacitor-updater": "^7.15.3",
+    "@tauri-apps/plugin-deep-link": "^2.4.1",
+    "@tauri-apps/plugin-dialog": "^2.4.0",
+    "@tauri-apps/plugin-process": "^2.2.0",
+    "@tauri-apps/plugin-shell": "^2.3.4",
+    "@tauri-apps/plugin-updater": "^2.8.0"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
+    "@tauri-apps/cli": "^2.8.4",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",

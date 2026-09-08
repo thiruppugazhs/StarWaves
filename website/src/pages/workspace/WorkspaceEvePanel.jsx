@@ -1,6 +1,11 @@
+import '../../styles/pages/workspace-eve.css'
 import { useEffect, useRef, useState } from 'react'
 import { Bot, Send, PanelRightClose, PanelRightOpen, Square, Wrench } from 'lucide-react'
+import { ModelSelectorDropdown } from '../../components/ui/ModelSelectorDropdown'
 import { useEveAgentChat } from './useEveAgentChat'
+import { EveInlineAvatar } from '../../components/eve/avatar/EveInlineAvatar'
+import { useEveAvatar } from '../../components/eve/avatar/EveAvatarProvider'
+import { useThemeCustomizer } from '../../hooks/useThemeCustomizer'
 
 export function WorkspaceEvePanel({
   collapsed,
@@ -11,7 +16,7 @@ export function WorkspaceEvePanel({
   onFilesChanged,
   onAction,
 }) {
-  const { messages, sending, streamText, activeTool, error, send, stop } = useEveAgentChat({
+  const { messages, sending, streamText, thinkingText, activeTool, error, send, stop } = useEveAgentChat({
     workspaceId,
     workspaceName,
     activeFilePath,
@@ -20,15 +25,32 @@ export function WorkspaceEvePanel({
   })
   const [draft, setDraft] = useState('')
   const chatRef = useRef(null)
+  const { prefs: avatarPrefs, activeModel: avatarModel } = useEveAvatar()
+  const { activePreset } = useThemeCustomizer() || {}
+  const [selectedModel, setSelectedModel] = useState({ provider: 'openrouter', model: 'openrouter/free' })
 
   useEffect(() => {
     const node = chatRef.current
     if (node) node.scrollTop = node.scrollHeight
-  }, [messages, streamText, activeTool])
+  }, [messages, streamText, thinkingText, activeTool])
 
   if (collapsed) {
     return (
       <div className="workspace-eve-collapsed">
+        {avatarPrefs?.enabled !== false && (
+          <div className="workspace-eve-micro-avatar" aria-hidden="true">
+            <EveInlineAvatar
+              size="sm"
+              presetId={activePreset}
+              prefs={avatarPrefs}
+              activeModel={avatarModel}
+              isEveSpeaking={sending}
+              isSending={sending}
+              streamText={streamText}
+              activeTool={activeTool}
+            />
+          </div>
+        )}
         <button
           className="workspace-eve-toggle"
           onClick={onToggle}
@@ -45,7 +67,7 @@ export function WorkspaceEvePanel({
     if (!draft.trim() || sending) return
     const text = draft
     setDraft('')
-    send(text)
+    send(text, selectedModel)
   }
 
   return (
@@ -78,6 +100,13 @@ export function WorkspaceEvePanel({
                 {entry.content}
               </div>
             ))}
+            {thinkingText && (
+              <div className="workspace-eve-thinking">
+                <span className="workspace-eve-thinking-label">Thinking…</span>
+                <span className="workspace-eve-thinking-text">{thinkingText}</span>
+                {!streamText && <span className="eve-thinking-cursor" aria-hidden="true" />}
+              </div>
+            )}
             {activeTool && (
               <div className="workspace-eve-tool">
                 <Wrench size={12} />
@@ -85,47 +114,66 @@ export function WorkspaceEvePanel({
               </div>
             )}
             {streamText && (
-              <div className="workspace-eve-message assistant streaming">{streamText}</div>
+              <div className="workspace-eve-message assistant streaming">
+                {streamText}
+                <span className="eve-streaming-cursor" aria-hidden="true" />
+              </div>
             )}
           </>
         )}
       </div>
       {error && <div className="workspace-eve-error">{error}</div>}
       <div className="workspace-eve-input">
-        <input
-          type="text"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              submit()
-            }
-          }}
-          placeholder="Ask Eve..."
-          aria-label="Ask Eve"
-          disabled={sending}
-        />
-        {sending ? (
-          <button
-            className="workspace-eve-send"
-            onClick={stop}
-            title="Stop Eve"
-            aria-label="Stop Eve"
-          >
-            <Square size={14} />
-          </button>
-        ) : (
-          <button
-            className="workspace-eve-send"
-            onClick={submit}
-            disabled={!draft.trim()}
-            title="Send to Eve"
-            aria-label="Send to Eve"
-          >
-            <Send size={14} />
-          </button>
-        )}
+        <div className="workspace-eve-model-row">
+          <ModelSelectorDropdown
+            className="workspace-eve-model-selector"
+            value={selectedModel.model}
+            onChange={(selection) => setSelectedModel({
+              provider: selection.provider,
+              model: selection.model || selection.value,
+            })}
+            direction="up"
+            showIcon={false}
+            placeholder="Select model"
+            disabled={sending}
+          />
+        </div>
+        <div className="workspace-eve-compose-row">
+          <input
+            type="text"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                submit()
+              }
+            }}
+            placeholder="Ask Eve..."
+            aria-label="Ask Eve"
+            disabled={sending}
+          />
+          {sending ? (
+            <button
+              className="workspace-eve-send"
+              onClick={stop}
+              title="Stop Eve"
+              aria-label="Stop Eve"
+            >
+              <Square size={14} />
+            </button>
+          ) : (
+            <button
+              className="workspace-eve-send"
+              onClick={submit}
+              disabled={!draft.trim()}
+              title="Send to Eve"
+              aria-label="Send to Eve"
+            >
+              <Send size={14} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -3,6 +3,11 @@
   "appName": "StarWaves",
   "webDir": "dist",
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "allowNavigation": ["api.starwaves.susindran.in", "accounts.google.com", "github.com"]
+  },
+  "plugins": {
+    "Browser": {},
+    "App": {}
   }
 }

@@ -72,23 +72,35 @@
   outline-offset: 1px;
 }
 
-/* Monochrome Alert Variants */
+/* Multi-Color Semantic Alert Variants */
 .alert-error {
-  background: var(--bg-surface, #121214);
-  border-color: var(--text-primary, #ffffff);
+  background: var(--color-danger-light);
+  border-color: color-mix(in srgb, var(--color-danger) 30%, transparent);
+}
+.alert-error .alert-icon {
+  color: var(--color-danger);
 }
 
 .alert-warning {
-  background: var(--bg-surface, #121214);
-  border-color: var(--border-heavy, #71717a);
+  background: var(--color-warning-light);
+  border-color: color-mix(in srgb, var(--color-warning) 30%, transparent);
+}
+.alert-warning .alert-icon {
+  color: var(--color-warning);
 }
 
 .alert-success {
-  background: var(--bg-surface, #121214);
-  border-color: var(--border-color, #27272a);
+  background: var(--color-success-light);
+  border-color: color-mix(in srgb, var(--color-success) 30%, transparent);
+}
+.alert-success .alert-icon {
+  color: var(--color-success);
 }
 
 .alert-info {
-  background: var(--bg-surface, #121214);
-  border-color: var(--border-color, #27272a);
+  background: var(--color-accent-light);
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+.alert-info .alert-icon {
+  color: var(--color-accent);
 }

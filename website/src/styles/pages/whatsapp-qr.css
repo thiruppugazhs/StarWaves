@@ -1,0 +1,216 @@
+/* WhatsApp QR Modal — split from whatsapp.css (Wave E) */
+/* QR Code Modal Dialog & Styles */
+.whatsapp-qr-modal-dialog {
+  width: min(100%, 500px);
+}
+
+.whatsapp-qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 0 0 0;
+  width: 100%;
+  text-align: center;
+}
+
+.whatsapp-qr-box {
+  width: 200px;
+  height: 200px;
+  padding: 12px;
+  background: var(--canvas-white);
+  border: 1px solid var(--border-color, #27272a);
+  border-radius: var(--radius-lg, 12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.3));
+  position: relative;
+  overflow: hidden;
+}
+
+.whatsapp-qr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.whatsapp-qr-loading,
+.whatsapp-qr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--canvas-ink);
+  font-size: 0.8125rem;
+  font-weight: 550;
+}
+
+.whatsapp-qr-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  background: var(--bg-secondary, #18181b);
+  color: var(--text-secondary, #a1a1aa);
+  border: 1px solid var(--border-color, #27272a);
+}
+
+.whatsapp-qr-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-primary, #ffffff);
+  animation: whatsapp-pulse 1.8s infinite;
+}
+
+@keyframes whatsapp-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0.3;
+  }
+}
+
+.whatsapp-qr-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.whatsapp-qr-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #a1a1aa);
+  line-height: 1.45;
+}
+
+.whatsapp-qr-step-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bg-tertiary, #27272a);
+  border: 1px solid var(--border-color, #3f3f46);
+  color: var(--text-primary, #ffffff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.whatsapp-qr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.whatsapp-phone-pairing-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+}
+
+.whatsapp-phone-pairing-desc {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #a1a1aa);
+  line-height: 1.45;
+}
+
+.whatsapp-phone-form {
+  width: 100%;
+}
+
+.whatsapp-phone-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.whatsapp-phone-input {
+  flex: 1;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--bg-primary, #09090b);
+  border: 1px solid var(--border-color, #27272a);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary, #ffffff);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.whatsapp-phone-input:focus {
+  border-color: var(--border-focus, var(--text-primary, #ffffff));
+}
+
+.whatsapp-pairing-card {
+  padding: 14px;
+  background: var(--bg-secondary, #18181b);
+  border-radius: var(--radius-lg, 12px);
+  text-align: center;
+  border: 1px solid var(--border-color, #27272a);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.whatsapp-pairing-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #71717a);
+  text-transform: uppercase;
+}
+
+.whatsapp-pairing-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.whatsapp-pairing-digits {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--text-primary, #ffffff);
+}
+
+.whatsapp-pairing-instruction {
+  margin: 4px 0 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted, #71717a);
+  line-height: 1.4;
+}
+

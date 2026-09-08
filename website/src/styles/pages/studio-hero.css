@@ -1,0 +1,440 @@
+/* Studio Hero — split from studio.css (Wave C) */
+
+/* ── Hero (prompt landing — one-page full-height view) ── */
+.studio-hero {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: 0;
+  padding: 1.5rem 0 2.5rem;
+  min-height: calc(100vh - var(--header-height));
+  width: 100%;
+  border-radius: 0;
+  background: var(--bg-primary);
+  border: 0;
+}
+
+/* Ambient glow backdrop */
+.studio-hero-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--color-primary) 18%, var(--bg-primary)) 0%,
+    color-mix(in srgb, var(--module-studio) 12%, var(--bg-primary)) 48%,
+    color-mix(in srgb, var(--module-eve) 18%, var(--bg-primary)) 100%);
+  opacity: 0.92;
+  animation: studio-gradient-shift 16s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.studio-hero-gradient {
+  position: absolute;
+  width: 58vw;
+  height: 42vw;
+  max-width: 900px;
+  max-height: 650px;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: 0.48;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+
+.studio-hero-gradient-primary {
+  top: 3%;
+  left: -12%;
+  background: color-mix(in srgb, var(--color-primary) 76%, transparent);
+  animation: studio-gradient-float-primary 18s ease-in-out infinite alternate;
+}
+
+.studio-hero-gradient-secondary {
+  right: -10%;
+  bottom: -12%;
+  background: color-mix(in srgb, var(--module-eve) 72%, transparent);
+  animation: studio-gradient-float-secondary 21s ease-in-out infinite alternate;
+}
+
+.studio-hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  max-width: 920px;
+  padding: 2.5rem var(--layout-gutter, 24px) 2.75rem;
+  text-align: center;
+}
+
+.studio-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--module-studio, var(--text-secondary));
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: var(--shadow-sm);
+}
+
+.studio-hero-title {
+  margin: 0;
+  max-width: 760px;
+  font-size: clamp(2.5rem, 5.5vw, 4.8rem);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.studio-prompt-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(860px, 100%);
+  margin-top: 0.55rem;
+  padding: 1.15rem 1.3rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--module-studio) 42%, var(--border-heavy));
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+  box-shadow: var(--shadow-surface);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  text-align: left;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.studio-prompt-card:focus-within {
+  border-color: var(--module-studio, var(--text-primary));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--module-studio) 10%, transparent), var(--shadow-surface);
+}
+
+.studio-prompt-card .studio-prompt-input {
+  border: none;
+  background: transparent;
+  background-color: transparent;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  resize: none;
+  outline: none;
+  min-height: 4.75rem;
+  max-height: 160px;
+  padding: 0;
+  font-family: inherit;
+  font-size: clamp(1rem, 1.4vw, 1.12rem);
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.studio-prompt-input::placeholder {
+  color: var(--text-muted);
+}
+
+.studio-prompt-card .studio-prompt-input:focus,
+.studio-prompt-card .studio-prompt-input:focus-visible {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.studio-hero::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+}
+
+.studio-hero::before {
+  background-image: linear-gradient(color-mix(in srgb, var(--text-primary) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--text-primary) 5%, transparent) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+  opacity: 0.2;
+}
+
+@keyframes studio-gradient-shift {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
+@keyframes studio-gradient-float-primary {
+  0% { transform: translate3d(-3%, -2%, 0) scale(0.95); }
+  100% { transform: translate3d(14%, 12%, 0) scale(1.12); }
+}
+
+@keyframes studio-gradient-float-secondary {
+  0% { transform: translate3d(4%, 2%, 0) scale(0.92); }
+  100% { transform: translate3d(-12%, -10%, 0) scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio-hero-glow,
+  .studio-hero-gradient-primary,
+  .studio-hero-gradient-secondary {
+    animation: none;
+  }
+}
+
+.studio-prompt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.studio-prompt-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.studio-prompt-attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.studio-prompt-attach:hover {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.studio-prompt-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.studio-prompt-attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 240px;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs, 6px);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.studio-prompt-attachment-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.studio-prompt-attachment-size {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.studio-prompt-attachment-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.studio-prompt-attachment-remove:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.studio-prompt-mode .custom-dropdown-trigger {
+  border: 1px solid transparent;
+  background: transparent;
+  box-shadow: none;
+  padding: 0.35rem 0.55rem;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.studio-prompt-mode .custom-dropdown-trigger:hover {
+  background: var(--bg-hover-subtle);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.studio-prompt-mode.model-selector-dropdown .model-selector-trigger {
+  padding: 0.35rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.studio-prompt-mode.model-selector-dropdown .model-selector-trigger:hover:not(:disabled) {
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.studio-prompt-submit {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--module-studio);
+  color: var(--text-inverse);
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.studio-prompt-submit:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: scale(1.07);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.24);
+}
+
+.studio-prompt-submit:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+.studio-prompt-submit.loading {
+  animation: pulse-submit 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-submit {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Suggestions chips */
+.studio-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  max-width: 860px;
+  margin-top: 0.45rem;
+}
+
+.studio-suggestions-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-right: 0.25rem;
+}
+
+.studio-suggestion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--module-studio) 16%, var(--border-color));
+  background: color-mix(in srgb, var(--bg-card) 74%, transparent);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.studio-suggestion-chip:hover {
+  border-color: var(--color-primary, var(--border-heavy));
+  color: var(--text-primary);
+  background: var(--bg-hover-subtle);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 760px) {
+  .studio-hero {
+    min-height: calc(100vh - var(--header-height-mobile));
+    padding-top: 1rem;
+  }
+
+  .studio-hero-content {
+    padding: 2.5rem var(--layout-gutter, 16px) 3rem;
+  }
+
+  .studio-hero-title {
+    font-size: clamp(2.6rem, 12vw, 4.5rem);
+  }
+
+  .studio-prompt-card {
+    padding: 1rem;
+  }
+
+  .studio-prompt-row {
+    align-items: flex-start;
+  }
+
+  .studio-prompt-tools {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.55rem;
+  }
+
+  .studio-hero-gradient {
+    width: 80vw;
+    height: 70vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .studio-hero-title {
+    font-size: clamp(2.35rem, 14vw, 3.5rem);
+  }
+
+  .studio-prompt-row {
+    flex-direction: column;
+  }
+
+  .studio-prompt-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+

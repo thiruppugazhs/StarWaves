@@ -8,6 +8,16 @@
   font-family: inherit;
 }
 
+::selection {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+::-moz-selection {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+}
+
 html,
 body,
 #root {
@@ -59,7 +69,11 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: var(--bg-primary);
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, color-mix(in srgb, var(--bg-secondary) 90%, transparent), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 110%, color-mix(in srgb, var(--bg-tertiary) 80%, transparent), transparent),
+    radial-gradient(ellipse 50% 60% at 50% 50%, color-mix(in srgb, var(--bg-secondary) 40%, transparent), transparent),
+    var(--bg-primary);
 }
 
 .primary-button, .secondary-button, .auth-button, .danger-button,
@@ -149,6 +163,44 @@ textarea:disabled {
   :where(button, a, [role="button"]) {
     min-height: 44px;
   }
+}
+
+/* Type scale helpers */
+.page-heading h1,
+.dashboard-heading h1,
+.dashboard-greeting h1,
+.project-page-heading h1,
+.calendar-toolbar h1,
+.contacts-header h1 {
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.03em;
+}
+
+.page-heading p,
+.dashboard-greeting p,
+.contacts-header-kicker,
+.calendar-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Inline content actions — replacement for removed page-heading toolbars.
+   Lives at the top of page content, not in a heading. */
+.page-inline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.page-inline-actions :where(button, a, select, input) {
+  min-height: 40px;
 }
 
 /* Custom Scrollbars */

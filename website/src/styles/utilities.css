@@ -87,3 +87,38 @@
   border: 0;
   margin: 0;
 }
+
+/* Dynamic inline-style allowance: progress widths & char-progress */
+.dashboard-project-bar-fill,
+.project-progress span,
+.project-grid-card [style*="width:"],
+.ws-card-open [style] {
+  /* allow dynamic width via --progress or inline width */
+}
+
+.avatar-sm {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.avatar-fallback {
+  display: none;
+}
+
+.text-muted { color: var(--text-muted); }
+
+/* App page-enter motion (ADR 0028): CSS-only route transition driven by a
+   key={activePage} wrapper — no JS animation cost on the critical path.
+   Follows the user's motion tokens; static under reduced motion. */
+.app-page-enter { animation: app-page-enter var(--transition-normal) cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes app-page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-page-enter { animation: none; }
+}
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

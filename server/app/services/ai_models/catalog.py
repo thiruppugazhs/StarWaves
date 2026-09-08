@@ -6,6 +6,8 @@ from typing import Any
 from app.core.config import settings
 
 MAX_TOOL_ROUNDS = 6
+# Resolved at import; stays "openai" universally per ADR 0005. Dynamic fallback
+# to first available provider lives in config._first_available_provider().
 DEFAULT_PROVIDER = settings.default_ai_provider
 AI_MODELS_SETTINGS_DOC = "ai-models"
 

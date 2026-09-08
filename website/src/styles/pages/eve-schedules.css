@@ -1,0 +1,195 @@
+/* Eve Schedules — split from eve.css (Wave D) */
+/* ── Automated Schedules Section ── */
+.eve-schedule-composer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-md, 10px);
+  background: var(--bg-card, var(--bg-secondary));
+  border: 1px solid var(--border-color);
+}
+
+.eve-schedule-composer-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.eve-schedule-composer-card p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.eve-schedule-full-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .form-row-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.eve-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding-top: 0.5rem;
+}
+
+.eve-schedules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.eve-schedule-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.2rem;
+  border-radius: var(--radius-md, 10px);
+  background: var(--bg-card, var(--bg-secondary));
+  border: 1px solid var(--border-color);
+  transition: all 0.15s ease;
+}
+
+.eve-schedule-card:hover {
+  border-color: var(--border-heavy, var(--border-color));
+  transform: translateY(-1px);
+}
+
+.eve-schedule-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.eve-schedule-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.eve-card-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.eve-card-run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  background: var(--bg-secondary, #121212);
+  border: 1px solid var(--border-color, #27272a);
+  color: var(--text-primary, #ffffff);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.eve-card-run-btn:hover:not(:disabled) {
+  border-color: var(--border-heavy, var(--border-color));
+  background: var(--bg-hover);
+}
+
+.eve-schedule-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+  margin: 0;
+}
+
+.eve-schedule-card-prompt {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #a1a1aa);
+  margin: 0;
+  font-style: italic;
+}
+
+.eve-schedule-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color, #27272a);
+}
+
+.eve-schedule-time {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted, #71717a);
+}
+
+.eve-schedule-last-run {
+  font-size: 0.72rem;
+  color: var(--text-muted, #71717a);
+}
+
+/* ── Banners ── */
+.eve-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-tertiary, #18181b);
+  border: 1px solid var(--border-color, #3f3f46);
+  color: var(--text-primary, #ffffff);
+  font-size: 0.82rem;
+}
+
+.eve-error-banner--rate {
+  border-color: var(--border-heavy, #52525b);
+  border-left: 3px solid var(--text-primary, #ffffff);
+  background: var(--bg-secondary, #121212);
+}
+
+.eve-error-banner--auth {
+  border-color: var(--border-heavy, #52525b);
+  border-left: 3px solid var(--text-secondary, #a1a1aa);
+  background: var(--bg-secondary, #121212);
+}
+
+.eve-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-tertiary, #18181b);
+  border: 1px solid var(--border-color, #3f3f46);
+  color: var(--text-primary, #ffffff);
+  font-size: 0.82rem;
+}
+

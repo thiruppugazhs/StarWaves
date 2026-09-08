@@ -1,25 +1,17 @@
 """Usage routes — AI token usage summary and logs."""
 
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Query
 
-from app.core.cache import CACHE_TTL_LONG, cached
-from app.core.dependencies import CurrentUserId, DbClient
+from app.core.cache import CACHE_TTL_SHORT, cached
+from app.core.dependencies import CurrentUserId
 from app.db.session import sync_engine
 from app.repositories import usage as usage_repo
 
 router = APIRouter(prefix="/usage", tags=["usage"])
 
 
-def _sync_session():
-    from sqlalchemy.orm import Session
-
-    with Session(sync_engine) as s:
-        yield s
-
-
 @router.get("/summary")
-@cached(ttl=CACHE_TTL_LONG, prefix="usage:summary")
+@cached(ttl=CACHE_TTL_SHORT, prefix="usage:summary")
 def get_usage_summary(
     user_id: CurrentUserId,
     days: int | None = Query(default=None, ge=1, le=365, description="Filter last N days"),
@@ -32,7 +24,7 @@ def get_usage_summary(
 
 
 @router.get("/logs")
-@cached(ttl=CACHE_TTL_LONG, prefix="usage:logs")
+@cached(ttl=CACHE_TTL_SHORT, prefix="usage:logs")
 def get_usage_logs(
     user_id: CurrentUserId,
     limit: int = Query(default=50, ge=1, le=200),

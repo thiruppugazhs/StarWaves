@@ -57,6 +57,9 @@ CREATE INDEX IF NOT EXISTS ix_user_sessions_user_last_seen ON user_sessions(user
 CREATE INDEX IF NOT EXISTS ix_user_sessions_jti ON user_sessions(token_jti);
 CREATE INDEX IF NOT EXISTS ix_user_sessions_user_device ON user_sessions(user_id, device_id);
 
+CREATE INDEX IF NOT EXISTS ix_ai_usage_user_created ON ai_usage(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS ix_ai_usage_provider_model ON ai_usage(provider, model);
+
 -- ---------------------------------------------------------------------------
 -- pgvector semantic recall index
 -- (server/app/db/session.py -> _ensure_eve_memory_embedding; requires the

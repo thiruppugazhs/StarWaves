@@ -1,3 +1,5 @@
+import '../../styles/pages/whatsapp-summary-modal.css'
+import '../../styles/pages/whatsapp-summary-chat.css'
 import { useState, useRef, useEffect } from 'react'
 import { Modal } from '../ui/Modal'
 import { Markdown } from '../ui/Markdown'

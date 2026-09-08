@@ -37,13 +37,25 @@ def resolve_chat_context(
     database: SqlClient,
     user_id: str,
     messages: list[dict[str, str]],
+    provider: str | None = None,
+    model: str | None = None,
+    editor_context: dict[str, Any] | None = None,
 ) -> ChatContext:
     """Build RAG memory instructions and resolve the user's AI provider client."""
-    config = resolve_ai_config(database, user_id)
+    config = resolve_ai_config(database, user_id, provider_override=provider, model_override=model)
+    instructions = build_memory_instructions(database, user_id, query=last_user_query(messages))
+    if editor_context:
+        import json
+        bounded_context = json.dumps(editor_context, default=str)[:12000]
+        instructions += (
+            "\nThe user currently has Avatar Studio open. Use avatar_editor_action for editor changes. "
+            "Never claim an editor action happened until the frontend confirms it. "
+            f"Current editor context: {bounded_context}"
+        )
     return ChatContext(
         database=database,
         user_id=user_id,
-        instructions=build_memory_instructions(database, user_id, query=last_user_query(messages)),
+        instructions=instructions,
         config=config,
         client=PROVIDER_CLIENTS[config.provider](config.client_options),
         conversation=[{"role": message["role"], "content": message["content"]} for message in messages],

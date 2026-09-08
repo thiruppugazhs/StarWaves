@@ -47,6 +47,33 @@ class TestCORSAndErrorMiddleware(unittest.TestCase):
             origin,
         )
 
+    def test_preview_allows_configured_frontend_framing(self):
+        response = self.client.get(
+            "/api/v1/studio/preview/not-a-valid-token/index.html",
+            headers={"Origin": "http://localhost:5173"},
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertIsNone(response.headers.get("x-frame-options"))
+        policy = response.headers.get("content-security-policy", "")
+        self.assertIn("frame-ancestors", policy)
+        self.assertIn("http://localhost:5173", policy)
+
+    def test_normal_api_response_retains_frame_protection(self):
+        response = self.client.get("/api/v1/health")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get("x-frame-options"), "SAMEORIGIN")
+        self.assertIn("frame-ancestors 'self'", response.headers.get("content-security-policy", ""))
+
+    def test_missing_studio_preview_project_returns_not_found(self):
+        from app.core.auth import create_user_token
+
+        response = self.client.post(
+            "/api/v1/studio/projects/missing-project/preview",
+            headers={"Authorization": f"Bearer {create_user_token({'uid': 'preview-test-user'})}"},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("not found", response.json()["detail"].lower())
+
     def test_cors_headers_on_500_error(self):
         @self.app.get("/api/v1/test-error")
         def throw_error():

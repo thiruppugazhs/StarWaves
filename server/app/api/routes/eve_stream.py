@@ -4,6 +4,8 @@ stream_chat_with_eve events to the client as server-sent events."""
 import asyncio
 import json
 import logging
+import queue
+import threading
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
@@ -16,6 +18,8 @@ from app.services.eve.voice_fast import stream_voice_reply
 from app.services.speech._shared import resolve_speech_preference
 
 logger = logging.getLogger(__name__)
+
+_SENTINEL = object()
 
 router = APIRouter(prefix="/eve")
 
@@ -36,21 +40,46 @@ async def chat_stream(
 
     Emits `data: {json event}\\n\\n` frames (delta / tool_start / tool_end /
     done / error) terminated by a final `data: [DONE]` frame.
+
+    The blocking provider/tool loop (sync OpenAI SDK) is offloaded to a
+    daemon thread bridged via a Queue so the single uvicorn worker's event
+    loop stays responsive for pings, WS, and concurrent streams.
     """
 
-    def event_source():
+    messages = [item.model_dump() for item in payload.messages]
+    session_id = payload.session_id
+    q: queue.Queue = queue.Queue()
+
+    def _producer():
         try:
-            for event in stream_chat_with_eve(
-                database,
-                user,
-                [item.model_dump() for item in payload.messages],
-                payload.session_id,
-            ):
-                yield f"data: {json.dumps(event, default=str)}\n\n"
+            if payload.provider or payload.model:
+                stream = stream_chat_with_eve(database, user, messages, session_id, payload.provider, payload.model, payload.editor_context)
+            else:
+                stream = stream_chat_with_eve(database, user, messages, session_id, editor_context=payload.editor_context)
+            for event in stream:
+                q.put(f"data: {json.dumps(event, default=str)}\n\n")
         except Exception as error:
-            # Never terminate the stream without an in-band error frame.
             logger.error(f"[Eve Chat Stream] Unhandled stream failure: {type(error).__name__}: {error}", exc_info=True)
-            yield f"data: {json.dumps({'type': 'error', 'detail': 'Eve stream failed unexpectedly.'})}\n\n"
+            q.put(f"data: {json.dumps({'type': 'error', 'detail': 'Eve stream failed unexpectedly.'})}\n\n")
+        finally:
+            q.put(_SENTINEL)
+
+    threading.Thread(target=_producer, daemon=True).start()
+
+    async def event_source():
+        while True:
+            # Poll queue without blocking the event loop
+            try:
+                item = await asyncio.to_thread(q.get, timeout=0.1)
+            except queue.Empty:
+                # Keep SSE connection alive; yield nothing and let caller await next
+                await asyncio.sleep(0.02)
+                continue
+            except Exception:
+                break
+            if item is _SENTINEL:
+                break
+            yield item
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_source(), media_type="text/event-stream", headers=SSE_HEADERS)
@@ -65,27 +94,41 @@ async def voice_stream(
     """Ultra low-latency Eve voice turn (<1s first audio).
 
     Skips RAG/tool loop; uses fast model (groq 8b-instant) streaming and
-    synthesizes TTS per sentence as deltas arrive. Events mirror chat stream
-    plus `audio` frames carrying base64 MP3 (or provider=browser when no
-    server TTS is available — client speaks via SpeechSynthesis).
+    synthesizes TTS per sentence as deltas arrive.
     """
     last_message = next((m.content for m in reversed(payload.messages) if m.role == "user"), "")
     speech = await asyncio.to_thread(resolve_speech_preference, database, user["uid"])
+    session_id = payload.session_id
+    tts_provider = speech.get("tts_provider")
+    tts_voice = speech.get("tts_voice")
+    q: queue.Queue = queue.Queue()
 
-    def event_source():
+    def _producer():
         try:
             for event in stream_voice_reply(
-                database,
-                user,
-                last_message,
-                session_id=payload.session_id,
-                tts_provider=speech.get("tts_provider"),
-                tts_voice=speech.get("tts_voice"),
+                database, user, last_message, session_id=session_id, tts_provider=tts_provider, tts_voice=tts_voice
             ):
-                yield f"data: {json.dumps(event, default=str)}\n\n"
+                q.put(f"data: {json.dumps(event, default=str)}\n\n")
         except Exception as error:
             logger.error(f"[Eve Voice Stream] Unhandled failure: {type(error).__name__}: {error}", exc_info=True)
-            yield f"data: {json.dumps({'type': 'error', 'detail': 'Voice stream failed unexpectedly.'})}\n\n"
+            q.put(f"data: {json.dumps({'type': 'error', 'detail': 'Voice stream failed unexpectedly.'})}\n\n")
+        finally:
+            q.put(_SENTINEL)
+
+    threading.Thread(target=_producer, daemon=True).start()
+
+    async def event_source():
+        while True:
+            try:
+                item = await asyncio.to_thread(q.get, timeout=0.1)
+            except queue.Empty:
+                await asyncio.sleep(0.02)
+                continue
+            except Exception:
+                break
+            if item is _SENTINEL:
+                break
+            yield item
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_source(), media_type="text/event-stream", headers=SSE_HEADERS)

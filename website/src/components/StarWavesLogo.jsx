@@ -1,7 +1,7 @@
 export function StarWavesLogo({ size = 30, className = "" }) {
   return (
     <img
-      src="/starwaves-logo.png"
+      src="/logo.png"
       alt="StarWaves Logo"
       width={size}
       height={size}

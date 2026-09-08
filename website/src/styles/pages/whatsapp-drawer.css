@@ -1,0 +1,78 @@
+/* WhatsApp Info Drawer — split from whatsapp.css (Wave E) */
+/* Info Drawer */
+.whatsapp-info-drawer {
+  width: 320px;
+  border-left: 1px solid var(--border-color, #27272a);
+  background: var(--bg-secondary, #121212);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.whatsapp-drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.whatsapp-drawer-section h4 {
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #71717a);
+  margin: 0;
+}
+
+/* Filter Pills */
+.whatsapp-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border-color, #27272a);
+}
+
+.whatsapp-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: var(--bg-tertiary, #1c1c1f);
+  color: var(--text-secondary, #a1a1aa);
+  border: 1px solid var(--border-color, #27272a);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-filter-pill:hover {
+  background: var(--bg-hover, #27272a);
+  color: var(--text-primary, #ffffff);
+}
+
+.whatsapp-filter-pill.active {
+  background: var(--text-primary, #ffffff);
+  color: var(--bg-primary, #000000);
+  border-color: var(--text-primary, #ffffff);
+}
+
+.whatsapp-pill-count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: var(--border-color, #3f3f46);
+  color: var(--text-primary, #ffffff);
+}
+
+.whatsapp-filter-pill.active .whatsapp-pill-count {
+  background: var(--bg-primary, #000000);
+  color: var(--text-primary, #ffffff);
+}
+
