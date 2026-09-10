@@ -272,6 +272,7 @@ function App() {
     setSessionUser({
       uid: user.uid,
       displayName,
+      assistantName: user.assistantName || (typeof localStorage !== 'undefined' ? localStorage.getItem('starwaves_assistant_name') : null) || 'Eve',
       email: user.email,
       providerData: user.providerData,
     })

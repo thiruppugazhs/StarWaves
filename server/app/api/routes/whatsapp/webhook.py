@@ -1,5 +1,6 @@
 """WhatsApp webhook — dispatches whatsmeow worker events."""
 
+import asyncio
 import hashlib
 import hmac
 import json
@@ -130,10 +131,34 @@ async def whatsapp_incoming_webhook(request: Request, database: SqlClient = Depe
     whatsapp_repo.upsert_whatsapp_chat(database, user_id, chat_id=chat_id, name=resolved_name, is_group=is_group, last_message=incoming.model_dump(mode="json"))
     await whatsapp_ws_manager.broadcast_to_user(user_id, {"type": "new_message", "message": incoming.model_dump(mode="json")})
 
-    is_eve_chat = chat_id == "eve"
-    user_settings = whatsapp_repo.get_whatsapp_settings(database, user_id)
-    should = (sender_id != "eve" and not sender_name.lower().startswith("eve")) and (has_eve_mention(content, user_settings) or (is_eve_chat and not is_from_me))
-    if should:
-        logger.info(f"Eve triggered for WhatsApp message from {sender_name} (from_me={is_from_me}) in {chat_id}")
-        await WhatsAppService._handle_eve_response(database, user_id, chat_id, content)
-    return {"status": "processed"}
+    # Offload auto-reply processing to Redis queue (Option 1)
+    task_payload = {
+        "user_id": user_id,
+        "chat_id": chat_id,
+        "content": content,
+        "sender_id": sender_id,
+        "sender_name": sender_name,
+        "is_from_me": is_from_me,
+        "is_group": is_group,
+        "chat_name": chat_name,
+        "message_id": incoming.id,
+    }
+
+    enqueued = False
+    redis_url = getattr(settings, "redis_url", None)
+    if redis_url:
+        try:
+            from app.core.cache import _get_redis
+            r = _get_redis()
+            if r is not None:
+                r.lpush("starwaves:whatsapp:incoming_events", json.dumps(task_payload))
+                enqueued = True
+        except Exception as q_err:
+            logger.warning("Could not push WhatsApp event to Redis: %s", q_err)
+
+    if not enqueued and not is_from_me:
+        # Graceful in-process background fallback if Redis daemon is not running
+        from app.services.whatsapp_autoreply.engine import WhatsAppAutoReplyEngine
+        asyncio.create_task(WhatsAppAutoReplyEngine.process_incoming_message(database, task_payload))
+
+    return {"status": "processed", "queued": enqueued}
