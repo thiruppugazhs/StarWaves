@@ -23,6 +23,10 @@ def forbidden(detail: str = "Forbidden.") -> HTTPException:
     return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
 
 
+def conflict(detail: str = "Conflict.") -> HTTPException:
+    return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
+
+
 def unprocessable(detail: str) -> HTTPException:
     return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail)
 
@@ -33,3 +37,7 @@ def service_unavailable(detail: str) -> HTTPException:
 
 def bad_gateway(detail: str) -> HTTPException:
     return HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=detail)
+
+
+def internal(detail: str = "An internal server error occurred.") -> HTTPException:
+    return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)

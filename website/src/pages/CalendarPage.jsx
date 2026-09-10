@@ -5,6 +5,7 @@ import { CalendarDetailPanel } from './calendar/CalendarDetailPanel'
 import { CalendarMonthView } from './calendar/CalendarMonthView'
 import { CalendarToolbar } from './calendar/CalendarToolbar'
 import { buildCalendarDays, weekDays } from './calendar/calendarUtils'
+import { CALENDAR_FOCUS_KEY, CALENDAR_VIEW_KEY } from '../lib/storageKeys'
 
 export function CalendarPage({ eventsByDate, onNavigate }) {
   const today = useMemo(() => new Date(), [])
@@ -13,7 +14,7 @@ export function CalendarPage({ eventsByDate, onNavigate }) {
   )
   const [selectedDate, setSelectedDate] = useState(null)
   const [viewMenuOpen, setViewMenuOpen] = useState(false)
-  const [calendarView, setCalendarView] = usePersistentState('starwaves.calendar.view', 'days')
+  const [calendarView, setCalendarView] = usePersistentState(CALENDAR_VIEW_KEY, 'days')
   const [pickerDate, setPickerDate] = useState(null)
   const [focusedEventId, setFocusedEventId] = useState(null)
   const days = useMemo(() => buildCalendarDays(visibleMonth), [visibleMonth])
@@ -29,7 +30,7 @@ export function CalendarPage({ eventsByDate, onNavigate }) {
   )
 
   useEffect(() => {
-    const rawFocus = localStorage.getItem('starwaves.calendar-focus')
+    const rawFocus = localStorage.getItem(CALENDAR_FOCUS_KEY)
     if (!rawFocus) return
     try {
       const focus = JSON.parse(rawFocus)
@@ -38,9 +39,9 @@ export function CalendarPage({ eventsByDate, onNavigate }) {
       setVisibleMonth(new Date(focusDate.getFullYear(), focusDate.getMonth(), 1))
       setSelectedDate(focusDate)
       setFocusedEventId(focus.targetId)
-      localStorage.removeItem('starwaves.calendar-focus')
+      localStorage.removeItem(CALENDAR_FOCUS_KEY)
     } catch {
-      localStorage.removeItem('starwaves.calendar-focus')
+      localStorage.removeItem(CALENDAR_FOCUS_KEY)
     }
   }, [])
 

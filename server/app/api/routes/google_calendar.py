@@ -3,12 +3,13 @@ import logging
 from urllib.parse import quote
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 from itsdangerous import URLSafeTimedSerializer
 
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.errors import bad_gateway, service_unavailable
 from app.services.google_calendar import (
     google_calendar_data,
     google_state_serializer,
@@ -63,7 +64,7 @@ def authorize_google_calendar(user: dict = Depends(get_current_user)):
     try:
         state = google_state_serializer().dumps({"uid": user["uid"]})
     except RuntimeError as error:
-        raise HTTPException(status_code=503, detail=str(error)) from None
+        raise service_unavailable(str(error)) from None
     url = build_google_authorize_url(
         settings.google_oauth_callback_url,
         GOOGLE_CALENDAR_SCOPES,
@@ -185,7 +186,7 @@ async def get_google_calendar_data(
         try:
             results = [await process_account(s) for s in snapshots]
         except (KeyError, ValueError, httpx.HTTPError) as error:
-            raise HTTPException(status_code=502, detail=str(error)) from None
+            raise bad_gateway(str(error)) from None
 
     connections = []
     events = []

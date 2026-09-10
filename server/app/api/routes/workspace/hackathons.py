@@ -3,7 +3,7 @@
 import asyncio
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 
 from app.api.routes.workspace._shared import (
@@ -13,6 +13,7 @@ from app.api.routes.workspace._shared import (
     user_collection,
 )
 from app.core.auth import get_current_user
+from app.core.errors import not_found
 from app.repositories.pagination import decode_cursor, encode_cursor
 from app.schemas.workspace import (
     HackathonCreate,
@@ -52,7 +53,7 @@ async def update_hackathon_source(
     user: dict = Depends(get_current_user),
 ):
     if source_id not in SOURCE_IDS:
-        raise HTTPException(status_code=404, detail="Unknown hackathon source.")
+        raise not_found("Unknown hackathon source.")
     reference = hackathon_settings_reference(database, user["uid"])
     snap = await asyncio.to_thread(reference.get)
     current = set((snap.to_dict() or {}).get("enabled", []))
@@ -144,10 +145,10 @@ async def get_hackathon(
     reference = user_collection(database, user["uid"], "hackathons").document(hackathon_id)
     snapshot = await asyncio.to_thread(reference.get)
     if not snapshot.exists:
-        raise HTTPException(status_code=404, detail="Hackathon not found.")
+        raise not_found("Hackathon not found.")
     data = snapshot.to_dict() or {}
     if data.get("deleted"):
-        raise HTTPException(status_code=404, detail="Hackathon not found.")
+        raise not_found("Hackathon not found.")
     return {"id": reference.id, **data}
 
 
@@ -161,7 +162,7 @@ async def update_hackathon(
     reference = user_collection(database, user["uid"], "hackathons").document(hackathon_id)
     exists = await asyncio.to_thread(lambda: reference.get().exists)
     if not exists:
-        raise HTTPException(status_code=404, detail="Hackathon not found.")
+        raise not_found("Hackathon not found.")
     updates = changes.model_dump(exclude_unset=True, mode="python")
     await asyncio.to_thread(
         lambda: reference.update(
@@ -184,7 +185,7 @@ async def delete_hackathon(
     reference = user_collection(database, user["uid"], "hackathons").document(hackathon_id)
     exists = await asyncio.to_thread(lambda: reference.get().exists)
     if not exists:
-        raise HTTPException(status_code=404, detail="Hackathon not found.")
+        raise not_found("Hackathon not found.")
     now = datetime.now(timezone.utc)
     await asyncio.to_thread(
         lambda: reference.update(
@@ -207,7 +208,7 @@ async def restore_hackathon(
     reference = user_collection(database, user["uid"], "hackathons").document(hackathon_id)
     exists = await asyncio.to_thread(lambda: reference.get().exists)
     if not exists:
-        raise HTTPException(status_code=404, detail="Hackathon not found.")
+        raise not_found("Hackathon not found.")
     await asyncio.to_thread(
         lambda: reference.update(
             {

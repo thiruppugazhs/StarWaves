@@ -7,15 +7,26 @@ from app.db import SqlClient, get_firestore
 
 from app.core.auth import get_current_user
 from app.repositories import whatsapp as whatsapp_repo
-from app.schemas.whatsapp import WhatsAppChatResponse, WhatsAppMessageResponse, WhatsAppSummaryChatRequest
+from app.schemas.whatsapp import (
+    WhatsAppChatListResponse,
+    WhatsAppChatResponse,
+    WhatsAppMessageResponse,
+    WhatsAppSummaryChatRequest,
+)
 from app.services.whatsapp import WhatsAppService
 
 router = APIRouter()
 
 
-@router.get("/chats", response_model=List[WhatsAppChatResponse])
-async def list_whatsapp_chats(current_user: dict = Depends(get_current_user), database: SqlClient = Depends(get_firestore)):
-    return await WhatsAppService.list_chats(database, current_user["uid"])
+@router.get("/chats", response_model=WhatsAppChatListResponse)
+async def list_whatsapp_chats(
+    limit: int = Query(default=30, ge=1, le=100, description="Max number of chats to return"),
+    cursor: Optional[str] = Query(default=None, description="Cursor chat ID to start after"),
+    current_user: dict = Depends(get_current_user),
+    database: SqlClient = Depends(get_firestore),
+):
+    return await WhatsAppService.list_chats(database, current_user["uid"], limit=limit, cursor=cursor)
+
 
 
 @router.get("/chats/{chat_id}/messages", response_model=List[WhatsAppMessageResponse])

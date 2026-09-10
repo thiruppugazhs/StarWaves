@@ -12,7 +12,9 @@ export function AiModelsSection({ user }) {
   const [providers, setProviders] = useState([])
   const [selectedProvider, setSelectedProvider] = useState('default')
   const [selectedModel, setSelectedModel] = useState('default')
-  const [assistantName, setAssistantName] = useState('Eve')
+  const [assistantName, setAssistantName] = useState(
+    () => user?.assistantName || (typeof localStorage !== 'undefined' ? localStorage.getItem('starwaves_assistant_name') : null) || 'Eve'
+  )
   const [apiKey, setApiKey] = useState('')
   const [showApiKey, setShowApiKey] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -23,6 +25,12 @@ export function AiModelsSection({ user }) {
   const [liveError, setLiveError] = useState('')
 
   useEffect(() => {
+    if (user?.assistantName) {
+      setAssistantName(user.assistantName)
+    }
+  }, [user?.assistantName])
+
+  useEffect(() => {
     let active = true
     loadAiModels()
       .then((data) => {
@@ -31,8 +39,8 @@ export function AiModelsSection({ user }) {
         setProviders(catalog)
         const preference = data.preference || null
 
-        if (preference?.assistant_name) {
-          setAssistantName(preference.assistant_name)
+        if (data.assistant_name) {
+          setAssistantName(data.assistant_name)
         }
 
         const chosenProviderId = preference?.provider || 'default'
@@ -208,12 +216,20 @@ export function AiModelsSection({ user }) {
       const payload = {
         provider: selectedProvider,
         model: isDefault ? 'default' : selectedModel,
-        assistant_name: assistantName.trim() || 'Eve',
+      }
+      if (assistantName && assistantName.trim()) {
+        payload.assistant_name = assistantName.trim()
       }
       if (!isDefault && apiKey.trim()) {
         payload.api_key = apiKey.trim()
       }
       const data = await saveAiModelPreference(payload)
+      if (data.assistant_name) {
+        setAssistantName(data.assistant_name)
+        try {
+          localStorage.setItem('starwaves_assistant_name', data.assistant_name)
+        } catch {}
+      }
       if (data.providers) {
         setProviders(data.providers)
         const savedProv = data.providers.find((p) => p.id === selectedProvider)
@@ -223,7 +239,7 @@ export function AiModelsSection({ user }) {
       }
       setApiKey('')
       setLiveError('')
-      setMessage(`AI settings saved. Your assistant (${assistantName.trim() || 'Eve'}) will use this configuration.`)
+      setMessage('AI model preference saved. Eve will use this model.')
     } catch (error) {
       setMessage(error.message)
     } finally {

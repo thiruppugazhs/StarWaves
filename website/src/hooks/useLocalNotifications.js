@@ -1,6 +1,6 @@
 import { usePersistentState } from './usePersistentState'
+import { LOCAL_NOTIFICATIONS_KEY } from '../lib/storageKeys'
 
-const LOCAL_NOTIFICATIONS_KEY = 'starwaves.local_notifications'
 
 function createNotificationId() {
   return `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`

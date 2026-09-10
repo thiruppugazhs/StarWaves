@@ -3,11 +3,12 @@
 import asyncio
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, Response
 from app.db import SqlClient, get_firestore
 
 from app.api.routes.studio._shared import not_found, require_non_serverless
 from app.core.auth import get_current_user
+from app.core.errors import bad_request, forbidden, not_found
 from app.schemas.studio import StudioPreviewResponse
 from app.services.studio import preview as studio_preview
 from app.repositories import studio as studio_repo
@@ -72,9 +73,9 @@ async def serve_preview(token: str, file_path: str = ""):
             studio_preview.read_preview_file, user_id, workspace_id, file_path
         )
     except studio_preview.PreviewTokenError as error:
-        raise HTTPException(status_code=403, detail=str(error)) from error
+        raise forbidden(str(error)) from error
     except FileNotFoundError as error:
-        raise HTTPException(status_code=404, detail=str(error)) from error
+        raise not_found(str(error)) from error
     except ValueError as error:
-        raise HTTPException(status_code=400, detail=str(error)) from error
+        raise bad_request(str(error)) from error
     return Response(content=data, media_type=media_type)

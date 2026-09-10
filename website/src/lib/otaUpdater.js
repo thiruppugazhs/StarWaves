@@ -1,6 +1,6 @@
 import { fetchOtaLatest, getAppVersion } from './updatesApi'
+import { OTA_BUNDLE_KEY as LAST_BUNDLE_KEY } from './storageKeys'
 
-const LAST_BUNDLE_KEY = 'starwaves:ota:bundleId'
 
 export const isNative = () => {
   try {

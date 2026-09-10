@@ -1,4 +1,4 @@
-"""AI config resolution — single responsibility: resolve each user's provider/model
+"""AI config resolution â single responsibility: resolve each user's provider/model
 choice into an AiConfig with working credentials and client options."""
 
 import time
@@ -26,7 +26,7 @@ def has_server_key(provider: str) -> bool:
     if provider == "groq":
         return bool(settings.groq_api_key)
     if provider == "ollama":
-        # Ollama is local or cloud — available when URL or API key is configured
+        # Ollama is local or cloud â available when URL or API key is configured
         return bool(settings.ollama_url or settings.ollama_api_key)
     if provider == "opencode":
         return bool(settings.opencode_api_key)
@@ -100,7 +100,7 @@ def _client_options(provider: str, user_api_key: str | None = None) -> dict[str,
 
     options: dict[str, Any] = {}
     if api_key:
-        # Ollama placeholder must not be sent as a real Bearer header for discovery —
+        # Ollama placeholder must not be sent as a real Bearer header for discovery â
         # OpenAI SDK still requires some key, but discovery skips auth for it.
         if not (provider == "ollama" and api_key == "ollama"):
             options["api_key"] = api_key
@@ -135,7 +135,7 @@ def build_ai_config(
         provider = _first_available_provider()
         user_api_key = None
     elif not user_api_key and not has_server_key(provider):
-        # Requested provider has no server key and no user key — fallback to first available
+        # Requested provider has no server key and no user key â fallback to first available
         provider = _first_available_provider()
         user_api_key = None
 
@@ -166,6 +166,21 @@ def load_ai_preference(database: SqlClient, user_uid: str) -> dict[str, Any] | N
     return snapshot.to_dict() or None
 
 
+def extract_user_keys(preference: dict[str, Any] | None) -> dict[str, str]:
+    """Single implementation of stored user API keys incl. legacy `api_key` (ADR 0046)."""
+    if not preference:
+        return {}
+    keys: dict[str, str] = {}
+    saved_keys = preference.get("api_keys")
+    if isinstance(saved_keys, dict):
+        keys.update({k: str(v) for k, v in saved_keys.items() if v})
+    legacy_key = preference.get("api_key")
+    saved_provider = preference.get("provider")
+    if legacy_key and saved_provider and saved_provider not in keys:
+        keys[saved_provider] = str(legacy_key)
+    return keys
+
+
 def _cache_get(user_uid: str) -> AiConfig | None:
     entry = _ai_config_cache.get(user_uid)
     if entry and entry[0] > time.monotonic():
@@ -189,6 +204,12 @@ def resolve_ai_config(
 ) -> AiConfig:
     """Resolve a user's AI choice, optionally applying a validated per-turn override."""
     has_override = bool(provider_override or model_override)
+
+    # P2: Fast path - when a provider_override has a server key we can skip the
+    # load_ai_preference() DB read entirely (no user API key needed).
+    if provider_override and has_server_key(provider_override):
+        return build_ai_config(provider_override, model_override)
+
     if not has_override:
         cached = _cache_get(user_uid)
         if cached is not None:
@@ -198,10 +219,7 @@ def resolve_ai_config(
 
     if has_override:
         chosen_provider = provider_override or (preference or {}).get("provider") or "default"
-        api_keys = (preference or {}).get("api_keys") or {}
-        user_api_key = api_keys.get(chosen_provider) if isinstance(api_keys, dict) else None
-        if not user_api_key and preference and preference.get("provider") == chosen_provider:
-            user_api_key = preference.get("api_key")
+        user_api_key = extract_user_keys(preference).get(chosen_provider)
         return build_ai_config(chosen_provider, model_override, user_api_key=user_api_key)
 
     if not preference:

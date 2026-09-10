@@ -29,7 +29,7 @@ def eve_pipeline(monkeypatch):
 
         holder["provider"] = provider
 
-        def fake_resolve(database, user_id, messages):
+        def fake_resolve(database, user_id, messages, *args, **kwargs):
             return ChatContext(
                 database=database,
                 user_id=user_id,

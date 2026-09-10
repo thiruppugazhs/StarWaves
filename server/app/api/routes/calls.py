@@ -8,10 +8,11 @@ that are not yet connected to the WebSocket.
 
 import asyncio
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query, status
 from app.db import SqlClient, get_firestore
 
 from app.core.auth import get_current_user
+from app.core.errors import bad_request, forbidden, not_found
 from app.core.cache import cache_invalidate_prefix, cached
 from app.core.ws_manager import call_ws_manager
 from app.repositories.calls import CallRepository
@@ -45,9 +46,9 @@ def _resolve_callee(database: SqlClient, identifier: str, current_user: dict) ->
         return EVE_BOT_USER
     record = get_user_by_email(database, cleaned) or get_user_by_id(database, cleaned)
     if not record:
-        raise HTTPException(status_code=404, detail="User not found.")
+        raise not_found("User not found.")
     if record["uid"] == current_user["uid"]:
-        raise HTTPException(status_code=400, detail="You cannot call yourself.")
+        raise bad_request("You cannot call yourself.")
     return record
 
 
@@ -58,9 +59,9 @@ def _person(record: dict) -> CallUser:
 
 def _require_participant(call: dict | None, uid: str) -> dict:
     if not call:
-        raise HTTPException(status_code=404, detail="Call not found.")
+        raise not_found("Call not found.")
     if uid not in call.get("participants", []):
-        raise HTTPException(status_code=403, detail="You are not part of this call.")
+        raise forbidden("You are not part of this call.")
     return call
 
 

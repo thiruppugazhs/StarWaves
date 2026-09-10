@@ -7,8 +7,8 @@ import { formatFileSize } from '../../utils/fileSize'
 import { composeBriefText, takeStudioBrief } from './studioBrief'
 import { QuestionCard } from './QuestionCard'
 import { parseQuestionsFromMessage } from './questionUtils'
+import { STUDIO_CHAT_PREFIX as CHAT_SESSION_KEY_PREFIX } from '../../lib/storageKeys'
 
-const CHAT_SESSION_KEY_PREFIX = 'starwaves.studio.chat_session.'
 const TEXT_EXTENSION_PATTERN = /\.(txt|md|json|js|jsx|ts|tsx|html|css|py|csv|xml|yaml|yml|sql|sh|log|rs|go|java|c|cpp|h)$/i
 const ATTACHMENT_TEXT_MAX_LENGTH = 40000
 const DEFAULT_MODEL_SELECTION = { provider: 'openrouter', model: 'openrouter/free' }

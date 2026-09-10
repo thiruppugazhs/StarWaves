@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.errors import bad_gateway, bad_request, not_found, service_unavailable, unauthorized
 from app.services.oauth import (
     decrypt_google_token,
     encrypt_google_token,
@@ -79,7 +80,7 @@ def authorize_google_chat(user: dict = Depends(get_current_user)):
     try:
         state = chat_state_serializer().dumps({"uid": user["uid"]})
     except RuntimeError as error:
-        raise HTTPException(status_code=503, detail=str(error)) from None
+        raise service_unavailable(str(error)) from None
     url = build_google_authorize_url(
         settings.google_chat_oauth_callback_url,
         GOOGLE_CHAT_SCOPES,
@@ -180,10 +181,7 @@ async def connect_google_chat_account(
             headers={"Authorization": f"Bearer {connection.access_token}"},
         )
     if response.status_code in (401, 403):
-        raise HTTPException(
-            status_code=400,
-            detail="Google rejected the Google Chat authorization.",
-        )
+        raise bad_request("Google rejected the Google Chat authorization.")
     try:
         response.raise_for_status()
         userinfo = response.json()
@@ -191,10 +189,7 @@ async def connect_google_chat_account(
         display_name = userinfo.get("name", email)
         picture = userinfo.get("picture")
     except (httpx.HTTPError, KeyError, ValueError) as error:
-        raise HTTPException(
-            status_code=502,
-            detail="Google Chat account verification failed.",
-        ) from error
+        raise bad_gateway("Google Chat account verification failed.") from error
 
     doc_id = integration_account_id(email)
     doc_ref = chat_accounts_collection(database, user["uid"]).document(doc_id)
@@ -231,7 +226,7 @@ def disconnect_google_chat_account(
 ):
     doc_ref = chat_accounts_collection(database, user["uid"]).document(account_id)
     if not doc_ref.get().exists:
-        raise HTTPException(status_code=404, detail="Account connection not found.")
+        raise not_found("Account connection not found.")
     doc_ref.delete()
     return {"disconnected": True}
 
@@ -378,18 +373,12 @@ async def send_google_chat_message(
         accounts = [a for a in accounts if a.get("email") == body.account_email]
 
     if not accounts:
-        raise HTTPException(
-            status_code=404,
-            detail="No connected Google Chat account found for message sending.",
-        )
+        raise not_found("No connected Google Chat account found for message sending.")
 
     account = accounts[0]
     token = await resolve_chat_access_token(account)
     if not token:
-        raise HTTPException(
-            status_code=401,
-            detail="Account access token is missing.",
-        )
+        raise unauthorized("Account access token is missing.")
 
     async with httpx.AsyncClient(timeout=15) as client:
         res = await client.post(
@@ -401,6 +390,9 @@ async def send_google_chat_message(
             json={"text": body.text},
         )
         if not res.is_success:
+            # Upstream status passthrough — the only raw HTTPException left in
+            # routes (ADR 0044 exception): res.status_code is dynamic and must
+            # be preserved verbatim for the client to handle provider errors.
             raise HTTPException(
                 status_code=res.status_code,
                 detail=f"Google Chat API rejected message: {res.text}",

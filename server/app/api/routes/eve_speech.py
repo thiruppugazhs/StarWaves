@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 
 from app.core.auth import get_current_user
 from app.core.cache import CACHE_TTL_LONG, cache_invalidate_prefix, cached
+from app.core.errors import unprocessable
 from app.schemas.eve_speech import (
     EveSpeechPreferenceUpdate,
     EveSpeechResponse,
@@ -70,10 +71,7 @@ def save_eve_speech(
         tts_provider=payload.tts_provider,
         tts_voice=payload.tts_voice,
     ):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Unknown speech provider, model, or voice.",
-        )
+        raise unprocessable("Unknown speech provider, model, or voice.")
     reference = _reference(database, user["uid"])
     reference.set(
         {

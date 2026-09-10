@@ -77,6 +77,13 @@ class WhatsAppChatResponse(BaseModel):
     eve_auto_reply: bool = False
 
 
+class WhatsAppChatListResponse(BaseModel):
+    items: List[WhatsAppChatResponse] = Field(default_factory=list)
+    next_cursor: Optional[str] = None
+    has_more: bool = False
+
+
+
 class WhatsAppSettings(BaseModel):
     auto_reply_enabled: bool = False
     auto_reply_prompt: Optional[str] = "You are Eve, answering incoming WhatsApp messages concisely on behalf of the user."

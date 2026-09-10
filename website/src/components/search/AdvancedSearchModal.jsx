@@ -13,8 +13,8 @@ import {
   buildSearchIndex,
   filterSearchItems,
 } from '../../config/searchIndex'
+import { RECENT_SEARCHES_KEY } from '../../lib/storageKeys'
 
-const RECENT_SEARCHES_KEY = 'starwaves.recent_searches'
 const MAX_RECENTS = 6
 
 export function AdvancedSearchModal({

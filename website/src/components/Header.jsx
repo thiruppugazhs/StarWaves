@@ -31,6 +31,7 @@ const EveAssistantModal = lazy(() => import('./EveAssistantModal').then((m) => (
 const AdvancedSearchModal = lazy(() => import('./search/AdvancedSearchModal').then((m) => ({ default: m.AdvancedSearchModal })))
 
 import { applyThemeVariables, THEME_PRESETS } from '../themes/presets'
+import { CALENDAR_FOCUS_KEY, CUSTOM_THEME_KEY } from '../lib/storageKeys'
 
 export function Header({
   activePage,
@@ -122,7 +123,7 @@ export function Header({
 
     let currentConfig = {}
     try {
-      const saved = localStorage.getItem('starwaves.custom_theme')
+      const saved = localStorage.getItem(CUSTOM_THEME_KEY)
       if (saved) currentConfig = JSON.parse(saved) || {}
     } catch {}
 
@@ -135,7 +136,7 @@ export function Header({
 
     applyThemeVariables(nextState)
     try {
-      localStorage.setItem('starwaves.custom_theme', JSON.stringify(nextState))
+      localStorage.setItem(CUSTOM_THEME_KEY, JSON.stringify(nextState))
     } catch {}
     window.dispatchEvent(new CustomEvent('starwaves:theme-change', { detail: nextState }))
   }
@@ -184,7 +185,7 @@ export function Header({
     if (destination) {
       if (destination === 'calendar' && notification.targetId && notification.dateKey) {
         localStorage.setItem(
-          'starwaves.calendar-focus',
+          CALENDAR_FOCUS_KEY,
           JSON.stringify({ targetId: notification.targetId, dateKey: notification.dateKey }),
         )
       }

@@ -34,11 +34,24 @@ export function WhatsAppChatList({
   isConnected = false,
   searchQuery = '',
   onSearchChange,
+  hasMoreChats = false,
+  isLoadingMoreChats = false,
+  onLoadMoreChats,
 }) {
   const [activeFilter, setActiveFilter] = useState('all') // 'all', 'unread', 'favourites', 'groups', 'archived'
   const [contextMenuChat, setContextMenuChat] = useState(null)
   const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 })
   const menuRef = useRef(null)
+  const listRef = useRef(null)
+
+  const handleScroll = (e) => {
+    if (!hasMoreChats || isLoadingMoreChats || !onLoadMoreChats) return
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
+    if (scrollHeight - scrollTop - clientHeight < 120) {
+      onLoadMoreChats()
+    }
+  }
+
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -205,7 +218,7 @@ export function WhatsAppChatList({
       </div>
 
       {/* Chat List */}
-      <div className="whatsapp-chat-list">
+      <div className="whatsapp-chat-list" ref={listRef} onScroll={handleScroll}>
         {filteredChats.length === 0 ? (
           <div className="whatsapp-chat-list-empty">
             {searchQuery
@@ -215,101 +228,109 @@ export function WhatsAppChatList({
               : 'No chats yet'}
           </div>
         ) : (
-          filteredChats.map((chat) => {
-            const isActive = selectedChatId === chat.id
-            const isEve = chat.is_eve || chat.id === 'eve'
+          <>
+            {filteredChats.map((chat) => {
+              const isActive = selectedChatId === chat.id
+              const isEve = chat.is_eve || chat.id === 'eve'
 
-            return (
-              <button
-                key={chat.id}
-                type="button"
-                className={`whatsapp-chat-item ${isActive ? 'active' : ''}`}
-                onClick={() => onSelectChat(chat.id)}
-                onContextMenu={(e) => handleContextMenu(e, chat)}
-                aria-current={isActive ? 'true' : undefined}
-                aria-label={`Open chat with ${chat.name || 'conversation'}`}
-              >
-                <div className={`whatsapp-avatar ${isEve ? 'is-eve' : chat.is_group ? 'is-group' : ''}`}>
-                  {isEve ? (
-                    <Bot size={22} />
-                  ) : chat.avatar_url ? (
-                    <img
-                      src={chat.avatar_url}
-                      alt={chat.name}
-                      className="whatsapp-avatar-img"
-                      loading="lazy"
-                      decoding="async"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none'
-                        if (e.currentTarget.nextSibling) {
-                          e.currentTarget.nextSibling.style.display = 'flex'
-                        }
-                      }}
-                    />
-                  ) : null}
-                  {!isEve && (
-                    <div
-                      className="whatsapp-avatar-fallback"
-                      style={chat.avatar_url ? { display: 'none' } : {}}
-                    >
-                      {chat.name && chat.name !== 'Contact' && chat.name !== chat.id && !/^\+?\d{6,}$/.test(String(chat.name).replace(/@s\.whatsapp\.net|@g\.us|@lid/g, '').trim()) ? (
-                        <span className="whatsapp-avatar-initial">{getSenderInitial(chat.name)}</span>
-                      ) : chat.is_group ? (
-                        <Users size={20} />
-                      ) : (
-                        <User size={20} />
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                  <div className="whatsapp-chat-info">
-                  <div className="whatsapp-chat-top">
-                    <span className="whatsapp-chat-name" title={chat.name}>
-                      {chat.pinned && <Pin size={12} className="whatsapp-chat-pin" />}
-                      {chat.is_muted && <BellOff size={12} className="whatsapp-chat-muted" />}
-                      {(() => {
-                        const cleanName = String(chat.name || '').replace(/@s\.whatsapp\.net|@g\.us|@lid/g, '').trim()
-                        const isNumericName = /^\+?\d{6,}$/.test(cleanName)
-                        if (chat.is_group && (!chat.name || chat.name === 'Contact' || chat.name === chat.id || isNumericName)) {
-                          return 'Group conversation'
-                        }
-                        if (!chat.name || chat.name === 'Contact' || isNumericName) return ''
-                        return chat.name
-                      })()}
-                    </span>
-                    <span className="whatsapp-chat-time">
-                      {formatChatTime(chat.last_message?.timestamp || chat.updated_at)}
-                    </span>
-                  </div>
-
-                  <div className="whatsapp-chat-bottom">
-                    <p className="whatsapp-chat-preview">
-                      {chat.last_message ? (
-                        <>
-                          {chat.last_message.is_from_me ? (
-                            <span className="whatsapp-chat-preview-strong">You: </span>
-                          ) : chat.is_group && formatSenderName(chat.last_message.sender_name) ? (
-                            <span className="whatsapp-chat-preview-strong">{formatSenderName(chat.last_message.sender_name)}: </span>
-                          ) : null}
-                          {chat.last_message.content || (chat.last_message.media ? `[${chat.last_message.media.type}]` : '')}
-                        </>
-                      ) : (
-                        isEve ? 'Ask Eve anything or manage workspace...' : 'No messages yet'
-                      )}
-                    </p>
-
-                    {chat.unread_count > 0 && (
-                      <span className="whatsapp-unread-badge">{chat.unread_count}</span>
+              return (
+                <button
+                  key={chat.id}
+                  type="button"
+                  className={`whatsapp-chat-item ${isActive ? 'active' : ''}`}
+                  onClick={() => onSelectChat(chat.id)}
+                  onContextMenu={(e) => handleContextMenu(e, chat)}
+                  aria-current={isActive ? 'true' : undefined}
+                  aria-label={`Open chat with ${chat.name || 'conversation'}`}
+                >
+                  <div className={`whatsapp-avatar ${isEve ? 'is-eve' : chat.is_group ? 'is-group' : ''}`}>
+                    {isEve ? (
+                      <Bot size={22} />
+                    ) : chat.avatar_url ? (
+                      <img
+                        src={chat.avatar_url}
+                        alt={chat.name}
+                        className="whatsapp-avatar-img"
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                          if (e.currentTarget.nextSibling) {
+                            e.currentTarget.nextSibling.style.display = 'flex'
+                          }
+                        }}
+                      />
+                    ) : null}
+                    {!isEve && (
+                      <div
+                        className="whatsapp-avatar-fallback"
+                        style={chat.avatar_url ? { display: 'none' } : {}}
+                      >
+                        {chat.name && chat.name !== 'Contact' && chat.name !== chat.id && !/^\+?\d{6,}$/.test(String(chat.name).replace(/@s\.whatsapp\.net|@g\.us|@lid/g, '').trim()) ? (
+                          <span className="whatsapp-avatar-initial">{getSenderInitial(chat.name)}</span>
+                        ) : chat.is_group ? (
+                          <Users size={20} />
+                        ) : (
+                          <User size={20} />
+                        )}
+                      </div>
                     )}
                   </div>
-                </div>
-              </button>
-            )
-          })
+
+                  <div className="whatsapp-chat-info">
+                    <div className="whatsapp-chat-top">
+                      <span className="whatsapp-chat-name" title={chat.name}>
+                        {chat.pinned && <Pin size={12} className="whatsapp-chat-pin" />}
+                        {chat.is_muted && <BellOff size={12} className="whatsapp-chat-muted" />}
+                        {(() => {
+                          const cleanName = String(chat.name || '').replace(/@s\.whatsapp\.net|@g\.us|@lid/g, '').trim()
+                          const isNumericName = /^\+?\d{6,}$/.test(cleanName)
+                          if (chat.is_group && (!chat.name || chat.name === 'Contact' || chat.name === chat.id || isNumericName)) {
+                            return 'Group conversation'
+                          }
+                          if (!chat.name || chat.name === 'Contact' || isNumericName) return ''
+                          return chat.name
+                        })()}
+                      </span>
+                      <span className="whatsapp-chat-time">
+                        {formatChatTime(chat.last_message?.timestamp || chat.updated_at)}
+                      </span>
+                    </div>
+
+                    <div className="whatsapp-chat-bottom">
+                      <p className="whatsapp-chat-preview">
+                        {chat.last_message ? (
+                          <>
+                            {chat.last_message.is_from_me ? (
+                              <span className="whatsapp-chat-preview-strong">You: </span>
+                            ) : chat.is_group && formatSenderName(chat.last_message.sender_name) ? (
+                              <span className="whatsapp-chat-preview-strong">{formatSenderName(chat.last_message.sender_name)}: </span>
+                            ) : null}
+                            {chat.last_message.content || (chat.last_message.media ? `[${chat.last_message.media.type}]` : '')}
+                          </>
+                        ) : (
+                          isEve ? 'Ask Eve anything or manage workspace...' : 'No messages yet'
+                        )}
+                      </p>
+
+                      {chat.unread_count > 0 && (
+                        <span className="whatsapp-unread-badge">{chat.unread_count}</span>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+            {isLoadingMoreChats && (
+              <div className="whatsapp-chat-list-loading" style={{ textAlign: 'center', padding: '10px 0', fontSize: '13px', color: 'var(--text-muted)' }}>
+                Loading more conversations...
+              </div>
+            )}
+          </>
         )}
       </div>
+
 
       {/* Right Click Context Menu on Chat Item */}
       {contextMenuChat && (

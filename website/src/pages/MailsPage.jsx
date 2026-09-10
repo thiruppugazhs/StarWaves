@@ -8,6 +8,7 @@ import {
 import { getGmailAccounts, getGmailStatus } from '../lib/gmailApi'
 import { ConfirmDialog, LoadingState, Pagination, SearchBar, TabNav } from '../components/ui'
 import { usePersistentState } from '../hooks/usePersistentState'
+import { MAIL_FOLDER_KEY, MAIL_INBOX_TAB_KEY } from '../lib/storageKeys'
 import { EMPTY_COMPOSE, INBOX_TABS, buildReplyDraft } from './mail/mailUtils'
 import { MailComposer } from './mail/MailComposer'
 import { MailConnect } from './mail/MailConnect'
@@ -21,8 +22,8 @@ export function MailsPage({ onNavigate }) {
   const [accounts, setAccounts] = useState([])
   const [selectedAccountEmail, setSelectedAccountEmail] = useState('')
   const [query, setQuery] = useState('')
-  const [folder, setFolder] = usePersistentState('starwaves.mail.folder', 'INBOX')
-  const [inboxTab, setInboxTab] = usePersistentState('starwaves.mail.inbox-tab', 'primary')
+  const [folder, setFolder] = usePersistentState(MAIL_FOLDER_KEY, 'INBOX')
+  const [inboxTab, setInboxTab] = usePersistentState(MAIL_INBOX_TAB_KEY, 'primary')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [connected, setConnected] = useState(null)

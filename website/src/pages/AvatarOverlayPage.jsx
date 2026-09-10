@@ -3,8 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { EyeOff, X } from "lucide-react"
 import { EveAvatar } from "../components/eve/avatar/EveAvatar"
 import { AVATAR_OVERLAY_BC_CHANNEL, AVATAR_DEFAULTS } from "../components/eve/avatar/avatarConstants"
+import { OVERLAY_POSITION_KEY } from '../lib/storageKeys'
 
-const OVERLAY_POSITION_KEY = "starwaves.overlay-position"
 
 // Reads initial position from localStorage so it persists across sessions
 function readSavedPosition() {

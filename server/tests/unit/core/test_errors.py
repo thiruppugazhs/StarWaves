@@ -6,7 +6,9 @@ from fastapi import HTTPException
 from app.core.errors import (
     bad_gateway,
     bad_request,
+    conflict,
     forbidden,
+    internal,
     not_found,
     service_unavailable,
     unauthorized,
@@ -21,6 +23,8 @@ from app.core.errors import (
         (bad_request, 400),
         (unauthorized, 401),
         (forbidden, 403),
+        (conflict, 409),
+        (internal, 500),
     ],
 )
 def test_error_helper_status_codes(helper, expected_status):
@@ -45,7 +49,7 @@ def test_error_helpers_requiring_detail(helper, expected_status):
 
 @pytest.mark.parametrize("detail", ["Custom message."])
 def test_error_helpers_carry_detail(detail):
-    for helper in (not_found, bad_request, unauthorized, forbidden, service_unavailable, bad_gateway):
+    for helper in (not_found, bad_request, unauthorized, forbidden, conflict, internal, service_unavailable, bad_gateway):
         exc = helper(detail)
         assert exc.detail == detail
 
@@ -62,5 +66,5 @@ def test_default_details_are_human_readable():
 
 
 def test_errors_are_http_exceptions():
-    for helper in (not_found, bad_request, unauthorized, forbidden, unprocessable, service_unavailable, bad_gateway):
+    for helper in (not_found, bad_request, unauthorized, forbidden, conflict, internal, unprocessable, service_unavailable, bad_gateway):
         assert isinstance(helper("x"), HTTPException)

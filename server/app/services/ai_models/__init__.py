@@ -9,6 +9,7 @@ from app.services.ai_models.catalog import (
 from app.services.ai_models.config import (
     any_provider_available,
     effective_api_key,
+    extract_user_keys,
     has_server_key,
     invalidate_ai_config_cache,
     load_ai_preference,
@@ -51,6 +52,7 @@ __all__ = [
     "ProviderClient",
     "any_provider_available",
     "effective_api_key",
+    "extract_user_keys",
     "fetch_provider_models",
     "get_provider_client",
     "has_server_key",

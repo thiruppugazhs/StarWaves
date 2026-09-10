@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { checkAndroidUpdateSilent, isNativeAndroid } from '../lib/androidUpdater'
 import { checkDesktopUpdateSilent, isTauri } from '../lib/desktopUpdater'
 import { checkOtaUpdate, notifyAppReady } from '../lib/otaUpdater'
+import { UPDATE_DISMISS_PREFIX as DISMISS_KEY_PREFIX } from '../lib/storageKeys'
 
 const INTERVAL_MS = 6 * 60 * 60 * 1000 // 6h for desktop, Android shares same interval
-const DISMISS_KEY_PREFIX = 'starwaves:update:dismissed:'
 
 function isDismissed(version) {
   if (!version) return false

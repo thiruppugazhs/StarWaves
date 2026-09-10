@@ -1,12 +1,13 @@
 """Account combining: request, verify, list, and unlink combined accounts."""
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query
 from app.db import SqlClient, get_firestore
 from itsdangerous import BadSignature, SignatureExpired
 from pydantic import BaseModel, EmailStr
 
 from app.api.routes.auth._shared import combine_token_serializer, get_current_user_optional
 from app.core.auth import get_current_user
+from app.core.errors import bad_gateway, bad_request
 from app.repositories.account_combine import (
     add_pending_combine_request,
     confirm_combine_accounts,
@@ -34,17 +35,11 @@ def request_combine_account(
 ):
     owner_email = user.get("email")
     if not owner_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Current user email is not available.",
-        )
+        raise bad_request("Current user email is not available.")
 
     target_email = payload.target_email.lower().strip()
     if target_email == owner_email.lower().strip():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot combine an account with its own email address.",
-        )
+        raise bad_request("Cannot combine an account with its own email address.")
 
     try:
         add_pending_combine_request(database, user["uid"], target_email)
@@ -55,20 +50,12 @@ def request_combine_account(
         })
         sent = send_account_combine_email(target_email, owner_email, token)
         if not sent:
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail=f"Failed to send verification email to {target_email}. Please try again later.",
-            )
+            raise bad_gateway(f"Failed to send verification email to {target_email}. Please try again later.")
         return {"message": f"Verification email sent to {target_email}."}
     except EmailDeliveryError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Failed to send verification email to {target_email}: {exc}",
-        ) from exc
+        raise bad_gateway(f"Failed to send verification email to {target_email}: {exc}") from exc
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
+        raise bad_request(str(exc),
         ) from None
 
 
@@ -81,10 +68,7 @@ def verify_combine_account(
     try:
         data = combine_token_serializer().loads(payload.token, max_age=86400)
     except (BadSignature, SignatureExpired):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The verification link is invalid or has expired.",
-        ) from None
+        raise bad_request("The verification link is invalid or has expired.") from None
 
     owner_uid = data["owner_uid"]
     target_email = data["target_email"]
@@ -103,9 +87,7 @@ def verify_combine_account(
             "target_email": result["target_email"],
         }
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
+        raise bad_request(str(exc),
         ) from None
 
 
@@ -127,9 +109,7 @@ def unlink_combined_account(
         remove_combined_account(database, user["uid"], target_identifier)
         return {"message": "Account unlinked successfully."}
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
+        raise bad_request(str(exc),
         ) from None
 
 
@@ -142,10 +122,7 @@ def merge_accounts(
 
     email = user.get("email")
     if not email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Current user email is not available.",
-        )
+        raise bad_request("Current user email is not available.")
 
     merged = merge_duplicate_user_accounts(database, email=email)
     return {

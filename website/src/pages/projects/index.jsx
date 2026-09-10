@@ -6,6 +6,7 @@ import { LayoutGrid, List, Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { createProject, deleteProject, updateProject } from '../../lib/workspaceApi'
 import { ConfirmDialog, CustomDropdown, EmptyState, FilterBar, SearchBar } from '../../components/ui'
 import { usePersistentState } from '../../hooks/usePersistentState'
+import { PROJECTS_SORT_KEY, PROJECTS_STATUS_KEY, PROJECTS_VIEW_KEY } from '../../lib/storageKeys'
 import { emptyProject } from './constants'
 import { useProjectFilters } from './useProjectFilters'
 import { ProjectMetrics } from './ProjectMetrics'
@@ -15,15 +16,15 @@ import { ProjectFormModal } from './ProjectFormModal'
 
 export function ProjectsPage({ projects, setProjects, onOpenProject, canLoadMore, loadingMore, onLoadMore }) {
   const [openProjects, setOpenProjects] = useState(() => new Set([projects[0]?.id]))
-  const [viewMode, setViewMode] = usePersistentState('starwaves.projects.view_mode', 'grid')
+  const [viewMode, setViewMode] = usePersistentState(PROJECTS_VIEW_KEY, 'grid')
   const [formOpen, setFormOpen] = useState(false)
   const [form, setForm] = useState(emptyProject)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [deleteId, setDeleteId] = useState(null)
   const [query, setQuery] = useState('')
-  const [statusFilter, setStatusFilter] = usePersistentState('starwaves.projects.status', 'All')
-  const [sortOrder, setSortOrder] = usePersistentState('starwaves.projects.sort', 'updated')
+  const [statusFilter, setStatusFilter] = usePersistentState(PROJECTS_STATUS_KEY, 'All')
+  const [sortOrder, setSortOrder] = usePersistentState(PROJECTS_SORT_KEY, 'updated')
 
   const { statusCounts, filteredProjects, hasFilters } = useProjectFilters({ projects, query, statusFilter, sortOrder })
 

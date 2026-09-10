@@ -1,11 +1,12 @@
 """User account management: profile retrieval/update and account deletion."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from app.db import SqlClient, get_firestore
 from pydantic import BaseModel
 
 from app.core.auth import get_current_user
 from app.core.cache import CACHE_TTL_LONG, cache_invalidate_prefix, cached
+from app.core.errors import bad_request, not_found
 from app.repositories.account_deletion import delete_user_account
 from app.repositories.users import get_user_by_id, update_user_profile as update_profile_in_db
 
@@ -30,10 +31,7 @@ def delete_account(
 ):
     deleted = delete_user_account(database, user["uid"])
     if not deleted:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User account not found.",
-        )
+        raise not_found("User account not found.")
     return {"message": "Your StarWaves account and all associated data have been deleted."}
 
 
@@ -75,6 +73,7 @@ def update_user_profile(
     database: SqlClient = Depends(get_firestore),
 ):
     try:
+        from app.core.errors import forbidden
         user_record = get_user_by_id(database, user["uid"]) or {}
         existing_assistant = user_record.get("assistant_name")
         is_subscribed = bool(user_record.get("is_subscribed") or user_record.get("subscription_plan"))
@@ -82,10 +81,7 @@ def update_user_profile(
         # Lock assistant name after initial setup unless user has a subscription
         if payload.assistantName and existing_assistant and payload.assistantName.strip().lower() != existing_assistant.strip().lower():
             if not is_subscribed:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Renaming your AI companion is a subscription feature. Upgrade your plan to rename your AI assistant.",
-                )
+                raise forbidden("Renaming your AI companion is a subscription feature. Upgrade your plan to rename your AI assistant.")
 
         updated = update_profile_in_db(
             database=database,
@@ -101,10 +97,8 @@ def update_user_profile(
             "assistantName": updated.get("assistant_name") or payload.assistantName or "Eve",
             "isSubscribed": is_subscribed,
         }
-    except HTTPException:
-        raise
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from None
+        from app.core.errors import AppError
+        if isinstance(exc, AppError):
+            raise
+        raise bad_request(str(exc)) from None

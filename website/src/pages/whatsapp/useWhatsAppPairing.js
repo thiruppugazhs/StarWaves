@@ -25,9 +25,11 @@ export function useWhatsAppPairing({
         if (stat.connected) {
           setStatus(stat)
           setIsQrModalOpen(false)
-          const chatList = await fetchWhatsAppChats().catch(() => [])
+          const res = await fetchWhatsAppChats().catch(() => [])
+          const chatList = Array.isArray(res) ? res : (res?.items || [])
           setChats(chatList)
           if (chatList.length > 0) setSelectedChatId((curr) => curr || chatList[0].id)
+
         } else if (!pairingData.qr_code && !pairingData.pairing_code) {
           const pair = await initiateWhatsAppPairing().catch(() => null)
           if (pair?.qr_code || pair?.pairing_code) {
@@ -84,9 +86,11 @@ export function useWhatsAppPairing({
       setStatus(stat)
       if (stat.connected) {
         setIsQrModalOpen(false)
-        const chatList = await fetchWhatsAppChats().catch(() => [])
+        const res = await fetchWhatsAppChats().catch(() => [])
+        const chatList = Array.isArray(res) ? res : (res?.items || [])
         setChats(chatList)
         if (chatList.length > 0) setSelectedChatId((curr) => curr || chatList[0].id)
+
       } else {
         const pair = await initiateWhatsAppPairing()
         setPairingData(pair)

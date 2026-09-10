@@ -33,8 +33,10 @@ export async function disconnectWhatsApp() {
   })
 }
 
-export async function fetchWhatsAppChats() {
-  return apiRequest('/whatsapp/chats', {
+export async function fetchWhatsAppChats({ limit = 30, cursor = null } = {}) {
+  let url = `/whatsapp/chats?limit=${limit}`
+  if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`
+  return apiRequest(url, {
     method: 'GET',
     errorMessage: 'Could not load WhatsApp conversations.',
   })

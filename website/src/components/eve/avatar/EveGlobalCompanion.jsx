@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Bot, Maximize2, Minimize2, Settings2, X } from 'lucide-react'
 import { AVATAR_LIMITS } from './avatarConstants'
 import { EveAvatar } from './EveAvatar'
+import { COMPANION_EXPANDED_KEY } from '../../../lib/storageKeys'
 
 export function EveGlobalCompanion({
   prefs,
@@ -23,7 +24,7 @@ export function EveGlobalCompanion({
 }) {
   const [expanded, setExpanded] = useState(() => {
     if (typeof window === 'undefined') return true
-    const saved = localStorage.getItem('starwaves.avatar-companion-expanded')
+    const saved = localStorage.getItem(COMPANION_EXPANDED_KEY)
     if (saved !== null) return saved === 'true'
     return true
   })
@@ -39,7 +40,7 @@ export function EveGlobalCompanion({
     const next = typeof val === 'function' ? val(expanded) : val
     setExpanded(next)
     try {
-      localStorage.setItem('starwaves.avatar-companion-expanded', String(next))
+      localStorage.setItem(COMPANION_EXPANDED_KEY, String(next))
     } catch {}
   }
 

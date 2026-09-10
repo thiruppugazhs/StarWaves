@@ -6,13 +6,14 @@ import logging
 import secrets
 import time
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from app.db import SqlClient, get_firestore
 from itsdangerous import BadSignature, SignatureExpired
 from pydantic import BaseModel, EmailStr
 
 from app.api.routes.auth._shared import state_serializer
 from app.core.cache import cache_delete, cache_get, cache_set
+from app.core.errors import bad_request, not_found
 from app.repositories.users import get_user_by_email, update_user_password
 from app.services.email import EmailDeliveryError, send_password_reset_email
 
@@ -97,70 +98,40 @@ def verify_reset_code(
 ):
     clean_code = payload.code.strip()
     if len(clean_code) != 6 or not clean_code.isdigit():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Verification code must be a 6-digit number.",
-        )
+        raise bad_request("Verification code must be a 6-digit number.")
 
     user_record = get_user_by_email(database, payload.email)
     if not user_record:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No account found with that email address.",
-        )
+        raise not_found("No account found with that email address.")
 
     if not payload.token:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Verification token is required.",
-        )
+        raise bad_request("Verification token is required.")
     try:
         data = state_serializer().loads(payload.token, max_age=3600)
         if data.get("action") != "reset_password" or not data.get("jti") or data.get("uid") != user_record["uid"]:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid verification session token.",
-            )
+            raise bad_request("Invalid verification session token.")
     except SignatureExpired:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Verification code has expired. Please request a new code.",
-        ) from None
+        raise bad_request("Verification code has expired. Please request a new code.") from None
     except BadSignature:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid verification session token.",
-        ) from None
+        raise bad_request("Invalid verification session token.") from None
     except HTTPException:
         raise
     except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid verification session token.",
-        ) from None
+        raise bad_request("Invalid verification session token.") from None
 
     # Server-side check: hash + attempt counting + jti binding
     stored = cache_get(_otp_key(user_record["uid"]))
     if not stored or stored.get("jti") != data.get("jti"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Verification code has expired. Please request a new code.",
-        )
+        raise bad_request("Verification code has expired. Please request a new code.")
     attempts = int(stored.get("attempts", 0))
     if attempts >= _OTP_MAX_ATTEMPTS:
         cache_delete(_otp_key(user_record["uid"]))
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Too many failed attempts. Please request a new code.",
-        )
+        raise bad_request("Too many failed attempts. Please request a new code.")
     if not hmac.compare_digest(str(stored.get("hash", "")), _hash_otp(clean_code)):
         stored["attempts"] = attempts + 1
         # keep original TTL window — re-set with remaining budget
         cache_set(_otp_key(user_record["uid"]), stored, ttl=_OTP_TTL)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid verification code. Please check your email and try again.",
-        )
+        raise bad_request("Invalid verification code. Please check your email and try again.")
 
     # Success: consume OTP (single-use) and mint a verified token bound to a new jti
     cache_delete(_otp_key(user_record["uid"]))
@@ -186,45 +157,27 @@ def reset_password(
     database: SqlClient = Depends(get_firestore),
 ):
     if len(payload.password) < 8:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 8 characters long.",
-        )
+        raise bad_request("Password must be at least 8 characters long.")
 
     try:
         data = state_serializer().loads(payload.token, max_age=3600)
     except SignatureExpired:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="This password reset session has expired. Please request a new code.",
-        ) from None
+        raise bad_request("This password reset session has expired. Please request a new code.") from None
     except BadSignature:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid reset session token.",
-        ) from None
+        raise bad_request("Invalid reset session token.") from None
 
     if data.get("action") != "reset_password_verified" or not data.get("uid") or not data.get("jti"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid reset token payload.",
-        )
+        raise bad_request("Invalid reset token payload.")
 
     # Single-use enforcement: verified jti must exist and be unconsumed
     verified = cache_get(_verified_key(data["jti"]))
     if not verified or verified.get("uid") != data["uid"]:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="This password reset session has expired or was already used. Please request a new code.",
-        )
+        raise bad_request("This password reset session has expired or was already used. Please request a new code.")
     # Consume immediately to prevent double-use race
     cache_delete(_verified_key(data["jti"]))
 
     updated = update_user_password(database, data["uid"], payload.password)
     if not updated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User record not found.",
-        )
+        raise not_found("User record not found.")
     return {"message": "Your password has been reset successfully. You can now log in with your new password."}
 

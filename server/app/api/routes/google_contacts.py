@@ -2,11 +2,12 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.errors import bad_request, forbidden, service_unavailable, unauthorized
 from app.repositories import contacts as contacts_repo
 from app.schemas.contact import ContactCreate
 from app.services.google_contacts import (
@@ -41,7 +42,7 @@ def authorize_google_contacts(user: dict = Depends(get_current_user)):
     try:
         state = google_contacts_state_serializer().dumps({"uid": user["uid"]})
     except RuntimeError as error:
-        raise HTTPException(status_code=503, detail=str(error)) from None
+        raise service_unavailable(str(error)) from None
     url = build_google_authorize_url(
         settings.google_contacts_oauth_callback_url,
         GOOGLE_CONTACTS_SCOPES,
@@ -148,20 +149,14 @@ async def import_google_contacts(
         doc = docs[0] if docs else None
 
     if not doc or not doc.exists:
-        raise HTTPException(
-            status_code=400,
-            detail="No connected Google account found. Please connect Google Contacts first.",
-        )
+        raise bad_request("No connected Google account found. Please connect Google Contacts first.")
 
     account_data = doc.to_dict() or {}
     enc_access = account_data.get("access_token")
     enc_refresh = account_data.get("refresh_token")
 
     if not enc_access:
-        raise HTTPException(
-            status_code=400,
-            detail="Google account is missing access credentials.",
-        )
+        raise bad_request("Google account is missing access credentials.")
 
     import httpx
 
@@ -195,7 +190,7 @@ async def import_google_contacts(
             else:
                 detail = f"Google People API access denied (403): {google_msg or initial_err}"
 
-            raise HTTPException(status_code=403, detail=detail) from None
+            raise forbidden(detail) from None
 
         if enc_refresh and (is_401 or not isinstance(initial_err, httpx.HTTPStatusError)):
             try:
@@ -214,19 +209,11 @@ async def import_google_contacts(
                         google_msg = err_data.get("error", {}).get("message", "")
                     except Exception:
                         google_msg = str(refresh_err)
-                    raise HTTPException(
-                        status_code=403,
-                        detail=f"Google People API access denied (403): {google_msg or 'Enable Google People API in Google Cloud Console.'}",
+                    raise forbidden(f"Google People API access denied (403): {google_msg or 'Enable Google People API in Google Cloud Console.'}",
                     ) from None
-                raise HTTPException(
-                    status_code=401,
-                    detail="Google Contacts session expired. Please reconnect your Google account.",
-                ) from None
+                raise unauthorized("Google Contacts session expired. Please reconnect your Google account.") from None
         else:
-            raise HTTPException(
-                status_code=401,
-                detail=f"Could not load contacts from Google: {initial_err}",
-            ) from None
+            raise unauthorized(f"Could not load contacts from Google: {initial_err}") from None
 
     # Existing contacts for deduplication
     existing_contacts = contacts_repo.list_contacts(database, user_uid)

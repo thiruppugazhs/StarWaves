@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { clearRequestCache } from '../lib/request'
 import { consumeAuthTokenFromHash, fetchCurrentUser, getStoredUser } from '../lib/authApi'
+import { AUTH_TOKEN_KEY, AUTH_USER_KEY } from '../lib/storageKeys'
 
 export function useAuth() {
   const [currentUser, setCurrentUser] = useState(() => getStoredUser())
@@ -27,7 +28,7 @@ export function useAuth() {
     }
 
     const handleStorage = (e) => {
-      if (!e.key || e.key === 'starwaves_auth_token' || e.key === 'starwaves_auth_user') {
+      if (!e.key || e.key === AUTH_TOKEN_KEY || e.key === AUTH_USER_KEY) {
         if (mounted) setCurrentUser(getStoredUser())
       }
       if (e.key && e.key.startsWith('starwaves:')) {

@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from fastapi.responses import Response, StreamingResponse
 from app.db import SqlClient, get_firestore
 
@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 from app.core.auth import get_current_user
 from app.core.cache import CACHE_TTL_MEDIUM, CACHE_TTL_SHORT, cache_invalidate_prefix, cached
+from app.core.errors import bad_gateway, bad_request, not_found, unprocessable
 from app.repositories import eve_sessions
 from app.repositories.eve import add_memory, delete_memory, list_memories, search_memories
 from app.schemas.eve import (
@@ -69,10 +70,7 @@ async def transcribe(
     engine, model = await asyncio.to_thread(resolve_stt_engine, database, user["uid"])
     transcriber = _STT_TRANSCRIBERS.get(engine)
     if transcriber is None:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="No server speech-to-text provider is configured. Select a server STT provider or use browser voice.",
-        )
+        raise unprocessable("No server speech-to-text provider is configured. Select a server STT provider or use browser voice.")
     audio_bytes = await file.read()
     try:
         text = await asyncio.to_thread(
@@ -84,10 +82,7 @@ async def transcribe(
         )
     except SpeechServiceError as error:
         logger.error(f"[Eve Transcribe] Transcription failed for user {user.get('uid')}: {error}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Speech transcription failed: {error}",
-        ) from error
+        raise bad_gateway(f"Speech transcription failed: {error}") from error
     return {"text": text}
 
 
@@ -99,10 +94,7 @@ async def synthesize(
 ):
     engine, voice = await asyncio.to_thread(resolve_tts_engine, database, user["uid"])
     if engine not in ("google", "openrouter"):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Server text-to-speech is not configured. Select a server TTS provider or use browser voice.",
-        )
+        raise unprocessable("Server text-to-speech is not configured. Select a server TTS provider or use browser voice.")
     try:
         if engine == "openrouter":
             audio_bytes, media_type = await asyncio.to_thread(
@@ -124,10 +116,7 @@ async def synthesize(
             )
     except SpeechServiceError as error:
         logger.error(f"[Eve Synthesize] Speech synthesis failed for user {user.get('uid')}: {error}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Speech synthesis failed: {error}",
-        ) from error
+        raise bad_gateway(f"Speech synthesis failed: {error}") from error
     return Response(content=audio_bytes, media_type=media_type)
 
 
@@ -144,10 +133,7 @@ async def synthesize_stream(
     """
     engine, voice = await asyncio.to_thread(resolve_tts_engine, database, user["uid"])
     if engine not in ("google", "openrouter"):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Server text-to-speech is not configured. Select a server TTS provider or use browser voice.",
-        )
+        raise unprocessable("Server text-to-speech is not configured. Select a server TTS provider or use browser voice.")
     if engine == "openrouter":
         try:
             # Offload the httpx.stream generator to a thread; StreamingResponse will
@@ -163,7 +149,7 @@ async def synthesize_stream(
                     )
                 except SpeechServiceError as error:
                     logger.error(f"[Eve Synthesize Stream] OpenRouter stream failed for user {user.get('uid')}: {error}", exc_info=True)
-                    # Cannot raise HTTPException mid-stream; just stop.
+                    # Cannot raise mid-stream; just stop.
                     return
 
             return StreamingResponse(
@@ -177,10 +163,7 @@ async def synthesize_stream(
             )
         except SpeechServiceError as error:
             logger.error(f"[Eve Synthesize Stream] Speech synthesis failed for user {user.get('uid')}: {error}", exc_info=True)
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail=f"Speech synthesis failed: {error}",
-            ) from error
+            raise bad_gateway(f"Speech synthesis failed: {error}") from error
 
     # Google: no true streaming — buffer then stream as single chunk so callers
     # get a uniform streaming interface regardless of provider.
@@ -195,10 +178,7 @@ async def synthesize_stream(
         )
     except SpeechServiceError as error:
         logger.error(f"[Eve Synthesize Stream] Speech synthesis failed for user {user.get('uid')}: {error}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Speech synthesis failed: {error}",
-        ) from error
+        raise bad_gateway(f"Speech synthesis failed: {error}") from error
 
     def _buffered_stream():
         yield audio_bytes
@@ -271,7 +251,7 @@ async def get_session(
     try:
         session = await asyncio.to_thread(eve_sessions.get_session, database, user["uid"], session_id)
     except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+        raise not_found(str(error)) from error
     return {"session": session}
 
 
@@ -283,7 +263,7 @@ async def delete_session(
 ):
     ok = await asyncio.to_thread(eve_sessions.delete_session, database, user["uid"], session_id)
     if not ok:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
+        raise not_found("Session not found.")
     _invalidate_eve(user["uid"])
 
 
@@ -306,7 +286,7 @@ async def search_eve_memories_route(
     user: dict = Depends(get_current_user),
 ):
     if limit < 1 or limit > 20:
-        raise HTTPException(status_code=400, detail="limit must be 1..20")
+        raise bad_request("limit must be 1..20")
     memories = await asyncio.to_thread(search_memories, database, user["uid"], q, limit)
     return {"memories": memories}
 
@@ -332,7 +312,7 @@ async def remove_memory(
 ):
     ok = await asyncio.to_thread(delete_memory, database, user["uid"], memory_id)
     if not ok:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Memory not found.")
+        raise not_found("Memory not found.")
     _invalidate_eve(user["uid"])
     return {"message": "Memory removed."}
 
@@ -352,7 +332,7 @@ async def delete_record(
             payload.record_id,
         )
     except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+        raise not_found(str(error)) from error
     return {"message": message, "changed_resources": changed_resources}
 
 
@@ -371,5 +351,5 @@ async def restore_record(
             payload.record_id,
         )
     except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+        raise not_found(str(error)) from error
     return {"message": message, "changed_resources": changed_resources}

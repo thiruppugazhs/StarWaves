@@ -1,4 +1,4 @@
-import { API_URL } from './request'
+import { getWsBase } from './request'
 import { getStoredAuthToken } from './authApi'
 
 const BACKOFF_INITIAL_MS = 500
@@ -6,15 +6,8 @@ const BACKOFF_MAX_MS = 30_000
 const BACKOFF_FACTOR = 2
 
 function buildWsUrl(token) {
-  let base
-  if (API_URL.startsWith('http://') || API_URL.startsWith('https://')) {
-    base = API_URL.replace(/^http/, 'ws').replace(/\/api\/v1\/?$/, '')
-  } else if (typeof window !== 'undefined' && window.location) {
-    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    base = `${proto}//${window.location.host}`
-  } else {
-    base = ''
-  }
+  // Shared http(s)→ws(s) base derivation lives in request.js (ADR 0046).
+  const base = getWsBase()
   return `${base}/ws/whatsapp?token=${encodeURIComponent(token)}`
 }
 

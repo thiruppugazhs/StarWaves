@@ -3,12 +3,13 @@ import logging
 from urllib.parse import quote, unquote
 
 import httpx
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Header, Query, Request
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 from itsdangerous import URLSafeTimedSerializer
 
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.errors import bad_gateway, bad_request, conflict, not_found, service_unavailable
 from app.services.oauth import (
     decrypt_google_token,
     encrypt_google_token,
@@ -55,14 +56,14 @@ async def access_token(database: SqlClient, user_id: str) -> str:
         return cached[1]
     snapshot = await asyncio.to_thread(drive_reference(database, user_id).get)
     if not snapshot.exists:
-        raise HTTPException(status_code=409, detail="Connect Google Drive first.")
+        raise conflict("Connect Google Drive first.")
     try:
         refresh_token = decrypt_google_token(snapshot.to_dict()["refresh_token"])
         token = await refresh_google_token(refresh_token)
         _drive_token_cache[user_id] = (time.monotonic() + _DRIVE_TOKEN_TTL, token)
         return token
     except (KeyError, ValueError, httpx.HTTPError) as error:
-        raise HTTPException(status_code=502, detail=str(error)) from None
+        raise bad_gateway(str(error)) from None
 
 
 @router.get("/authorize")
@@ -70,7 +71,7 @@ def authorize_google_drive(user: dict = Depends(get_current_user)):
     try:
         state = drive_state_serializer().dumps({"uid": user["uid"]})
     except RuntimeError as error:
-        raise HTTPException(status_code=503, detail=str(error)) from None
+        raise service_unavailable(str(error)) from None
     url = build_google_authorize_url(
         settings.google_drive_oauth_callback_url,
         GOOGLE_DRIVE_SCOPES,
@@ -187,7 +188,7 @@ async def google_drive_files(
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as error:
-            raise HTTPException(status_code=502, detail=response.text) from error
+            raise bad_gateway(response.text) from error
         return response.json()
 
 
@@ -198,16 +199,16 @@ async def google_drive_editor_url(
     user: dict = Depends(get_current_user),
 ):
     if "/" in document_id or not document_id.strip():
-        raise HTTPException(status_code=400, detail="Invalid document ID.")
+        raise bad_request("Invalid document ID.")
 
     document_reference = database.collection("users").document(user["uid"]).collection("documents").document(document_id)
     snapshot = await asyncio.to_thread(document_reference.get)
     if not snapshot.exists:
-        raise HTTPException(status_code=404, detail="Document not found.")
+        raise not_found("Document not found.")
     document = snapshot.to_dict() or {}
     drive_file_id = document.get("drive_file_id")
     if not drive_file_id:
-        raise HTTPException(status_code=409, detail="This document is not linked to Google Drive.")
+        raise conflict("This document is not linked to Google Drive.")
 
     token = await access_token(database, user["uid"])
     async with httpx.AsyncClient(timeout=30) as client:
@@ -217,11 +218,11 @@ async def google_drive_editor_url(
             params={"fields": "id,name,mimeType,webViewLink"},
         )
     if response.status_code == 404:
-        raise HTTPException(status_code=404, detail="The Google Drive file no longer exists.")
+        raise not_found("The Google Drive file no longer exists.")
     try:
         response.raise_for_status()
     except httpx.HTTPStatusError as error:
-        raise HTTPException(status_code=502, detail="Google Drive could not open this file.") from error
+        raise bad_gateway("Google Drive could not open this file.") from error
 
     file = response.json()
     editor_hosts = {
@@ -231,7 +232,7 @@ async def google_drive_editor_url(
     }
     editor_template = editor_hosts.get(file.get("mimeType"))
     if not editor_template:
-        raise HTTPException(status_code=409, detail="This file type does not have a Google Workspace editor.")
+        raise conflict("This file type does not have a Google Workspace editor.")
     return {
         "id": file["id"],
         "name": file.get("name", document.get("name", "Untitled document")),
@@ -276,10 +277,7 @@ async def upload_google_drive_file(
             )
             upload_response.raise_for_status()
         except (httpx.HTTPStatusError, KeyError) as error:
-            raise HTTPException(
-                status_code=502,
-                detail="Google Drive upload failed.",
-            ) from error
+            raise bad_gateway("Google Drive upload failed.") from error
         return upload_response.json()
 
 

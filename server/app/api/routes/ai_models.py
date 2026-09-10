@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 
 from app.core.auth import get_current_user
+from app.core.errors import not_found, unprocessable
 from app.core.cache import CACHE_TTL_LONG, cache_invalidate_prefix, cached
 from app.core.config import settings
 from app.schemas.ai_models import AiModelsResponse, AiModelPreferenceUpdate
@@ -10,6 +11,7 @@ from app.services.ai_models import (
     AI_PROVIDERS,
     DEFAULT_PROVIDER,
     effective_api_key,
+    extract_user_keys,
     fetch_provider_models,
     has_server_key,
     invalidate_ai_config_cache,
@@ -37,17 +39,8 @@ def _reference(database: SqlClient, user_id: str):
 
 
 def _extract_user_keys(preference: dict | None) -> dict[str, str]:
-    if not preference:
-        return {}
-    keys: dict[str, str] = {}
-    saved_keys = preference.get("api_keys")
-    if isinstance(saved_keys, dict):
-        keys.update({k: str(v) for k, v in saved_keys.items() if v})
-    legacy_key = preference.get("api_key")
-    saved_provider = preference.get("provider")
-    if legacy_key and saved_provider and saved_provider not in keys:
-        keys[saved_provider] = str(legacy_key)
-    return keys
+    # Canonical implementation lives in services/ai_models/config (ADR 0046).
+    return extract_user_keys(preference)
 
 
 def _preference_payload(preference: dict | None, user_keys: dict[str, str]) -> dict | None:
@@ -96,7 +89,7 @@ async def list_provider_models(
         # Fall back to the server env-configured key for this provider
         effective_key = effective_api_key(provider, user_keys)
     if provider not in AI_PROVIDERS:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown provider")
+        raise not_found("Unknown provider")
     if not effective_key:
         # No key available — return static fallback list
         static = AI_PROVIDERS[provider]["models"]
@@ -116,10 +109,7 @@ async def save_ai_models(
     user: dict = Depends(get_current_user),
 ):
     if not validate_preference(payload.provider, payload.model):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Unknown AI provider or model.",
-        )
+        raise unprocessable("Unknown AI provider or model.")
 
     current_pref = load_ai_preference(database, user["uid"])
     user_keys = _extract_user_keys(current_pref)
@@ -135,10 +125,7 @@ async def save_ai_models(
 
     # If provider is not default/env-configured, require user API key
     if not key_optional and not has_env and not api_key_to_save and not user_keys.get(payload.provider):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"API key is required for {provider_label}.",
-        )
+        raise unprocessable(f"API key is required for {provider_label}.")
 
     if api_key_to_save and not is_default:
         user_keys[payload.provider] = api_key_to_save
@@ -150,10 +137,8 @@ async def save_ai_models(
 
     if payload.assistant_name and existing_assistant and payload.assistant_name.strip().lower() != existing_assistant.strip().lower():
         if not is_subscribed:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Renaming your AI companion is a subscription feature. Upgrade your plan to rename your AI assistant.",
-            )
+            from app.core.errors import forbidden
+            raise forbidden("Renaming your AI companion is a subscription feature. Upgrade your plan to rename your AI assistant.")
 
     update_payload = {
         "provider": payload.provider,

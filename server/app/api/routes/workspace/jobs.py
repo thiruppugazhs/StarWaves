@@ -1,12 +1,13 @@
 """Job routes: list, create, update, and delete workspace jobs."""
 
 import asyncio
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response
 from app.db import SqlClient, get_firestore
 
 from app.api.routes.workspace._shared import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 from app.core.auth import get_current_user
 from app.core.cache import CACHE_TTL_MEDIUM, CACHE_TTL_SHORT, cache_invalidate_prefix, cached
+from app.core.errors import not_found
 from app.repositories import JobRepository
 from app.schemas.workspace import JobCreate, JobResponse, JobUpdate, PageResponse
 
@@ -42,7 +43,7 @@ async def get_job(
     repository = JobRepository(database, user["uid"])
     result = await asyncio.to_thread(repository.get, job_id)
     if not result:
-        raise HTTPException(status_code=404, detail="Job not found.")
+        raise not_found("Job not found.")
     return result
 
 
@@ -69,7 +70,7 @@ async def update_job(
     updates = changes.model_dump(exclude_unset=True)
     result = await asyncio.to_thread(repository.update, job_id, updates)
     if not result:
-        raise HTTPException(status_code=404, detail="Job not found.")
+        raise not_found("Job not found.")
     _invalidate_ws_jobs(user["uid"])
     return result
 
@@ -83,7 +84,7 @@ async def delete_job(
     repository = JobRepository(database, user["uid"])
     ok = await asyncio.to_thread(repository.delete, job_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Job not found.")
+        raise not_found("Job not found.")
     _invalidate_ws_jobs(user["uid"])
     return Response(status_code=204)
 
@@ -97,9 +98,9 @@ async def restore_job(
     repository = JobRepository(database, user["uid"])
     ok = await asyncio.to_thread(repository.restore, job_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Job not found.")
+        raise not_found("Job not found.")
     result = await asyncio.to_thread(repository.get, job_id)
     if not result:
-        raise HTTPException(status_code=404, detail="Job not found.")
+        raise not_found("Job not found.")
     _invalidate_ws_jobs(user["uid"])
     return result

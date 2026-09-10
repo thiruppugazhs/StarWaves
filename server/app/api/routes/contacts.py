@@ -1,8 +1,9 @@
 import asyncio
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from app.db import SqlClient, get_firestore
 
 from app.core.auth import get_current_user
+from app.core.errors import not_found
 from app.core.cache import CACHE_TTL_MEDIUM, CACHE_TTL_SHORT, cache_invalidate_prefix, cached
 from app.repositories import contacts
 from app.schemas.contact import ContactCreate, ContactResponse, ContactUpdate
@@ -40,7 +41,7 @@ async def get_contact(
 ):
     contact = await asyncio.to_thread(contacts.get_contact, database, user["uid"], contact_id)
     if contact is None:
-        raise HTTPException(status_code=404, detail="Contact not found.")
+        raise not_found("Contact not found.")
     return contact
 
 
@@ -64,7 +65,7 @@ async def update_contact(
 ):
     contact = await asyncio.to_thread(contacts.update_contact, database, user["uid"], contact_id, changes)
     if contact is None:
-        raise HTTPException(status_code=404, detail="Contact not found.")
+        raise not_found("Contact not found.")
     _invalidate_contacts(user["uid"])
     return contact
 
@@ -77,7 +78,7 @@ async def delete_contact(
 ):
     ok = await asyncio.to_thread(contacts.delete_contact, database, user["uid"], contact_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Contact not found.")
+        raise not_found("Contact not found.")
     _invalidate_contacts(user["uid"])
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -90,9 +91,9 @@ async def restore_contact(
 ):
     ok = await asyncio.to_thread(contacts.restore_contact, database, user["uid"], contact_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Contact not found.")
+        raise not_found("Contact not found.")
     contact = await asyncio.to_thread(contacts.get_contact, database, user["uid"], contact_id)
     if contact is None:
-        raise HTTPException(status_code=404, detail="Contact not found.")
+        raise not_found("Contact not found.")
     _invalidate_contacts(user["uid"])
     return contact

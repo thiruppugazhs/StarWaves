@@ -76,16 +76,18 @@
 .job-modal {
   background: var(--glass-bg-overlay);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(24px) var(--glass-saturation);
-  -webkit-backdrop-filter: blur(24px) var(--glass-saturation);
-  box-shadow: var(--glass-shadow-modal);
+  backdrop-filter: blur(var(--glass-blur-modal)) var(--glass-saturation-modal);
+  -webkit-backdrop-filter: blur(var(--glass-blur-modal)) var(--glass-saturation-modal);
+  box-shadow:
+    var(--glass-shadow-modal),
+    inset 0 1px 0 color-mix(in srgb, var(--canvas-white) 42%, transparent);
 }
 
 .modal-backdrop,
 .todo-modal-backdrop,
 .delete-account-backdrop {
-  backdrop-filter: blur(8px) var(--glass-saturation);
-  -webkit-backdrop-filter: blur(8px) var(--glass-saturation);
+  backdrop-filter: blur(var(--glass-blur-backdrop)) var(--glass-saturation-backdrop);
+  -webkit-backdrop-filter: blur(var(--glass-blur-backdrop)) var(--glass-saturation-backdrop);
 }
 
 /* ── 5. Dropdowns ──────────────────────────────────────────────────────────── */
@@ -280,6 +282,7 @@ input[type="file"]::file-selector-button:hover {
   .modal-backdrop,
   .todo-modal-backdrop,
   .delete-account-backdrop,
+  .whatsapp-qr-status-pill,
   .custom-dropdown-menu,
   .settings-card,
   .search-palette,

@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from app.db import SqlClient, get_firestore
 
 from app.core.cache import CACHE_TTL_MEDIUM, CACHE_TTL_SHORT, cache_invalidate_prefix, cached
+from app.core.errors import not_found
 from app.repositories import profiles
 from app.schemas.profile import ProfileCreate, ProfileResponse, ProfileUpdate
 
@@ -45,7 +46,7 @@ def get_profile(
 ) -> ProfileResponse:
     profile = profiles.get_profile(database, profile_id)
     if profile is None:
-        raise HTTPException(status_code=404, detail="Profile not found.")
+        raise not_found("Profile not found.")
     return profile
 
 
@@ -57,7 +58,7 @@ def update_profile(
 ) -> ProfileResponse:
     profile = profiles.update_profile(database, profile_id, changes)
     if profile is None:
-        raise HTTPException(status_code=404, detail="Profile not found.")
+        raise not_found("Profile not found.")
     _invalidate_profiles()
     return profile
 
@@ -68,7 +69,7 @@ def delete_profile(
     database: SqlClient = Depends(get_firestore),
 ) -> Response:
     if not profiles.delete_profile(database, profile_id):
-        raise HTTPException(status_code=404, detail="Profile not found.")
+        raise not_found("Profile not found.")
     _invalidate_profiles()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

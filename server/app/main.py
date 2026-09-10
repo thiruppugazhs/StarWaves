@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import os
 import re
 from contextlib import asynccontextmanager
 
@@ -61,10 +60,8 @@ async def lifespan(app: FastAPI):
         await init_db()
     except Exception as err:
         logger.warning("Could not auto-init database tables: %s", err)
-    # Unified serverless detection: VERCEL (Vercel), AWS_LAMBDA_FUNCTION_NAME (Lambda), or explicit IS_SERVERLESS
-    is_serverless = bool(
-        os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or (os.getenv("IS_SERVERLESS", "").lower() == "true")
-    )
+    # Serverless detection lives on settings (ADR 0045) — single source, no os.getenv bypass.
+    is_serverless = settings.is_serverless
     if not is_serverless:
         try:
             server_worker.start()
@@ -187,12 +184,9 @@ def create_app() -> FastAPI:
         from pathlib import Path
 
         updates_dir = Path(__file__).resolve().parents[1] / "static" / "updates"
-        # ENV override
-        import os as _os
-
-        _env_dir = _os.getenv("UPDATES_DIR") or _os.getenv("STATIC_UPDATES_DIR") or getattr(settings, "updates_dir", None)
-        if _env_dir:
-            updates_dir = Path(_env_dir)
+        # ENV override lives on settings (UPDATES_DIR / STATIC_UPDATES_DIR) — ADR 0045.
+        if settings.updates_dir:
+            updates_dir = Path(settings.updates_dir)
         updates_dir.mkdir(parents=True, exist_ok=True)
         application.mount("/updates", StaticFiles(directory=str(updates_dir)), name="updates-static")
     except Exception as exc:  # pragma: no cover

@@ -1,12 +1,13 @@
 import asyncio
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from app.db import SqlClient, get_firestore
 
 from app.core.auth import get_current_user
 from app.core.cache import cache_delete, cache_get, cache_set
 from app.core.config import settings
 from app.core.sync import broadcast_invalidate
+from app.core.errors import bad_request, not_found, service_unavailable
 from app.repositories import workspace_files
 
 _TREE_TTL = 3  # seconds
@@ -48,10 +49,7 @@ router = APIRouter(prefix="/workspace-files")
 
 def _require_non_serverless():
     if getattr(settings, "is_serverless", False):
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Workspace file storage is not available in serverless mode.",
-        )
+        raise service_unavailable("Workspace file storage is not available in serverless mode.")
 
 
 # Workspace Management Endpoints
@@ -79,7 +77,7 @@ async def create_workspace(
         await broadcast_invalidate(user["uid"], "workspace_files", {"workspace_id": created.get("id")})
         return WorkspaceItem(**created)
     except ValueError as error:
-        raise HTTPException(status_code=400, detail=str(error))
+        raise bad_request(str(error))
 
 
 @router.patch("/workspaces/{workspace_id}", response_model=WorkspaceItem)
@@ -94,9 +92,9 @@ async def rename_workspace(
         _invalidate_tree_cache(user["uid"], workspace_id)
         return WorkspaceItem(**updated)
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Workspace not found.")
+        raise not_found("Workspace not found.")
     except ValueError as error:
-        raise HTTPException(status_code=400, detail=str(error))
+        raise bad_request(str(error))
 
 
 @router.delete("/workspaces/{workspace_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -107,7 +105,7 @@ async def delete_workspace(
     _require_non_serverless()
     ok = await asyncio.to_thread(workspace_files.delete_workspace, user["uid"], workspace_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Workspace not found.")
+        raise not_found("Workspace not found.")
     _invalidate_tree_cache(user["uid"], workspace_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -137,9 +135,9 @@ async def read_file(
     try:
         content, size = await asyncio.to_thread(workspace_files.read_file, user["uid"], file_path, workspace_id)
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="File not found.")
+        raise not_found("File not found.")
     except ValueError as error:
-        raise HTTPException(status_code=400, detail=str(error))
+        raise bad_request(str(error))
     return WorkspaceFileReadResponse(path=file_path, content=content, size=size)
 
 
@@ -156,7 +154,7 @@ async def write_file(
         _invalidate_tree_cache(user["uid"], workspace_id)
         await broadcast_invalidate(user["uid"], "workspace_files", {"workspace_id": workspace_id})
     except ValueError as error:
-        raise HTTPException(status_code=400, detail=str(error))
+        raise bad_request(str(error))
     return {"path": file_path, "size": size, "written": True}
 
 
@@ -170,11 +168,11 @@ async def delete_file(
     try:
         ok = await asyncio.to_thread(workspace_files.delete_file, user["uid"], file_path, workspace_id)
         if not ok:
-            raise HTTPException(status_code=404, detail="File not found.")
+            raise not_found("File not found.")
         _invalidate_tree_cache(user["uid"], workspace_id)
         await broadcast_invalidate(user["uid"], "workspace_files", {"workspace_id": workspace_id})
     except ValueError as error:
-        raise HTTPException(status_code=400, detail=str(error))
+        raise bad_request(str(error))
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -189,10 +187,10 @@ async def sync_files(
     MAX_SYNC_FILES = 50
     MAX_SYNC_BYTES = 10 * 1024 * 1024
     if len(body.files) > MAX_SYNC_FILES:
-        raise HTTPException(status_code=400, detail=f"Sync limited to {MAX_SYNC_FILES} files per request (got {len(body.files)}).")
+        raise bad_request(f"Sync limited to {MAX_SYNC_FILES} files per request (got {len(body.files)}).")
     total_bytes = sum(len((e.content or "").encode("utf-8")) for e in body.files)
     if total_bytes > MAX_SYNC_BYTES:
-        raise HTTPException(status_code=400, detail=f"Sync payload too large: {total_bytes} bytes > {MAX_SYNC_BYTES}.")
+        raise bad_request(f"Sync payload too large: {total_bytes} bytes > {MAX_SYNC_BYTES}.")
     import asyncio as _asyncio
 
     sem = _asyncio.Semaphore(5)

@@ -36,6 +36,7 @@ import { EveUiBanner } from './components/ui/EveUiBanner'
 import { UpdateBanner } from './components/ui/UpdateBanner'
 import { useAutoUpdater } from './hooks/useAutoUpdater'
 import { EveAvatarProvider } from './components/eve/avatar/EveAvatarProvider'
+import { CUSTOM_THEME_KEY, THEME_MODE_KEY } from './lib/storageKeys'
 
 const routeTitles = {
   '/': 'StarWaves — Developer productivity workspace',
@@ -203,7 +204,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('starwaves.custom_theme')
+    const savedTheme = localStorage.getItem(CUSTOM_THEME_KEY)
     if (savedTheme) {
       try {
         const parsed = JSON.parse(savedTheme)
@@ -215,7 +216,7 @@ function App() {
         console.error('Could not load custom theme:', err)
       }
     }
-    const stored = localStorage.getItem('starwaves.theme')
+    const stored = localStorage.getItem(THEME_MODE_KEY)
     if (stored === 'light') {
       applyThemeVariables({ preset: 'light', mode: 'light' })
     }

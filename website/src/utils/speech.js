@@ -2,7 +2,8 @@
 // Prefs are stored in localStorage so the call center, CallScreen, and the
 // Settings "Eve voice" section share the same configuration.
 
-export const EVE_VOICE_PREFS_KEY = 'starwaves.eve_voice_prefs'
+import { EVE_VOICE_PREFS_KEY } from '../lib/storageKeys'
+export { EVE_VOICE_PREFS_KEY }
 
 export const DEFAULT_EVE_VOICE_PREFS = {
   language: 'en-US',

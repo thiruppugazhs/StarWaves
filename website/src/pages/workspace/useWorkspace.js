@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useWorkspaceBridge } from './useWorkspaceBridge'
 import { createIgnoreMatcher, parseSdIgnore } from './sdIgnore'
+import { ACTIVE_WORKSPACE_KEY as ACTIVE_WORKSPACE_STORAGE_KEY } from '../../lib/storageKeys'
 
 const SDIGNORE_FILENAME = '.sdignore'
-const ACTIVE_WORKSPACE_STORAGE_KEY = 'starwaves.workspace.active_id'
 
 export function useWorkspace() {
   const bridge = useWorkspaceBridge()

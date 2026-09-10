@@ -9,8 +9,9 @@ import {
   Rocket,
   Trophy,
 } from 'lucide-react'
+import { DASHBOARD_KEY } from '../lib/storageKeys'
 
-export const DASHBOARD_STORAGE_KEY = 'starwaves.dashboard.preferences'
+export const DASHBOARD_STORAGE_KEY = DASHBOARD_KEY
 export const DASHBOARD_SCHEMA_VERSION = 2
 export const DASHBOARD_BREAKPOINTS = { lg: 1200, md: 900, sm: 620, xs: 0 }
 export const DASHBOARD_COLS = { lg: 12, md: 10, sm: 6, xs: 2 }

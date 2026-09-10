@@ -2,10 +2,11 @@
 
 import asyncio
 import logging
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import PlainTextResponse
 
 from app.core.auth import get_current_user
+from app.core.errors import bad_gateway, service_unavailable
 from app.core.config import settings
 from app.db import SERVER_TIMESTAMP, SqlClient, get_firestore
 from app.repositories.calls import CallRepository
@@ -46,7 +47,7 @@ def twilio_config(user: dict = Depends(get_current_user)):
 @router.post("/twilio", response_model=CallResponse)
 async def create_twilio_call(payload: TwilioCallCreate, database: SqlClient = Depends(get_firestore), user: dict = Depends(get_current_user)):
     if not is_twilio_configured():
-        raise HTTPException(status_code=503, detail="Twilio PSTN calling is not configured on the server. Set TWILIO_* env vars.")
+        raise service_unavailable("Twilio PSTN calling is not configured on the server. Set TWILIO_* env vars.")
     repo = CallRepository(database)
     # Create internal call record with provider=twilio
     caller = CallUser(uid=user["uid"], name=user.get("name") or user.get("display_name") or "", email=user.get("email") or "")
@@ -70,7 +71,7 @@ async def create_twilio_call(payload: TwilioCallCreate, database: SqlClient = De
         # mark call as missed/failed but still return record for UI
         repo.update_status(call["id"], "missed")
         call["status"] = "missed"
-        raise HTTPException(status_code=502, detail=str(e)) from e
+        raise bad_gateway(str(e)) from e
     send_call_notification(database=database, target_user_id=user["uid"], title="Twilio Call Initiated", message=f"Calling {payload.phone_number} via Twilio", notification_type="call_incoming", call_id=call["id"])
     return call
 
@@ -78,7 +79,7 @@ async def create_twilio_call(payload: TwilioCallCreate, database: SqlClient = De
 @router.post("/trigger-eve-twilio", response_model=CallResponse)
 async def trigger_eve_twilio_call(payload: EveTwilioCallRequest, database: SqlClient = Depends(get_firestore), user: dict = Depends(get_current_user)):
     if not is_twilio_configured():
-        raise HTTPException(status_code=503, detail="Twilio not configured.")
+        raise service_unavailable("Twilio not configured.")
     repo = CallRepository(database)
     user_rec = get_user_by_id(database, user["uid"]) or user
     callee = CallUser(uid=user["uid"], name=user_rec.get("display_name") or user_rec.get("name") or "User", email=user_rec.get("email") or "")
@@ -103,7 +104,7 @@ async def trigger_eve_twilio_call(payload: EveTwilioCallRequest, database: SqlCl
     except TwilioError as e:
         logger.error(f"Eve Twilio failed for {payload.phone_number}: {e}")
         repo.update_status(call["id"], "missed")
-        raise HTTPException(status_code=502, detail=str(e)) from e
+        raise bad_gateway(str(e)) from e
     send_call_notification(database=database, target_user_id=user["uid"], title="Incoming Eve Call (Twilio)", message=f"Eve is calling your phone {payload.phone_number}", notification_type="call_incoming", call_id=call["id"])
     return call
 

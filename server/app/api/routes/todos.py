@@ -1,10 +1,11 @@
 import asyncio
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from app.db import SqlClient, get_firestore
 
 from app.core.auth import get_current_user
 from app.core.cache import CACHE_TTL_MEDIUM, CACHE_TTL_SHORT, cache_invalidate_prefix, cached
 from app.core.sync import broadcast_data_change
+from app.core.errors import not_found
 from app.repositories import todos
 
 from app.schemas.todo import TodoCreate, TodoResponse, TodoUpdate
@@ -45,7 +46,7 @@ async def get_todo(
 ):
     todo = await asyncio.to_thread(todos.get_todo, database, user["uid"], todo_id)
     if todo is None:
-        raise HTTPException(status_code=404, detail="Todo not found.")
+        raise not_found("Todo not found.")
     return todo
 
 
@@ -70,7 +71,7 @@ async def update_todo(
 ):
     todo = await asyncio.to_thread(todos.update_todo, database, user["uid"], todo_id, changes)
     if todo is None:
-        raise HTTPException(status_code=404, detail="Todo not found.")
+        raise not_found("Todo not found.")
     _invalidate_todos(user["uid"])
     await broadcast_data_change(user["uid"], "todos", "update", todo_id)
     return todo
@@ -84,7 +85,7 @@ async def delete_todo(
 ):
     ok = await asyncio.to_thread(todos.delete_todo, database, user["uid"], todo_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Todo not found.")
+        raise not_found("Todo not found.")
     _invalidate_todos(user["uid"])
     await broadcast_data_change(user["uid"], "todos", "delete", todo_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -98,10 +99,10 @@ async def restore_todo(
 ):
     ok = await asyncio.to_thread(todos.restore_todo, database, user["uid"], todo_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Todo not found.")
+        raise not_found("Todo not found.")
     todo = await asyncio.to_thread(todos.get_todo, database, user["uid"], todo_id)
     if todo is None:
-        raise HTTPException(status_code=404, detail="Todo not found.")
+        raise not_found("Todo not found.")
     _invalidate_todos(user["uid"])
     await broadcast_data_change(user["uid"], "todos", "restore", todo_id)
     return todo

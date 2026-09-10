@@ -7,13 +7,14 @@ import logging
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, Header, Request
 from app.db import SqlClient, get_firestore
 
 from app.core.config import settings
 
 from app.api.routes.whatsapp._shared import has_eve_mention, resolve_chat_name
 from app.core.whatsapp_ws_manager import whatsapp_ws_manager
+from app.core.errors import bad_request, unauthorized
 from app.repositories import whatsapp as whatsapp_repo
 from app.schemas.whatsapp import WhatsAppMediaAttachment, WhatsAppMessageResponse
 from app.services.whatsapp import WhatsAppService
@@ -86,7 +87,7 @@ def _verify_worker_signature(request: Request, raw_body: bytes):
     provided = request.headers.get("x-worker-signature") or request.headers.get("x-whatsapp-signature") or ""
     expected = hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
     if not hmac.compare_digest(provided, expected):
-        raise HTTPException(status_code=401, detail="Invalid worker signature.")
+        raise unauthorized("Invalid worker signature.")
 
 
 @router.post("/webhook")
@@ -96,7 +97,7 @@ async def whatsapp_incoming_webhook(request: Request, database: SqlClient = Depe
     try:
         payload = json.loads(raw) if raw else {}
     except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Invalid JSON payload.")
+        raise bad_request("Invalid JSON payload.")
     if not isinstance(payload, dict):
         payload = {}
     if payload.get("type") == "qr_update":

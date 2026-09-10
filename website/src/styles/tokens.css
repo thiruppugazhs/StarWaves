@@ -64,6 +64,10 @@
   /* Glassmorphism */
   --glass-blur: 18px;
   --glass-saturation: saturate(180%);
+  --glass-blur-modal: 30px;
+  --glass-blur-backdrop: 14px;
+  --glass-saturation-modal: saturate(165%);
+  --glass-saturation-backdrop: saturate(135%);
   --glass-bg: rgba(255, 255, 255, 0.52);
   --glass-bg-card: rgba(255, 255, 255, 0.42);
   --glass-bg-overlay: rgba(255, 255, 255, 0.72);

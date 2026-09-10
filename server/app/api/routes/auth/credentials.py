@@ -3,12 +3,13 @@
 import logging
 import uuid
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Header, Request
 from app.db import SqlClient, get_firestore
 from pydantic import BaseModel, EmailStr
 
 from app.api.routes.auth._shared import _send_welcome_email_best_effort
 from app.core.auth import create_session_token
+from app.core.errors import bad_request, internal, unauthorized
 from app.repositories.password import hash_password, needs_rehash, verify_password
 from app.repositories.users import create_user_with_password, get_user_by_email
 
@@ -43,14 +44,10 @@ def signup(
             name=payload.name,
         )
     except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
+        raise bad_request(str(exc),
         ) from None
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
+        raise bad_request(str(exc),
         ) from None
 
     _send_welcome_email_best_effort(
@@ -95,33 +92,21 @@ def login(
     try:
         user_record = get_user_by_email(database, clean_email)
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database service unavailable. Could not verify account details.",
-        ) from exc
+        raise internal("Database service unavailable. Could not verify account details.") from exc
 
     if not user_record or not user_record.get("password_hash") or not user_record.get("password_salt"):
         logger.warning("Login failed for %s: Account record or password credentials missing.", clean_email)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="The email or password is incorrect.",
-        ) from None
+        raise unauthorized("The email or password is incorrect.") from None
 
     try:
         is_valid = verify_password(payload.password, user_record["password_hash"], user_record["password_salt"])
     except Exception as exc:
         logger.warning("Error verifying password for %s: %s", clean_email, exc)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="The email or password is incorrect.",
-        ) from None
+        raise unauthorized("The email or password is incorrect.") from None
 
     if not is_valid:
         logger.warning("Login failed for %s: Password mismatch.", clean_email)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="The email or password is incorrect.",
-        ) from None
+        raise unauthorized("The email or password is incorrect.") from None
 
     # Transparent rehash: upgrade legacy 100k hashes to 600k on successful login
     try:
@@ -154,10 +139,7 @@ def login(
             ip_address=ip,
         )
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to generate authentication token.",
-        ) from exc
+        raise internal("Failed to generate authentication token.") from exc
 
     return {
         "token": token,
@@ -191,17 +173,12 @@ def verify_otp(
     clean_email = payload.email.lower().strip()
     is_valid, err_msg = verify_email_otp(database, clean_email, payload.otp)
     if not is_valid:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=err_msg or "Invalid verification code.",
-        )
+        raise bad_request(err_msg or "Invalid verification code.")
 
     user_record = get_user_by_email(database, clean_email)
     if not user_record:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Account not found.",
-        )
+        from app.core.errors import not_found
+        raise not_found("Account not found.")
 
     _send_welcome_email_best_effort(
         to_email=user_record["email"],
@@ -247,10 +224,8 @@ def resend_otp(
     clean_email = payload.email.lower().strip()
     user_record = get_user_by_email(database, clean_email)
     if not user_record:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No account found for this email address.",
-        )
+        from app.core.errors import not_found
+        raise not_found("No account found for this email address.")
 
     otp_code = create_email_otp(database, clean_email)
     logger.info("Resent verification OTP for %s: %s", clean_email, otp_code)
@@ -270,4 +245,3 @@ def resend_otp(
     if not settings.smtp_host or settings.app_env != "production":
         res["dev_otp"] = otp_code
     return res
-

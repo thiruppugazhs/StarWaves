@@ -1,12 +1,7 @@
 import '../../styles/pages/workspace-panels.css'
 import { useEffect, useState } from 'react'
 import { ArrowUpRight, Globe, RefreshCw, X } from 'lucide-react'
-
-const BROWSER_URL_KEY = 'starwaves.workspace.browser-url'
-
-function storageKey(workspaceId) {
-  return `${BROWSER_URL_KEY}:${workspaceId || 'default'}`
-}
+import { workspaceBrowserKey as storageKey } from '../../lib/storageKeys'
 
 function loadStoredUrl(workspaceId) {
   try {

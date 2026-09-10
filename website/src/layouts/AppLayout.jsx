@@ -4,6 +4,7 @@ import { Sidebar } from '../components/Sidebar'
 import { MobileTabBar } from '../components/MobileTabBar'
 import { NetworkStatus } from '../components/NetworkStatus'
 import '../App.css'
+import { SIDEBAR_EXPANDED_KEY } from '../lib/storageKeys'
 
 export function AppLayout({
   activePage,
@@ -26,7 +27,7 @@ export function AppLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarExpanded, setSidebarExpanded] = useState(
-    () => localStorage.getItem('starwaves.sidebar-expanded') !== 'false',
+    () => localStorage.getItem(SIDEBAR_EXPANDED_KEY) !== 'false',
   )
   const contentRef = useRef(null)
   const isSidebarExpanded = sidebarExpanded
@@ -36,7 +37,7 @@ export function AppLayout({
   }, [activePage])
 
   useEffect(() => {
-    localStorage.setItem('starwaves.sidebar-expanded', String(sidebarExpanded))
+    localStorage.setItem(SIDEBAR_EXPANDED_KEY, String(sidebarExpanded))
   }, [sidebarExpanded])
 
   return (

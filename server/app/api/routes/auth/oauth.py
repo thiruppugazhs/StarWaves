@@ -4,7 +4,7 @@ import asyncio
 import json
 from urllib.parse import urlencode, urlparse
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from app.db import SqlClient, get_firestore
 from app.core.http import create_async_client
@@ -14,6 +14,7 @@ from app.api.routes.auth._shared import _send_welcome_email_best_effort, state_s
 from app.core.auth import create_session_token
 from app.core.config import settings
 from app.core.cors import is_allowed_origin as _is_allowed_origin
+from app.core.errors import bad_request, service_unavailable
 from app.repositories.users import get_or_create_google_user
 
 router = APIRouter(prefix="/auth")
@@ -28,10 +29,7 @@ def google_login(
     platform: str | None = None,
 ):
     if not settings.google_oauth_client_id:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Google OAuth is not configured on the server.",
-        )
+        raise service_unavailable("Google OAuth is not configured on the server.")
 
     raw_origin = origin or request.headers.get("referer") or request.headers.get("origin") or settings.frontend_url
     try:
@@ -97,18 +95,12 @@ async def google_callback(
     try:
         state_data = state_serializer().loads(state, max_age=600)
     except (BadSignature, SignatureExpired):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Google OAuth state token is invalid or expired.",
-        ) from None
+        raise bad_request("Google OAuth state token is invalid or expired.") from None
 
     target_origin = (state_data.get("origin") if isinstance(state_data, dict) else None) or settings.frontend_url
 
     if not settings.google_oauth_client_id or not settings.google_oauth_client_secret:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Google OAuth is not properly configured.",
-        )
+        raise service_unavailable("Google OAuth is not properly configured.")
 
     async with create_async_client() as client:
         token_response = await client.post(
@@ -122,10 +114,7 @@ async def google_callback(
             },
         )
         if token_response.status_code != 200:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Failed to exchange authorization code with Google.",
-            )
+            raise bad_request("Failed to exchange authorization code with Google.")
         tokens = token_response.json()
 
         userinfo_response = await client.get(
@@ -133,10 +122,7 @@ async def google_callback(
             headers={"Authorization": f"Bearer {tokens['access_token']}"},
         )
         if userinfo_response.status_code != 200:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Failed to fetch Google user profile.",
-            )
+            raise bad_request("Failed to fetch Google user profile.")
         google_user = userinfo_response.json()
 
     email = google_user.get("email")
@@ -144,10 +130,7 @@ async def google_callback(
     picture = google_user.get("picture")
 
     if not email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Google account did not return an email address.",
-        )
+        raise bad_request("Google account did not return an email address.")
 
     user_record = get_or_create_google_user(
         database=database,

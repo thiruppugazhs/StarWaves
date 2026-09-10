@@ -114,8 +114,18 @@ def save_whatsapp_settings(database: SqlClient, user_id: str, settings: WhatsApp
     doc_ref.set(settings.model_dump(), merge=True)
 
 
-def list_whatsapp_chats(database: SqlClient, user_id: str) -> List[WhatsAppChatResponse]:
+def list_whatsapp_chats(
+    database: SqlClient,
+    user_id: str,
+    limit: Optional[int] = None,
+    cursor: Optional[str] = None,
+) -> tuple[List[WhatsAppChatResponse], Optional[str], bool]:
     query = _chats_col(database, user_id).order_by("updated_at", direction=Query.DESCENDING)
+    if cursor:
+        query = query.start_after(cursor)
+    if limit is not None:
+        query = query.limit(limit + 1)
+
     results = []
     for snap in query.stream():
         data = snap.to_dict() or {}
@@ -154,7 +164,16 @@ def list_whatsapp_chats(database: SqlClient, user_id: str) -> List[WhatsAppChatR
                 eve_auto_reply=bool(data.get("eve_auto_reply", False)),
             )
         )
-    return results
+
+    has_more = False
+    next_cursor = None
+    if limit is not None and len(results) > limit:
+        has_more = True
+        results = results[:limit]
+        next_cursor = results[-1].id
+
+    return results, next_cursor, has_more
+
 
 
 def get_whatsapp_chat(database: SqlClient, user_id: str, chat_id: str) -> Optional[WhatsAppChatResponse]:

@@ -21,6 +21,9 @@ import '../styles/pages/whatsapp-polish.css'
 export function WhatsAppPage() {
   const [status, setStatus] = useState({ connected: false })
   const [chats, setChats] = useState([])
+  const [nextChatsCursor, setNextChatsCursor] = useState(null)
+  const [hasMoreChats, setHasMoreChats] = useState(false)
+  const [isLoadingMoreChats, setIsLoadingMoreChats] = useState(false)
   const [selectedChatId, setSelectedChatId] = useState(null)
   const selectedChatIdRef = useRef(null)
   selectedChatIdRef.current = selectedChatId
@@ -88,8 +91,11 @@ export function WhatsAppPage() {
       const stat = await fetchWhatsAppStatus().catch(() => ({ connected: false }))
       setStatus(stat)
 
-      const chatList = await fetchWhatsAppChats().catch(() => [])
+      const chatRes = await fetchWhatsAppChats({ limit: 30 }).catch(() => ({ items: [], next_cursor: null, has_more: false }))
+      const chatList = Array.isArray(chatRes) ? chatRes : (chatRes?.items || [])
       setChats(chatList)
+      setNextChatsCursor(chatRes?.next_cursor || null)
+      setHasMoreChats(Boolean(chatRes?.has_more))
       const initialChatId = chatList.length > 0 ? chatList[0].id : null
       setSelectedChatId((current) => current || initialChatId)
 
@@ -114,6 +120,27 @@ export function WhatsAppPage() {
     }
   }
 
+  const handleLoadMoreChats = async () => {
+    if (isLoadingMoreChats || !hasMoreChats || !nextChatsCursor) return
+    setIsLoadingMoreChats(true)
+    try {
+      const res = await fetchWhatsAppChats({ limit: 30, cursor: nextChatsCursor })
+      const newItems = Array.isArray(res) ? res : (res?.items || [])
+      setChats((prev) => {
+        const existingIds = new Set(prev.map((c) => c.id))
+        const filtered = newItems.filter((c) => !existingIds.has(c.id))
+        return [...prev, ...filtered]
+      })
+      setNextChatsCursor(res?.next_cursor || null)
+      setHasMoreChats(Boolean(res?.has_more))
+    } catch (err) {
+      console.error('Failed to load more WhatsApp chats:', err)
+      setHasMoreChats(false)
+    } finally {
+      setIsLoadingMoreChats(false)
+    }
+  }
+
   useEffect(() => {
     let mounted = true
     loadInitialData()
@@ -131,18 +158,25 @@ export function WhatsAppPage() {
         }))
         if (event.connected) {
           setIsQrModalOpen(false)
-          fetchWhatsAppChats().then((list) => {
+          fetchWhatsAppChats({ limit: 30 }).then((res) => {
+            const list = Array.isArray(res) ? res : (res?.items || [])
             setChats(list)
+            setNextChatsCursor(res?.next_cursor || null)
+            setHasMoreChats(Boolean(res?.has_more))
             setSelectedChatId((curr) => curr || (list.length > 0 ? list[0].id : null))
           }).catch(() => {})
         }
       } else if (event.type === 'chats_synced') {
-        fetchWhatsAppChats().then((list) => {
+        fetchWhatsAppChats({ limit: 30 }).then((res) => {
+          const list = Array.isArray(res) ? res : (res?.items || [])
           setChats(list)
+          setNextChatsCursor(res?.next_cursor || null)
+          setHasMoreChats(Boolean(res?.has_more))
           setSelectedChatId((curr) => curr || (list.length > 0 ? list[0].id : null))
         }).catch(() => {})
       } else if (event.type === 'qr_update') {
         handleQrUpdate(event.qr_code, event.pairing_code)
+
       } else if (event.type === 'new_message') {
         const incomingMsg = event.message
         if (incomingMsg) {
@@ -413,6 +447,9 @@ export function WhatsAppPage() {
           isConnected={status.connected}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          hasMoreChats={hasMoreChats}
+          isLoadingMoreChats={isLoadingMoreChats}
+          onLoadMoreChats={handleLoadMoreChats}
         />
 
         {selectedChat ? (

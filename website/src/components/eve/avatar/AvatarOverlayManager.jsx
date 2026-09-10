@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react"
 import { useEveAvatar } from "./EveAvatarProvider"
 import { AVATAR_OVERLAY_BC_CHANNEL, AVATAR_DEFAULTS } from "./avatarConstants"
+import { OVERLAY_POSITION_KEY } from '../../../lib/storageKeys'
 
-const OVERLAY_POSITION_KEY = "starwaves.overlay-position"
 
 function isTauri() {
   return typeof window !== "undefined" && !!window.__TAURI__

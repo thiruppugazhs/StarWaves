@@ -2,7 +2,8 @@
 
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
+from app.core.errors import not_found
 
 from app.schemas.health import DependencyStatus
 
@@ -26,6 +27,6 @@ async def get_single_check(name: str) -> DependencyStatus:
 
     data = await get_check(name)
     if data is None:
-        raise HTTPException(status_code=404, detail=f"Unknown check '{name}'. Use database, cache, whatsapp, workspace.")
+        raise not_found(f"Unknown check '{name}'. Use database, cache, whatsapp, workspace.")
     logger.info("GET /api/v1/health/checks/%s -> %s", name, data["status"])
     return DependencyStatus(**data)

@@ -266,3 +266,93 @@ class TestEmbeddingsGuards:
 
         assert embeddings.generate_embedding("") is None
         assert embeddings.generate_embedding("   ") is None
+
+
+# ----------------------------------------------------------- latency_optimizations
+
+
+class TestMemoriesRAGCache:
+    def test_rag_cache_stores_and_retrieves(self):
+        from app.services.eve.memories import _rag_get, _rag_set, invalidate_memories_cache
+
+        uid = "test-user-rag"
+        query = "what is my tech stack?"
+        sample_memories = [{"content": "user uses react and fastapi"}]
+
+        invalidate_memories_cache(uid)
+        assert _rag_get(uid, query) is None
+
+        _rag_set(uid, query, sample_memories)
+        cached = _rag_get(uid, query)
+        assert cached == sample_memories
+
+        invalidate_memories_cache(uid)
+        assert _rag_get(uid, query) is None
+
+    def test_build_memory_instructions_uses_rag_cache(self, monkeypatch):
+        from app.services.eve import memories
+
+        uid = "test-user-rag-build"
+        query = "my preferences"
+        fake_db = MagicMock()
+
+        memories.invalidate_memories_cache(uid)
+        search_mock = MagicMock(return_value=[{"content": "prefers dark mode"}])
+        monkeypatch.setattr(memories, "search_memories", search_mock)
+
+        # First call hits search_memories
+        out1 = memories.build_memory_instructions(fake_db, uid, query=query)
+        assert "prefers dark mode" in out1
+        assert search_mock.call_count == 1
+
+        # Second call with same query uses cache — search_memories NOT called again
+        out2 = memories.build_memory_instructions(fake_db, uid, query=query)
+        assert "prefers dark mode" in out2
+        assert search_mock.call_count == 1
+
+    def test_injected_memories_capped_at_max(self, monkeypatch):
+        from app.services.eve import memories
+
+        uid = "test-user-cap"
+        fake_db = MagicMock()
+        memories.invalidate_memories_cache(uid)
+
+        # 30 memories returned from list
+        lots_of_memories = [{"content": f"fact {i}"} for i in range(30)]
+        monkeypatch.setattr(memories, "list_memories", lambda db, u: lots_of_memories)
+
+        instructions = memories.build_memory_instructions(fake_db, uid, query=None)
+        # Should contain up to MAX_INJECTED_MEMORIES (15) entries
+        assert "fact 0" in instructions
+        assert f"fact {memories.MAX_INJECTED_MEMORIES - 1}" in instructions
+        assert f"fact {memories.MAX_INJECTED_MEMORIES}" not in instructions
+
+
+class TestSessionValidationCache:
+    def test_session_cache_add_and_has(self):
+        from app.services.eve.chat_stream import _session_cache_add, _session_cache_has
+
+        uid = "test-user-session"
+        sid = "sess-123"
+
+        assert _session_cache_has(uid, sid) is False
+        _session_cache_add(uid, sid)
+        assert _session_cache_has(uid, sid) is True
+
+
+class TestParallelAllRecords:
+    def test_all_records_fetches_all_supported_resources(self, monkeypatch):
+        from app.services.eve import workspace_records
+
+        fake_db = MagicMock()
+        uid = "user-parallel-test"
+
+        def fake_list(db, user_id, resource):
+            return [{"id": f"{resource}-1"}]
+
+        monkeypatch.setattr(workspace_records, "_list_records", fake_list)
+
+        records = workspace_records._all_records(fake_db, uid)
+        for res in workspace_records.SUPPORTED_RESOURCES:
+            assert res in records
+            assert len(records[res]) == 1

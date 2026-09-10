@@ -6,6 +6,7 @@ from typing import Any
 from app.db import ArrayUnion, Query, SERVER_TIMESTAMP, SqlClient
 
 # Re-export canonical pagination primitives from core
+from app.core.errors import bad_request
 from app.core.pagination import encode_cursor, decode_cursor, resolve_limit, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 
 
@@ -23,7 +24,6 @@ def serialize_dates(values: dict[str, Any]) -> dict[str, Any]:
 def paginate_collection(collection, order_field: str, cursor: str | None, limit: int):
     # Use server-side deleted filter when available; fall back to Python filter for legacy stores.
     # Fetch limit+1 to detect has_more without over-fetching 3x.
-    from fastapi import HTTPException
     try:
         base_query = collection.where("deleted", "==", False)
     except Exception:
@@ -32,7 +32,7 @@ def paginate_collection(collection, order_field: str, cursor: str | None, limit:
     try:
         cursor_id = decode_cursor(cursor)
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail="Invalid pagination cursor.") from exc
+        raise bad_request("Invalid pagination cursor.") from exc
     if cursor_id:
         try:
             cursor_doc = collection.document(cursor_id).get()

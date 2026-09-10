@@ -3,13 +3,14 @@ import logging
 from urllib.parse import quote
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 from itsdangerous import URLSafeTimedSerializer
 from pydantic import BaseModel, Field
 
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.errors import bad_gateway, bad_request, not_found, service_unavailable
 from app.services.oauth import (
     decrypt_google_token,
     encrypt_google_token,
@@ -52,7 +53,7 @@ def authorize_gmail(user: dict = Depends(get_current_user)):
     try:
         state = gmail_state_serializer().dumps({"uid": user["uid"]})
     except RuntimeError as error:
-        raise HTTPException(status_code=503, detail=str(error)) from None
+        raise service_unavailable(str(error)) from None
     url = build_google_authorize_url(
         settings.gmail_oauth_callback_url,
         GMAIL_SCOPES,
@@ -126,19 +127,13 @@ async def connect_gmail(
             headers={"Authorization": f"Bearer {connection.access_token}"},
         )
     if response.status_code in (401, 403):
-        raise HTTPException(
-            status_code=400,
-            detail="Google rejected the Gmail authorization.",
-        )
+        raise bad_request("Google rejected the Gmail authorization.")
     try:
         response.raise_for_status()
         profile = response.json()
         email = profile["emailAddress"]
     except (httpx.HTTPError, KeyError, ValueError) as error:
-        raise HTTPException(
-            status_code=502,
-            detail="Gmail account verification failed.",
-        ) from error
+        raise bad_gateway("Gmail account verification failed.") from error
 
     doc_id = integration_account_id(email)
     doc_ref = gmail_accounts_collection(database, user["uid"]).document(doc_id)
@@ -204,12 +199,12 @@ async def get_gmail_token(
         doc_id = integration_account_id(email)
         snapshot = await asyncio.to_thread(collection.document(doc_id).get)
         if not snapshot.exists:
-            raise HTTPException(status_code=404, detail="Gmail account not found.")
+            raise not_found("Gmail account not found.")
         data = snapshot.to_dict()
     else:
         snapshots = await asyncio.to_thread(lambda: list(collection.stream()))
         if not snapshots:
-            raise HTTPException(status_code=404, detail="No Gmail accounts connected.")
+            raise not_found("No Gmail accounts connected.")
         data = snapshots[0].to_dict()
 
     encrypted_refresh_token = data.get("refresh_token")
@@ -224,20 +219,14 @@ async def get_gmail_token(
             }
             _gmail_token_cache[cache_key] = (_time.monotonic() + _GMAIL_TOKEN_TTL, result)
             return result
-        raise HTTPException(
-            status_code=400,
-            detail="No refresh token stored for this Gmail account. Please reconnect via the OAuth flow.",
-        )
+        raise bad_request("No refresh token stored for this Gmail account. Please reconnect via the OAuth flow.")
 
     try:
         refresh_token = decrypt_google_token(encrypted_refresh_token)
         access_token = await refresh_google_token(refresh_token)
     except Exception as error:
         logger.error("Gmail token refresh failed: %s", error, exc_info=True)
-        raise HTTPException(
-            status_code=502,
-            detail="Could not refresh Gmail access token. Please reconnect your account.",
-        ) from error
+        raise bad_gateway("Could not refresh Gmail access token. Please reconnect your account.") from error
 
     result = {
         "email": data.get("email", ""),

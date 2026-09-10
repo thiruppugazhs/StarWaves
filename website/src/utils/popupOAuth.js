@@ -6,6 +6,8 @@
  * @param {string} title - Title/name for the popup window.
  * @returns {Promise<void>} Resolves when the popup closes or signals success.
  */
+import { API_URL } from '../lib/request'
+import { OAUTH_EVENT_KEY } from '../lib/storageKeys'
 export function openOAuthPopup(url, title = 'google-oauth-popup') {
   return new Promise((resolve, reject) => {
     const width = 500
@@ -53,7 +55,7 @@ export function openOAuthPopup(url, title = 'google-oauth-popup') {
 
     const allowedOrigins = (() => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || ''
+        const apiUrl = API_URL || ''
         if (apiUrl.startsWith('http')) return [new URL(apiUrl).origin]
       } catch {}
       return []
@@ -70,7 +72,7 @@ export function openOAuthPopup(url, title = 'google-oauth-popup') {
     }
 
     const handleStorage = (event) => {
-      if (event.key === 'starwaves_oauth_event' && event.newValue) {
+      if (event.key === OAUTH_EVENT_KEY && event.newValue) {
         try {
           const parsed = JSON.parse(event.newValue)
           if (parsed?.payload?.type === 'STARWAVES_OAUTH_CALLBACK') {

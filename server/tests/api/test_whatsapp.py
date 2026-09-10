@@ -55,6 +55,26 @@ class TestWhatsAppEndpoints(unittest.TestCase):
         phone_data = phone_response.json()
         self.assertIn(phone_data["status"], ["qr_ready", "waiting", "paired"])
 
+    @patch("app.services.whatsapp.WhatsAppService.list_chats")
+    def test_list_whatsapp_chats_pagination(self, mock_list_chats):
+        from app.schemas.whatsapp import WhatsAppChatListResponse, WhatsAppChatResponse
+
+        mock_list_chats.return_value = WhatsAppChatListResponse(
+            items=[
+                WhatsAppChatResponse(id="chat-1", name="Alice"),
+                WhatsAppChatResponse(id="chat-2", name="Bob"),
+            ],
+            next_cursor="chat-2",
+            has_more=True,
+        )
+        response = self.client.get("/api/v1/whatsapp/chats?limit=2")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data["items"]), 2)
+        self.assertEqual(data["next_cursor"], "chat-2")
+        self.assertTrue(data["has_more"])
+
+
 
 if __name__ == "__main__":
     unittest.main()

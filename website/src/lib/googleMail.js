@@ -1,10 +1,13 @@
 import { authorizeGmail, clearGmailAuthorization, hasGmailConnection, saveGmailAccountToken } from './firebase'
 import { getStoredAuthToken } from './authApi'
 import { getGmailToken } from './gmailApi'
+import { API_URL as BACKEND_API_URL } from './request'
 import { openOAuthPopup } from '../utils/popupOAuth'
 
 const API = 'https://gmail.googleapis.com/gmail/v1/users/me'
-const BACKEND_API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api/v1'
+// NOTE: raw fetch (not apiRequest) is intentional here — the OAuth popup flow
+// needs window.open-friendly authorize handling per AGENTS §4.5-2 (ADR 0046).
+// Direct Google API calls below must also stay on native fetch (external host).
 
 export async function beginGmailOAuth() {
   const token = getStoredAuthToken()

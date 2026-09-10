@@ -1,3 +1,4 @@
+import { THEME_MODE_KEY } from '../lib/storageKeys'
 // Theme application primitives — zero imports.
 // Extracted from presets.js so the startup path (App -> applyThemeVariables)
 // never pays for the 25 raw CSS preset strings or the customizer hook.
@@ -265,13 +266,13 @@ export function applyThemeVariables(data) {
   } else if (data.preset) {
     isDark = !lightPresets.includes(data.preset)
   } else {
-    const stored = localStorage.getItem('starwaves.theme')
+    const stored = localStorage.getItem(THEME_MODE_KEY)
     isDark = stored ? stored === 'dark' : true
   }
 
   root.classList.toggle('dark-theme', isDark)
   try {
-    localStorage.setItem('starwaves.theme', isDark ? 'dark' : 'light')
+    localStorage.setItem(THEME_MODE_KEY, isDark ? 'dark' : 'light')
   } catch {}
 
   // Update theme-color meta tag for browser/mobile status bar

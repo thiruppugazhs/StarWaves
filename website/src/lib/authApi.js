@@ -168,26 +168,6 @@ export async function loginWithEmail(email, password) {
   return result.user || result
 }
 
-export async function verifyEmailOtp(email, otp) {
-  const result = await request('/auth/verify-otp', {
-    method: 'POST',
-    body: JSON.stringify({ email, otp }),
-    authRequired: false,
-  })
-  if (result.token) {
-    setStoredAuthToken(result.token, result.user)
-  }
-  return result.user
-}
-
-export async function resendEmailOtp(email) {
-  return request('/auth/resend-otp', {
-    method: 'POST',
-    body: JSON.stringify({ email }),
-    authRequired: false,
-  })
-}
-
 export function requestPasswordReset(email) {
   return request('/auth/forgot-password', {
     method: 'POST',
@@ -208,6 +188,26 @@ export function resetPassword(token, password) {
   return request('/auth/reset-password', {
     method: 'POST',
     body: JSON.stringify({ token, password }),
+    authRequired: false,
+  })
+}
+
+export async function verifyEmailOtp(email, otp) {
+  const result = await request('/auth/verify-otp', {
+    method: 'POST',
+    body: JSON.stringify({ email, otp }),
+    authRequired: false,
+  })
+  if (result.token) {
+    setStoredAuthToken(result.token, result.user)
+  }
+  return result
+}
+
+export function resendEmailOtp(email) {
+  return request('/auth/resend-otp', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
     authRequired: false,
   })
 }
@@ -233,8 +233,9 @@ export async function fetchCurrentUser() {
 }
 
 export async function updateUserProfile(displayName, assistantName = null) {
-  const body = { displayName }
-  if (assistantName) body.assistantName = assistantName
+  const body = {}
+  if (displayName !== undefined && displayName !== null) body.displayName = displayName
+  if (assistantName !== undefined && assistantName !== null) body.assistantName = assistantName
   const updatedUser = await request('/auth/profile', {
     method: 'PATCH',
     body: JSON.stringify(body),
@@ -243,7 +244,7 @@ export async function updateUserProfile(displayName, assistantName = null) {
   const cleanAssistant = updatedUser?.assistantName || assistantName || current.assistantName || 'Eve'
   const newUser = {
     ...current,
-    displayName: updatedUser?.displayName || displayName,
+    displayName: updatedUser?.displayName || displayName || current.displayName,
     assistantName: cleanAssistant,
     isSubscribed: Boolean(updatedUser?.isSubscribed ?? current.isSubscribed),
   }

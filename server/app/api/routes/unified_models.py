@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, Query
 from app.db import SqlClient, get_firestore
 
 from app.core.auth import get_current_user
-from app.services.ai_models.config import has_server_key
+from app.services.ai_models.config import extract_user_keys, has_server_key
 from app.services.ai_models.unified import discover_all_models
 
 router = APIRouter(prefix="/models")
@@ -20,17 +20,8 @@ def _user_keys_from_db(database: SqlClient, user_uid: str) -> dict[str, str]:
     try:
         from app.services.ai_models.config import load_ai_preference
         pref = load_ai_preference(database, user_uid)
-        if not pref:
-            return {}
-        keys: dict[str, str] = {}
-        saved = pref.get("api_keys")
-        if isinstance(saved, dict):
-            keys.update({k: str(v) for k, v in saved.items() if v})
-        legacy = pref.get("api_key")
-        prov = pref.get("provider")
-        if legacy and prov and prov not in keys:
-            keys[prov] = str(legacy)
-        return keys
+        # Canonical key extraction incl. legacy `api_key` (ADR 0046).
+        return extract_user_keys(pref)
     except Exception:
         return {}
 

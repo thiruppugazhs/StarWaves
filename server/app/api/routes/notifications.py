@@ -1,9 +1,10 @@
 import hashlib
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 from pydantic import BaseModel, Field
 
 from app.core.auth import get_current_user
+from app.core.errors import internal, not_found
 from app.services.notifications import send_multicast_notification, send_push_notification
 
 router = APIRouter(prefix="/notifications")
@@ -86,19 +87,13 @@ def send_notification_to_user(
             )
             return {"status": "sent", "message_id": msg_id}
         except Exception as exc:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to send push notification: {exc}",
-            ) from None
+            raise internal(f"Failed to send push notification: {exc}") from None
 
     docs = list(devices_collection(database, user["uid"]).stream())
     tokens = [doc.to_dict().get("token") for doc in docs if doc.to_dict().get("token")]
 
     if not tokens:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No registered device tokens found for this user.",
-        )
+        raise not_found("No registered device tokens found for this user.")
 
     try:
         res = send_multicast_notification(
@@ -120,7 +115,4 @@ def send_notification_to_user(
             "pruned_invalid_tokens": pruned,
         }
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to send multicast notification: {exc}",
-        ) from None
+        raise internal(f"Failed to send multicast notification: {exc}") from None

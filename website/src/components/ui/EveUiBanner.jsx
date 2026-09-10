@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Sparkles, RotateCcw, X } from 'lucide-react'
 import { restoreUiVersion, getUiHistory } from '../../lib/uiPreferencesApi'
+import { UI_CACHE_KEY } from '../../lib/storageKeys'
 
-const UI_CACHE_KEY = 'starwaves.ui.cache'
 const BANNER_AUTO_HIDE_MS = 12000
 
 export function EveUiBanner() {

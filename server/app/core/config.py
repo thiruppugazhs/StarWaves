@@ -136,7 +136,7 @@ class Settings:
     cron_secret: str | None = os.getenv("CRON_SECRET") or (
         "starwaves-cron-secret" if app_env != "production" else None
     )
-    # Unified serverless flag: VERCEL/Lambda auto-detect + explicit IS_SERVERLESS override (see main.py lifespan)
+    # Unified serverless flag: VERCEL/Lambda auto-detect + explicit IS_SERVERLESS override (canonical — main.py uses this, ADR 0045)
     is_serverless: bool = bool(
         os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or os.getenv("IS_SERVERLESS", "false").lower() == "true"
     )

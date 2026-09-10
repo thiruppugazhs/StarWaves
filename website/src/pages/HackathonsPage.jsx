@@ -14,6 +14,7 @@ import {
 import { usePersistentState } from '../hooks/usePersistentState'
 import { createHackathon, deleteHackathon, updateHackathon } from '../lib/workspaceApi'
 import { ConfirmDialog, CustomDropdown, EmptyState, FilterBar, MetricCard, MetricGrid, Modal, SearchBar, Alert } from '../components/ui'
+import { HACKATHONS_MODE_KEY, HACKATHONS_SORT_KEY, HACKATHONS_SOURCE_KEY, HACKATHON_FOCUS_KEY, HACKATHON_LAYOUT_KEY } from '../lib/storageKeys'
 
 const emptyHackathon = {
   title: '',
@@ -28,12 +29,12 @@ const emptyHackathon = {
 
 export function HackathonsPage({ hackathons, setHackathons, canLoadMore, loadingMore, onLoadMore, onOpenHackathon }) {
   const [cardLayout, setCardLayout] = useState(
-    () => window.localStorage.getItem('starwaves-hackathon-layout') || 'compact',
+    () => window.localStorage.getItem(HACKATHON_LAYOUT_KEY) || 'compact',
   )
   const [formOpen, setFormOpen] = useState(false)
 
   useEffect(() => {
-    window.localStorage.setItem('starwaves-hackathon-layout', cardLayout)
+    window.localStorage.setItem(HACKATHON_LAYOUT_KEY, cardLayout)
   }, [cardLayout])
   const [form, setForm] = useState(emptyHackathon)
   const [saving, setSaving] = useState(false)
@@ -45,9 +46,9 @@ export function HackathonsPage({ hackathons, setHackathons, canLoadMore, loading
   const [editError, setEditError] = useState('')
   const [deleteId, setDeleteId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [modeFilter, setModeFilter] = usePersistentState('starwaves.hackathons.mode', 'All formats')
-  const [sourceFilter, setSourceFilter] = usePersistentState('starwaves.hackathons.source', 'All sources')
-  const [sortOrder, setSortOrder] = usePersistentState('starwaves.hackathons.sort', 'Soonest')
+  const [modeFilter, setModeFilter] = usePersistentState(HACKATHONS_MODE_KEY, 'All formats')
+  const [sourceFilter, setSourceFilter] = usePersistentState(HACKATHONS_SOURCE_KEY, 'All sources')
+  const [sortOrder, setSortOrder] = usePersistentState(HACKATHONS_SORT_KEY, 'Soonest')
 
   const sourceOptions = [...new Set(hackathons.map((item) => item.source || 'manual'))]
   const filteredHackathons = hackathons
@@ -72,7 +73,7 @@ export function HackathonsPage({ hackathons, setHackathons, canLoadMore, loading
   }
 
   useEffect(() => {
-    const rawFocus = localStorage.getItem('starwaves.hackathon-focus')
+    const rawFocus = localStorage.getItem(HACKATHON_FOCUS_KEY)
     if (!rawFocus) return
 
     try {
@@ -80,7 +81,7 @@ export function HackathonsPage({ hackathons, setHackathons, canLoadMore, loading
       const focusedHackathon = hackathons.find((hackathon) => hackathon.id === hackathonId)
       if (focusedHackathon) onOpenHackathon?.(focusedHackathon.id)
     } finally {
-      localStorage.removeItem('starwaves.hackathon-focus')
+      localStorage.removeItem(HACKATHON_FOCUS_KEY)
     }
   }, [hackathons, onOpenHackathon])
 

@@ -6,6 +6,7 @@ import {
 } from '../../lib/competitiveCodingProfileApi'
 import { loadContests } from '../../lib/workspaceApi'
 import { SectionHeading, SettingsCard } from '../../components/ui'
+import { ENABLED_PLATFORMS_KEY } from '../../lib/storageKeys'
 
 const CONTEST_PLATFORMS = [
   {
@@ -42,7 +43,7 @@ export function CodingSection({ user, onContestSitesChange }) {
   const [enabledContestPlatforms, setEnabledContestPlatforms] = useState(() => {
     try {
       return JSON.parse(
-        localStorage.getItem('starwaves-enabled-contest-platforms') ??
+        localStorage.getItem(ENABLED_PLATFORMS_KEY) ??
           '["codeforces","codechef","leetcode"]',
       )
     } catch {
@@ -103,7 +104,7 @@ export function CodingSection({ user, onContestSitesChange }) {
     setEnabledContestPlatforms(nextEnabled)
     try {
       localStorage.setItem(
-        'starwaves-enabled-contest-platforms',
+        ENABLED_PLATFORMS_KEY,
         JSON.stringify(nextEnabled),
       )
     } catch {

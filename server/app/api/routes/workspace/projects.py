@@ -1,12 +1,13 @@
 """Project routes: list, create, patch, and delete workspace projects."""
 
 import asyncio
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response
 from app.db import SqlClient, get_firestore
 
 from app.api.routes.workspace._shared import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 from app.core.auth import get_current_user
 from app.core.cache import CACHE_TTL_MEDIUM, CACHE_TTL_SHORT, cache_invalidate_prefix, cached
+from app.core.errors import not_found
 from app.repositories import ProjectRepository
 from app.schemas.workspace import PageResponse, ProjectCreate, ProjectResponse, ProjectUpdate
 
@@ -42,7 +43,7 @@ async def get_project(
     repository = ProjectRepository(database, user["uid"])
     result = await asyncio.to_thread(repository.get, project_id)
     if not result:
-        raise HTTPException(status_code=404, detail="Project not found.")
+        raise not_found("Project not found.")
     return result
 
 
@@ -69,7 +70,7 @@ async def patch_project(
     updates = changes.model_dump(exclude_unset=True)
     result = await asyncio.to_thread(repository.patch, project_id, updates)
     if not result:
-        raise HTTPException(status_code=404, detail="Project not found.")
+        raise not_found("Project not found.")
     _invalidate_ws_projects(user["uid"])
     return result
 
@@ -83,7 +84,7 @@ async def delete_project(
     repository = ProjectRepository(database, user["uid"])
     ok = await asyncio.to_thread(repository.delete, project_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Project not found.")
+        raise not_found("Project not found.")
     _invalidate_ws_projects(user["uid"])
     return Response(status_code=204)
 
@@ -97,9 +98,9 @@ async def restore_project(
     repository = ProjectRepository(database, user["uid"])
     ok = await asyncio.to_thread(repository.restore, project_id)
     if not ok:
-        raise HTTPException(status_code=404, detail="Project not found.")
+        raise not_found("Project not found.")
     result = await asyncio.to_thread(repository.get, project_id)
     if not result:
-        raise HTTPException(status_code=404, detail="Project not found.")
+        raise not_found("Project not found.")
     _invalidate_ws_projects(user["uid"])
     return result

@@ -1,7 +1,9 @@
 import { getStoredAuthToken } from './authApi'
+import { API_URL as BACKEND_API_URL } from './request'
 import { openOAuthPopup } from '../utils/popupOAuth'
 
-const BACKEND_API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api/v1'
+// NOTE: raw fetch (not apiRequest) is intentional here — the OAuth popup flow
+// needs window.open-friendly authorize handling per AGENTS §4.5-2 (ADR 0046).
 
 export async function beginGoogleContactsOAuth() {
   const token = getStoredAuthToken()

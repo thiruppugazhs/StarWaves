@@ -1,6 +1,5 @@
+import { GMAIL_ACCOUNTS_KEY, GMAIL_CONNECTED_KEY, GMAIL_SESSION_KEY } from './storageKeys'
 // Connection helpers for multi-account Gmail authorization cache
-const GMAIL_SESSION_KEY = 'starwaves-gmail-authorization-v2'
-const GMAIL_ACCOUNTS_KEY = 'starwaves-gmail-accounts-v2'
 
 export function clearGmailAuthorization(email = null) {
   if (email) {
@@ -14,7 +13,7 @@ export function clearGmailAuthorization(email = null) {
   } else {
     sessionStorage.removeItem(GMAIL_SESSION_KEY)
     sessionStorage.removeItem(GMAIL_ACCOUNTS_KEY)
-    localStorage.removeItem('starwaves-gmail-connected')
+    localStorage.removeItem(GMAIL_CONNECTED_KEY)
   }
   window.dispatchEvent(new Event('starwaves:gmail-change'))
 }
@@ -25,7 +24,7 @@ export function saveGmailAccountToken(email, token, expiresAt) {
     map[email.toLowerCase()] = { accessToken: token, expiresAt }
     sessionStorage.setItem(GMAIL_ACCOUNTS_KEY, JSON.stringify(map))
     sessionStorage.setItem(GMAIL_SESSION_KEY, JSON.stringify({ accessToken: token, expiresAt }))
-    localStorage.setItem('starwaves-gmail-connected', 'true')
+    localStorage.setItem(GMAIL_CONNECTED_KEY, 'true')
     window.dispatchEvent(new Event('starwaves:gmail-change'))
   } catch {
     // ignore
@@ -33,7 +32,7 @@ export function saveGmailAccountToken(email, token, expiresAt) {
 }
 
 export function hasGmailConnection() {
-  return localStorage.getItem('starwaves-gmail-connected') === 'true'
+  return localStorage.getItem(GMAIL_CONNECTED_KEY) === 'true'
 }
 
 export async function authorizeGmail(email = null) {

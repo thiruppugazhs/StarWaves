@@ -1,3 +1,4 @@
+import { AUTH_TOKEN_KEY as TOKEN_KEY, AUTH_USER_KEY as USER_KEY, DEVICE_ID_KEY, DEVICE_NAME_KEY } from './storageKeys'
 // Pure auth/device storage helpers — zero imports.
 //
 // Lives apart from `authApi.js` on purpose: `request.js` needs these on every
@@ -8,10 +9,6 @@
 // module). `authApi.js` re-exports everything below for backward
 // compatibility, so existing `from './authApi'` call sites keep working.
 
-const TOKEN_KEY = 'starwaves_auth_token'
-const USER_KEY = 'starwaves_auth_user'
-const DEVICE_ID_KEY = 'starwaves.device_id'
-const DEVICE_NAME_KEY = 'starwaves.device_name'
 
 export function getDeviceId() {
   let id = localStorage.getItem(DEVICE_ID_KEY)

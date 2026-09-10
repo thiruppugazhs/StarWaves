@@ -3,10 +3,11 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, Query
 from app.db import ArrayUnion, FieldFilter, SERVER_TIMESTAMP, SqlClient, get_firestore
 
 from app.core.config import settings
+from app.core.errors import internal, unauthorized
 from app.repositories.calls import CallRepository
 from app.repositories.eve_schedules import EveScheduleRepository, list_all_due_schedules
 from app.repositories.users import get_user_by_id
@@ -25,16 +26,10 @@ def _verify_cron_secret(
 ):
     expected_secret = getattr(settings, "cron_secret", None)
     if not expected_secret:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Cron secret not configured.",
-        )
+        raise internal("Cron secret not configured.")
     provided = secret or (authorization.removeprefix("Bearer ").strip() if authorization else None) or ""
     if not hmac.compare_digest(provided, expected_secret):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing cron authorization.",
-        )
+        raise unauthorized("Invalid or missing cron authorization.")
     return True
 
 

@@ -1,6 +1,7 @@
-"""Workspace record helpers — single responsibility: CRUD for workspace resources."""
+"""Workspace record helpers - single responsibility: CRUD for workspace resources."""
 
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
@@ -47,14 +48,29 @@ def _list_records(database: SqlClient, user_id: str, resource: str) -> list[dict
     raise ValueError("Unsupported workspace resource.")
 
 
-
 def _all_records(database: SqlClient, user_id: str) -> dict[str, list[dict[str, Any]]]:
-    return {resource: _list_records(database, user_id, resource) for resource in SUPPORTED_RESOURCES}
-
+    # P6: Fetch all resource types concurrently instead of serially.
+    # The tool loop already runs on a daemon thread, so spawning inner threads
+    # here is safe. Reduces total time from ~sum(each read) to ~max(each read).
+    results: dict[str, list[dict[str, Any]]] = {}
+    with ThreadPoolExecutor(max_workers=len(SUPPORTED_RESOURCES)) as executor:
+        futures = {
+            executor.submit(_list_records, database, user_id, resource): resource
+            for resource in SUPPORTED_RESOURCES
+        }
+        for future in as_completed(futures):
+            resource = futures[future]
+            try:
+                results[resource] = future.result()
+            except Exception as exc:
+                logger.warning("[Workspace Records] Failed to fetch %s for user %s: %s", resource, user_id, exc)
+                results[resource] = []
+    return results
 
 
 def _record_text(record: dict[str, Any]) -> str:
     return " ".join(str(value) for value in record.values() if value is not None).lower()
+
 
 
 

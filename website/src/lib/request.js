@@ -2,6 +2,19 @@ import { clearAuthSession, getDeviceId, getDeviceName, getStoredAuthToken } from
 
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api/v1'
 
+export function getWsBase() {
+  // Single shared http(s)→ws(s) derivation for WebSocket clients (ADR 0046).
+  // WS endpoints live at /ws/* directly on the server, without the /api/v1 prefix.
+  if (API_URL.startsWith('http://') || API_URL.startsWith('https://')) {
+    return API_URL.replace(/^http/, 'ws').replace(/\/api\/v1\/?$/, '')
+  }
+  if (typeof window !== 'undefined' && window.location) {
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    return `${proto}//${window.location.host}`
+  }
+  return ''
+}
+
 // Warn if prod build points to localhost (common Vercel mis-config)
 if (typeof window !== 'undefined' && import.meta.env.PROD && API_URL.includes('127.0.0.1')) {
   console.warn('[StarWaves] VITE_API_URL is localhost in production — set Vercel env to https://api.starwaves.susindran.in/api/v1')

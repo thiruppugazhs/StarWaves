@@ -4,13 +4,13 @@ import {
   applyThemeVariables,
   resetThemeVariables,
 } from '../themes/presets'
+import { CUSTOM_THEME_KEY as STORAGE_KEY, THEME_MODE_KEY, themeExportFilename } from '../lib/storageKeys'
 
-const STORAGE_KEY = 'starwaves.custom_theme'
 
 // Crimson Noir is the default (ADR 0028): fresh visitors with no stored
 // preference land on dark. Stored 'light' is always respected.
 function prefersDarkTheme() {
-  const stored = localStorage.getItem('starwaves.theme')
+  const stored = localStorage.getItem(THEME_MODE_KEY)
   return stored ? stored === 'dark' : true
 }
 
@@ -149,7 +149,7 @@ export function useThemeCustomizer() {
     downloadAnchor.setAttribute('href', dataStr)
     downloadAnchor.setAttribute(
       'download',
-      `starwaves-ui-ux-${themeState.preset || 'custom'}.json`,
+      themeExportFilename(themeState.preset),
     )
     document.body.appendChild(downloadAnchor)
     downloadAnchor.click()

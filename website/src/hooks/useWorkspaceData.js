@@ -18,6 +18,7 @@ import {
   buildCalendarReminders,
   CALENDAR_REMINDER_PREFIX,
 } from '../utils/calendarReminders'
+import { ENABLED_PLATFORMS_KEY, FIRED_REMINDERS_KEY, IMPORTED_CALENDARS_KEY, IMPORTED_EVENTS_KEY } from '../lib/storageKeys'
 
 function useDebouncedValue(value, delayMs) {
   const [debounced, setDebounced] = useState(value)
@@ -49,26 +50,26 @@ export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
   const [googleCalendarEvents, setGoogleCalendarEvents] = useState([])
   const [importedIcsCalendars, setImportedIcsCalendars] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('starwaves-imported-calendars') ?? '[]')
+      return JSON.parse(localStorage.getItem(IMPORTED_CALENDARS_KEY) ?? '[]')
     } catch {
       return []
     }
   })
   const [importedIcsEvents, setImportedIcsEvents] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('starwaves-imported-events') ?? '[]')
+      return JSON.parse(localStorage.getItem(IMPORTED_EVENTS_KEY) ?? '[]')
     } catch {
       return []
     }
   })
   const [firedReminderIds, setFiredReminderIds] = usePersistentState(
-    'starwaves.fired_reminders',
+    FIRED_REMINDERS_KEY,
     [],
   )
 
   useEffect(() => {
     try {
-      localStorage.setItem('starwaves-imported-calendars', JSON.stringify(importedIcsCalendars))
+      localStorage.setItem(IMPORTED_CALENDARS_KEY, JSON.stringify(importedIcsCalendars))
     } catch {
       // ignore
     }
@@ -82,7 +83,7 @@ export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
 
   useEffect(() => {
     try {
-      localStorage.setItem('starwaves-imported-events', JSON.stringify(importedIcsEvents))
+      localStorage.setItem(IMPORTED_EVENTS_KEY, JSON.stringify(importedIcsEvents))
     } catch {
       // ignore
     }
@@ -229,7 +230,7 @@ export function useWorkspaceData(currentUser, activePage, refreshKey = 0) {
       setHackathons(hackathonsPage.items)
       setNotifications(notificationsPage.items)
       const enabledPlatforms = (() => {
-        try { return JSON.parse(localStorage.getItem('starwaves-enabled-contest-platforms') ?? '["codeforces","codechef","leetcode"]') } catch { return ['codeforces', 'codechef', 'leetcode'] }
+        try { return JSON.parse(localStorage.getItem(ENABLED_PLATFORMS_KEY) ?? '["codeforces","codechef","leetcode"]') } catch { return ['codeforces', 'codechef', 'leetcode'] }
       })()
       const rawContestItems = contestsResult.status === 'fulfilled' ? contestsResult.value.items : []
       const rawContestSites = rawContestItems.reduce((sites, contest) => {

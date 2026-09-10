@@ -3,12 +3,13 @@ import logging
 from urllib.parse import quote
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import RedirectResponse
 from app.db import ArrayUnion, SERVER_TIMESTAMP, SqlClient, get_firestore
 
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.errors import service_unavailable
 from app.services.github import fetch_github_data, state_serializer
 from app.services.oauth import (
     build_github_authorize_url,
@@ -39,7 +40,7 @@ def authorize_github(user: dict = Depends(get_current_user)):
     try:
         state = state_serializer().dumps({"uid": user["uid"]})
     except RuntimeError as error:
-        raise HTTPException(status_code=503, detail=str(error)) from None
+        raise service_unavailable(str(error)) from None
     url = build_github_authorize_url(
         settings.github_oauth_callback_url,
         GITHUB_SCOPES,

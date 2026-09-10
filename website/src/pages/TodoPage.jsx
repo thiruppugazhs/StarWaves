@@ -4,12 +4,13 @@ import { CalendarDays, Check, Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import { createTodo, deleteTodo, updateTodo } from '../lib/todosApi'
 import { Alert, ConfirmDialog, EmptyState, FilterBar, FilterPills, Modal, SearchBar } from '../components/ui'
 import { usePersistentState } from '../hooks/usePersistentState'
+import { TODO_FILTER_KEY } from '../lib/storageKeys'
 
 export function TodoPage({ tasks, setTasks, createIntent }) {
   const [newTask, setNewTask] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
-  const [filter, setFilter] = usePersistentState('starwaves.todo.filter', 'all')
+  const [filter, setFilter] = usePersistentState(TODO_FILTER_KEY, 'all')
   const [taskFormOpen, setTaskFormOpen] = useState(false)
   const [taskSaving, setTaskSaving] = useState(false)
   const [taskError, setTaskError] = useState('')

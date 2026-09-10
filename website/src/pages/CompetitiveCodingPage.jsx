@@ -3,14 +3,15 @@ import { useMemo, useState } from 'react'
 import { CalendarDays, ChevronDown, Clock3, Filter, Search, SlidersHorizontal, Trophy } from 'lucide-react'
 import { CustomDropdown, EmptyState, FilterBar, MetricCard, MetricGrid, SearchBar } from '../components/ui'
 import { usePersistentState } from '../hooks/usePersistentState'
+import { CONTESTS_PLATFORM_KEY, CONTESTS_SORT_KEY, CONTESTS_TIMEFRAME_KEY } from '../lib/storageKeys'
 
 export function CompetitiveCodingPage({ contestSites }) {
   const [openSites, setOpenSites] = useState(() => new Set(['codeforces']))
   const [showAll, setShowAll] = useState({})
   const [query, setQuery] = useState('')
-  const [platform, setPlatform] = usePersistentState('starwaves.contests.platform', 'all')
-  const [timeframe, setTimeframe] = usePersistentState('starwaves.contests.timeframe', 'all')
-  const [sortOrder, setSortOrder] = usePersistentState('starwaves.contests.sort', 'soonest')
+  const [platform, setPlatform] = usePersistentState(CONTESTS_PLATFORM_KEY, 'all')
+  const [timeframe, setTimeframe] = usePersistentState(CONTESTS_TIMEFRAME_KEY, 'all')
+  const [sortOrder, setSortOrder] = usePersistentState(CONTESTS_SORT_KEY, 'soonest')
   const allContests = useMemo(() => contestSites.flatMap((site) => site.contests.map((contest) => ({ ...contest, siteId: site.id, siteName: site.name }))), [contestSites])
   const filteredContests = useMemo(() => {
     const now = Date.now()

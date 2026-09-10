@@ -1,4 +1,4 @@
-const BRIEF_STORAGE_PREFIX = 'starwaves.studio.brief.'
+import { STUDIO_BRIEF_PREFIX as BRIEF_STORAGE_PREFIX } from '../../lib/storageKeys'
 
 export function setStudioBrief(projectId, brief) {
   try {

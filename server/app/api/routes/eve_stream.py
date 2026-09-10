@@ -1,10 +1,9 @@
-"""Eve chat SSE streaming endpoint — single responsibility: stream
+"""Eve chat SSE streaming endpoint - single responsibility: stream
 stream_chat_with_eve events to the client as server-sent events."""
 
 import asyncio
 import json
 import logging
-import queue
 import threading
 
 from fastapi import APIRouter, Depends
@@ -30,59 +29,70 @@ SSE_HEADERS = {
 }
 
 
+def _run_producer_thread(target, loop, async_q):
+    def post(item):
+        loop.call_soon_threadsafe(async_q.put_nowait, item)
+
+    def run():
+        try:
+            for item in target():
+                post(item)
+        except Exception as error:
+            logger.error("[Eve SSE Producer] Unhandled error: %s: %s", type(error).__name__, error, exc_info=True)
+            post(f"data: {json.dumps({'type': 'error', 'detail': 'Eve stream failed unexpectedly.'})}\n\n")
+        finally:
+            post(_SENTINEL)
+
+    threading.Thread(target=run, daemon=True).start()
+
+
+async def _consume_queue(async_q):
+    while True:
+        item = await async_q.get()
+        if item is _SENTINEL:
+            break
+        yield item
+    yield "data: [DONE]\n\n"
+
+
 @router.post("/chat/stream")
 async def chat_stream(
     payload: EveChatRequest,
     database: SqlClient = Depends(get_firestore),
     user: dict = Depends(get_current_user),
 ):
-    """Stream an Eve chat response as server-sent events.
-
-    Emits `data: {json event}\\n\\n` frames (delta / tool_start / tool_end /
-    done / error) terminated by a final `data: [DONE]` frame.
-
-    The blocking provider/tool loop (sync OpenAI SDK) is offloaded to a
-    daemon thread bridged via a Queue so the single uvicorn worker's event
-    loop stays responsive for pings, WS, and concurrent streams.
-    """
-
     messages = [item.model_dump() for item in payload.messages]
     session_id = payload.session_id
-    q: queue.Queue = queue.Queue()
+    loop = asyncio.get_event_loop()
+    async_q: asyncio.Queue = asyncio.Queue()
 
-    def _producer():
-        try:
+    def _iter_events():
+        if payload.editor_context is not None:
             if payload.provider or payload.model:
-                stream = stream_chat_with_eve(database, user, messages, session_id, payload.provider, payload.model, payload.editor_context)
+                stream = stream_chat_with_eve(
+                    database, user, messages, session_id,
+                    payload.provider, payload.model, payload.editor_context,
+                )
             else:
-                stream = stream_chat_with_eve(database, user, messages, session_id, editor_context=payload.editor_context)
-            for event in stream:
-                q.put(f"data: {json.dumps(event, default=str)}\n\n")
-        except Exception as error:
-            logger.error(f"[Eve Chat Stream] Unhandled stream failure: {type(error).__name__}: {error}", exc_info=True)
-            q.put(f"data: {json.dumps({'type': 'error', 'detail': 'Eve stream failed unexpectedly.'})}\n\n")
-        finally:
-            q.put(_SENTINEL)
+                stream = stream_chat_with_eve(
+                    database, user, messages, session_id,
+                    editor_context=payload.editor_context,
+                )
+        else:
+            if payload.provider or payload.model:
+                stream = stream_chat_with_eve(
+                    database, user, messages, session_id,
+                    payload.provider, payload.model,
+                )
+            else:
+                stream = stream_chat_with_eve(
+                    database, user, messages, session_id,
+                )
+        for event in stream:
+            yield f"data: {json.dumps(event, default=str)}\n\n"
 
-    threading.Thread(target=_producer, daemon=True).start()
-
-    async def event_source():
-        while True:
-            # Poll queue without blocking the event loop
-            try:
-                item = await asyncio.to_thread(q.get, timeout=0.1)
-            except queue.Empty:
-                # Keep SSE connection alive; yield nothing and let caller await next
-                await asyncio.sleep(0.02)
-                continue
-            except Exception:
-                break
-            if item is _SENTINEL:
-                break
-            yield item
-        yield "data: [DONE]\n\n"
-
-    return StreamingResponse(event_source(), media_type="text/event-stream", headers=SSE_HEADERS)
+    _run_producer_thread(_iter_events, loop, async_q)
+    return StreamingResponse(_consume_queue(async_q), media_type="text/event-stream", headers=SSE_HEADERS)
 
 
 @router.post("/voice/stream")
@@ -91,44 +101,20 @@ async def voice_stream(
     database: SqlClient = Depends(get_firestore),
     user: dict = Depends(get_current_user),
 ):
-    """Ultra low-latency Eve voice turn (<1s first audio).
-
-    Skips RAG/tool loop; uses fast model (groq 8b-instant) streaming and
-    synthesizes TTS per sentence as deltas arrive.
-    """
     last_message = next((m.content for m in reversed(payload.messages) if m.role == "user"), "")
     speech = await asyncio.to_thread(resolve_speech_preference, database, user["uid"])
     session_id = payload.session_id
     tts_provider = speech.get("tts_provider")
     tts_voice = speech.get("tts_voice")
-    q: queue.Queue = queue.Queue()
+    loop = asyncio.get_event_loop()
+    async_q: asyncio.Queue = asyncio.Queue()
 
-    def _producer():
-        try:
-            for event in stream_voice_reply(
-                database, user, last_message, session_id=session_id, tts_provider=tts_provider, tts_voice=tts_voice
-            ):
-                q.put(f"data: {json.dumps(event, default=str)}\n\n")
-        except Exception as error:
-            logger.error(f"[Eve Voice Stream] Unhandled failure: {type(error).__name__}: {error}", exc_info=True)
-            q.put(f"data: {json.dumps({'type': 'error', 'detail': 'Voice stream failed unexpectedly.'})}\n\n")
-        finally:
-            q.put(_SENTINEL)
+    def _iter_events():
+        for event in stream_voice_reply(
+            database, user, last_message,
+            session_id=session_id, tts_provider=tts_provider, tts_voice=tts_voice,
+        ):
+            yield f"data: {json.dumps(event, default=str)}\n\n"
 
-    threading.Thread(target=_producer, daemon=True).start()
-
-    async def event_source():
-        while True:
-            try:
-                item = await asyncio.to_thread(q.get, timeout=0.1)
-            except queue.Empty:
-                await asyncio.sleep(0.02)
-                continue
-            except Exception:
-                break
-            if item is _SENTINEL:
-                break
-            yield item
-        yield "data: [DONE]\n\n"
-
-    return StreamingResponse(event_source(), media_type="text/event-stream", headers=SSE_HEADERS)
+    _run_producer_thread(_iter_events, loop, async_q)
+    return StreamingResponse(_consume_queue(async_q), media_type="text/event-stream", headers=SSE_HEADERS)

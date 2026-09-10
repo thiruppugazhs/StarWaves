@@ -1,10 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { getUiPreferences } from '../lib/uiPreferencesApi'
 import { useRouter } from './useRouter'
+import { UI_CACHE_KEY as CACHE_KEY } from '../lib/storageKeys'
 
 const GLOBAL_STYLE_ID = 'eve-ui-global'
 const PAGE_STYLE_PREFIX = 'eve-ui-page-'
-const CACHE_KEY = 'starwaves.ui.cache'
 
 function ensureStyleTag(id) {
   let el = document.getElementById(id)

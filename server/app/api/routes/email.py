@@ -1,12 +1,13 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from app.db import SqlClient, get_firestore
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from pydantic import BaseModel, EmailStr
 
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.errors import bad_gateway, bad_request, not_found
 from app.repositories.users import get_user_by_id, mark_email_verified
 from app.services.email import (
     EmailDeliveryError,
@@ -24,20 +25,14 @@ router = APIRouter(prefix="/email")
 
 def _ensure_email_sent(sent: bool, target_email: str, email_kind: str) -> None:
     if not sent:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Failed to send {email_kind} to {target_email}. Please check SMTP configuration and try again.",
-        )
+        raise bad_gateway(f"Failed to send {email_kind} to {target_email}. Please check SMTP configuration and try again.")
 
 
 def _deliver_email(send_func, target_email: str, email_kind: str, **kwargs) -> bool:
     try:
         return send_func(**kwargs)
     except EmailDeliveryError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Failed to send {email_kind} to {target_email}: {exc}",
-        ) from exc
+        raise bad_gateway(f"Failed to send {email_kind} to {target_email}: {exc}") from exc
 
 
 def email_token_serializer() -> URLSafeTimedSerializer:
@@ -87,10 +82,7 @@ def send_test_email(
 ):
     target_email = (payload.to_email if payload and payload.to_email else user.get("email")) or ""
     if not target_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No valid recipient email address specified.",
-        )
+        raise bad_request("No valid recipient email address specified.")
 
     user_name = user.get("name") or target_email.split("@")[0]
     subject = "StarWaves Mail Service Test"
@@ -125,10 +117,7 @@ def resend_welcome(
 ):
     target_email = user.get("email")
     if not target_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User does not have a valid email address.",
-        )
+        raise bad_request("User does not have a valid email address.")
     display_name = user.get("name") or target_email.split("@")[0]
 
     sent = _deliver_email(
@@ -148,10 +137,7 @@ def request_email_verification(
 ):
     target_email = user.get("email")
     if not target_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User does not have a valid email address.",
-        )
+        raise bad_request("User does not have a valid email address.")
     display_name = user.get("name") or target_email.split("@")[0]
 
     token = email_token_serializer().dumps({
@@ -180,29 +166,17 @@ def confirm_email_verification(
     try:
         data = email_token_serializer().loads(payload.token, max_age=86400)
     except SignatureExpired:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Verification token has expired. Please request a new verification email.",
-        ) from None
+        raise bad_request("Verification token has expired. Please request a new verification email.") from None
     except BadSignature:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid verification token.",
-        ) from None
+        raise bad_request("Invalid verification token.") from None
 
     if data.get("action") != "verify_email" or not data.get("uid"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid token payload.",
-        )
+        raise bad_request("Invalid token payload.")
 
     uid = data["uid"]
     success = mark_email_verified(database, uid)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User record not found.",
-        )
+        raise not_found("User record not found.")
 
     return {"message": "Email address verified successfully."}
 
@@ -214,10 +188,7 @@ def send_announcement(
 ):
     target_email = payload.to_email or user.get("email") or ""
     if not target_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Recipient email address is required.",
-        )
+        raise bad_request("Recipient email address is required.")
 
     display_name = user.get("name") or target_email.split("@")[0]
 
@@ -241,10 +212,7 @@ def send_reminder(
 ):
     target_email = payload.to_email or user.get("email") or ""
     if not target_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Recipient email address is required.",
-        )
+        raise bad_request("Recipient email address is required.")
 
     display_name = user.get("name") or target_email.split("@")[0]
 
@@ -276,10 +244,7 @@ def send_calendar_reminder_test(
 ):
     target_email = (payload.to_email if payload and payload.to_email else user.get("email")) or ""
     if not target_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Recipient email address is required.",
-        )
+        raise bad_request("Recipient email address is required.")
 
     display_name = user.get("name") or target_email.split("@")[0]
     window = payload.window if payload else "1h"

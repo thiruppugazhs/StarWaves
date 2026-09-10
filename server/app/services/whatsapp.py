@@ -14,6 +14,7 @@ from app.core.http import create_async_client
 from app.core.whatsapp_ws_manager import whatsapp_ws_manager
 from app.repositories import whatsapp as whatsapp_repo
 from app.schemas.whatsapp import (
+    WhatsAppChatListResponse,
     WhatsAppChatResponse,
     WhatsAppMediaAttachment,
     WhatsAppMessageCreate,
@@ -163,7 +164,7 @@ class WhatsAppService:
 
     @staticmethod
     def _ensure_eve_chat(database: SqlClient, user_id: str):
-        chats = whatsapp_repo.list_whatsapp_chats(database, user_id)
+        chats, _, _ = whatsapp_repo.list_whatsapp_chats(database, user_id, limit=20)
         eve_exists = any(c.id == "eve" or c.is_eve for c in chats)
         if not eve_exists:
             whatsapp_repo.upsert_whatsapp_chat(
@@ -205,15 +206,11 @@ class WhatsAppService:
         return {"status": "disconnected"}
 
     @staticmethod
-    async def list_chats(database: SqlClient, user_id: str) -> List[WhatsAppChatResponse]:
-        import asyncio
-        # Fast query from database first — offload to thread
-        chats = await asyncio.to_thread(whatsapp_repo.list_whatsapp_chats, database, user_id)
+    async def _sync_worker_chats_background(database: SqlClient, user_id: str):
 
-        # Sync chats from worker BEFORE returning — ensures pagination/chat list reflects all new chats
         try:
             worker_url = settings.whatsapp_gateway_url
-            async with create_async_client(timeout=httpx.Timeout(1.2, connect=0.8)) as client:
+            async with create_async_client(timeout=httpx.Timeout(1.5, connect=0.8)) as client:
                 resp = await client.get(f"{worker_url}/session/chats/{user_id}")
                 if resp.is_success:
                     worker_chats = resp.json().get("chats") or []
@@ -245,15 +242,43 @@ class WhatsAppService:
                                 last_message=last_msg_data,
                             )
                         )
-                    chats = await asyncio.to_thread(whatsapp_repo.list_whatsapp_chats, database, user_id)
         except Exception:
             pass
 
-        if not any(c.id == "eve" for c in chats):
-            await asyncio.to_thread(WhatsAppService._ensure_eve_chat, database, user_id)
-            chats = await asyncio.to_thread(whatsapp_repo.list_whatsapp_chats, database, user_id)
+    @staticmethod
+    async def list_chats(
+        database: SqlClient,
+        user_id: str,
+        limit: int = 30,
+        cursor: Optional[str] = None,
+    ) -> WhatsAppChatListResponse:
+        import asyncio
 
-        # Sort chats:
+        # Fast query from database
+        chats, next_cursor, has_more = await asyncio.to_thread(
+            whatsapp_repo.list_whatsapp_chats,
+            database,
+            user_id,
+            limit=limit,
+            cursor=cursor,
+        )
+
+        # On initial page without cursor, ensure Eve chat exists
+        if not cursor and not any(c.id == "eve" for c in chats):
+            await asyncio.to_thread(WhatsAppService._ensure_eve_chat, database, user_id)
+            chats, next_cursor, has_more = await asyncio.to_thread(
+                whatsapp_repo.list_whatsapp_chats,
+                database,
+                user_id,
+                limit=limit,
+                cursor=cursor,
+            )
+
+        # If on first page, fire background sync from worker non-blockingly
+        if not cursor:
+            asyncio.create_task(WhatsAppService._sync_worker_chats_background(database, user_id))
+
+        # Sort chats for page view:
         # 1. Pinned or Eve first
         # 2. Chats with real messages by last_message.timestamp descending
         # 3. Remaining contacts by name
@@ -271,7 +296,8 @@ class WhatsAppService:
             return (is_pinned, has_message, ts)
 
         chats.sort(key=get_chat_sort_key, reverse=True)
-        return chats
+        return WhatsAppChatListResponse(items=chats, next_cursor=next_cursor, has_more=has_more)
+
 
     @staticmethod
     async def get_messages(
