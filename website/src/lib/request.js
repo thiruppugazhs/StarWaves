@@ -254,7 +254,13 @@ export async function apiRequest(
           window.dispatchEvent(new CustomEvent('starwaves:session-revoked'))
         } catch {}
       }
-      const detailMessage = formatErrorDetail(failure?.detail, errorMessage)
+      const errorPayload = failure?.detail || failure?.message || failure?.error || (
+        response.status === 502 ? 'Backend server is temporarily unreachable (502 Bad Gateway). Please ensure the backend containers are running.' :
+        response.status === 504 ? 'Gateway timeout (504). The server took too long to respond.' :
+        response.status === 503 ? 'Service temporarily unavailable (503). Please try again shortly.' :
+        null
+      )
+      const detailMessage = formatErrorDetail(errorPayload, errorMessage)
       throw Object.assign(new Error(detailMessage), { status: response.status, detail: failure?.detail })
     }
     if (response.status === 204) return null

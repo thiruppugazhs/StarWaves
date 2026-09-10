@@ -28,6 +28,9 @@ def main():
     env_path.write_text(env_content, encoding="utf-8")
     print(f"[OK] Created {env_path}")
 
+    if sa_path.exists() and sa_path.is_dir():
+        import shutil
+        shutil.rmtree(sa_path)
     sa_path.write_text(sa_content, encoding="utf-8")
     print(f"[OK] Created {sa_path}")
 

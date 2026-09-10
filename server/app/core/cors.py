@@ -5,12 +5,14 @@ from app.core.config import settings
 
 ALLOWED_ORIGIN_REGEX = (
     r"^https?://(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$"
+    r"|^https?://(\d{1,3}\.){3}\d{1,3}(:\d+)?$"
     r"|^capacitor://localhost$"
     r"|^tauri://localhost$"
     r"|^https://tauri\.localhost$"
     r"|^com\.starwaves\.app://.*$"
     r"|^app\.starwaves\.workspace://.*$"
     r"|^https://([a-zA-Z0-9-]+\.)*susindran\.in$"
+    r"|^https://([a-zA-Z0-9-]+\.)*thiruppugazhs\.in$"
     r"|^https://([a-zA-Z0-9-]+\.)*vercel\.app$"
 )
 
